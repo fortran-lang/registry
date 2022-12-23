@@ -23,7 +23,7 @@ def index():
 
 @app.route('/login', methods=['GET'])
 def render_main():
-   return render_template("login.html")
+   return render_template('login.html')
 
 
 @app.errorhandler(404)
