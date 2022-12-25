@@ -37,6 +37,7 @@ def login():
             password = request.form.get("password")
             hashed_password = hashlib.sha256(password.encode()).hexdigest()
             user = db.users.find_one({"email": email, "password": hashed_password})
+            uuid = generate_uuid()
         else:
             user = db.users.find_one({"uuid": uuid})
 
@@ -47,7 +48,7 @@ def login():
             {"_id": user["_id"]}, {"$set": {"loginAt": datetime.utcnow()}}
         )
 
-        db.users.update_one({"_id": user["_id"]}, {"$set": {"uuid": generate_uuid()}})
+        db.users.update_one({"_id": user["_id"]}, {"$set": {"uuid": uuid}})
 
         response = make_response("Login successful")
         response.set_cookie("uuid", uuid)
@@ -66,6 +67,7 @@ def signup():
             password = request.form.get("password")
             hashed_password = hashlib.sha256(password.encode()).hexdigest()
             user = db.users.find_one({"email": email})
+            uuid = generate_uuid()
         else:
             user = db.users.find_one({"uuid": uuid})
 
@@ -81,14 +83,13 @@ def signup():
             "uuid": "",
         }
         db.users.insert_one(user)
-        db.users.update_one({"_id": user["_id"]}, {"$set": {"uuid": generate_uuid()}})
+        db.users.update_one({"_id": user["_id"]}, {"$set": {"uuid": uuid}})
 
         response = make_response("Signup successful")
         response.set_cookie("uuid", uuid)
         return response
     else:
         return render_template("login.html")
-
 
 @app.route("/logout", methods=["POST"])
 def logout():
