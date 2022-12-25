@@ -2,7 +2,7 @@ import os
 import hashlib
 from flask import Flask
 from flask import render_template
-from flask import request, make_response, jsonify
+from flask import request, make_response, jsonify, send_from_directory
 from datetime import datetime
 from pymongo import MongoClient
 import re
@@ -243,6 +243,22 @@ def search_packages(query):
     )
 
     return jsonify([package for package in packages])
+# Route that will handle response for a particular package.
+@app.route('/package/<package_id>', methods=["GET"])
+def get_package_from_id(package_id):
+
+    # Check if the package exists in database.
+    package = db.packages.find_one({"_id": package_id})
+
+    # Package does not exists in database.
+    if not package:
+        return jsonify({"message": "Package not found", "code": 404})
+    else:
+        test_directory = os.path.dirname(__file__)
+        try:
+            return send_from_directory(test_directory, path="Flask-2.2.2.tar.gz", as_attachment=True)
+        except FileNotFoundError:
+            return "File not found"
 
 @app.errorhandler(404)
 def page_not_found(e):
