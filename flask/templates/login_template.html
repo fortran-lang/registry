@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.min.js"
+      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+      integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/holder/2.9.6/holder.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
+      integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <style>
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-align: center;
+        align-items: center;
+        padding-top: 40px;
+        padding-bottom: 40px;
+        background-color: #f5f5f5;
+      }
+
+      .form-signin {
+        width: 100%;
+        max-width: 420px;
+        padding: 15px;
+        margin: auto;
+      }
+
+      .form-label-group {
+        position: relative;
+        margin-bottom: 1rem;
+      }
+
+      .form-label-group > input,
+      .form-label-group > label {
+        height: 3.125rem;
+        padding: 0.75rem;
+      }
+
+      .form-label-group > label {
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: block;
+        width: 100%;
+        margin-bottom: 0; /* Override default `<label>` margin */
+        line-height: 1.5;
+        color: #495057;
+        pointer-events: none;
+        cursor: text; /* Match the input under the label */
+        border: 1px solid transparent;
+        border-radius: 0.25rem;
+        transition: all 0.1s ease-in-out;
+      }
+
+      .form-label-group input::-webkit-input-placeholder {
+        color: transparent;
+      }
+
+      .form-label-group input:-ms-input-placeholder {
+        color: transparent;
+      }
+
+      .form-label-group input::-ms-input-placeholder {
+        color: transparent;
+      }
+
+      .form-label-group input::-moz-placeholder {
+        color: transparent;
+      }
+
+      .form-label-group input::placeholder {
+        color: transparent;
+      }
+
+      .form-label-group input:not(:placeholder-shown) {
+        padding-top: 1.25rem;
+        padding-bottom: 0.25rem;
+      }
+
+      .form-label-group input:not(:placeholder-shown) ~ label {
+        padding-top: 0.25rem;
+        padding-bottom: 0.25rem;
+        font-size: 12px;
+        color: #777;
+      }
+
+      /* Fallback for Edge
+-------------------------------------------------- */
+      @supports (-ms-ime-align: auto) {
+        .form-label-group > label {
+          display: none;
+        }
+        .form-label-group input::-ms-input-placeholder {
+          color: #777;
+        }
+      }
+
+      /* Fallback for IE
+-------------------------------------------------- */
+      @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+        .form-label-group > label {
+          display: none;
+        }
+        .form-label-group input:-ms-input-placeholder {
+          color: #777;
+        }
+      }
+    </style>
+   
+    <form class="form-signin" id="actionForm" name="actionForm" method="POST" action="/signup">
+      <div class="text-center mb-4">
+        <img
+          class="mb-4"
+          src="https://fortran-lang.org/en/_static/fortran-logo-256x256.png"
+          alt=""
+          width="72"
+          height="72"
+        />
+        <h1 class="h3 mb-3 font-weight-normal">Log in to FPM Registry</h1>
+        <p>
+          random text
+        </p>
+      </div>
+
+      <div class="form-label-group">
+        <input
+          type="email"
+          id="inputEmail"
+          class="form-control"
+          placeholder="Email address"
+          required
+          autofocus
+        />
+        <label for="inputEmail">Email address</label>
+      </div>
+
+      <div class="form-label-group">
+        <input
+          type="password"
+          id="inputPassword"
+          class="form-control"
+          placeholder="Password"
+          required
+        />
+        <label for="inputPassword">Password</label>
+      </div>
+
+      <a href="" >Forgot Password</a><br><br>
+      <button class="btn btn-lg btn-primary btn-block" type="submit">
+        Sign in
+      </button>
+    </form>
+  </body>
+</html>
