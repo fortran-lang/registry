@@ -80,16 +80,15 @@ def signup():
             "password": hashed_password,
             "lastLogin": datetime.utcnow(),
             "createdAt": datetime.utcnow(),
-            "uuid": "",
+            "uuid": uuid,
         }
         db.users.insert_one(user)
-        db.users.update_one({"_id": user["_id"]}, {"$set": {"uuid": uuid}})
 
         response = make_response("Signup successful")
         response.set_cookie("uuid", uuid)
         return response
     else:
-        return render_template("login.html")
+        return render_template("signup.html")
 
 @app.route("/logout", methods=["POST"])
 def logout():
