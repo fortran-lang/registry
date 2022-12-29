@@ -1,4 +1,4 @@
 pymongo
 flask
 python-dateutil
-uuid
+python-dotenv
