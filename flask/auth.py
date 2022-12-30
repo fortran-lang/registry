@@ -1,10 +1,19 @@
-import hashlib
+import os
+from dotenv import load_dotenv
 from flask import render_template
 from flask import request, make_response, jsonify
 from datetime import datetime
 from uuid import uuid4
 from app import app
 from mongo import db
+import bcrypt
+
+load_dotenv()
+
+try:
+    salt = os.getenv("SALT")
+except KeyError as err:
+    print("Add SALT to .env file")
 
 
 def generate_uuid():
@@ -23,7 +32,7 @@ def login():
         if not uuid:
             email = request.form.get("email")
             password = request.form.get("password")
-            hashed_password = hashlib.sha256(password.encode()).hexdigest()
+            hashed_password = bcrypt.hashpw(password, salt)
             user = db.users.find_one({"email": email, "password": hashed_password})
             uuid = generate_uuid()
         else:
@@ -53,7 +62,7 @@ def signup():
             name = request.form.get("name")
             email = request.form.get("email")
             password = request.form.get("password")
-            hashed_password = hashlib.sha256(password.encode()).hexdigest()
+            hashed_password = bcrypt.hashpw(password, salt)
             user = db.users.find_one({"email": email})
             uuid = generate_uuid()
         else:
@@ -108,7 +117,7 @@ def forgotpassword():
     if not user:
         return jsonify({"message": "User not found", "code": 404})
 
-    hashed_password = hashlib.sha256(password.encode()).hexdigest()
+    hashed_password = bcrypt.hashpw(password, salt)
     db.users.update_one({"_id": user["_id"]}, {"$set": {"password": hashed_password}})
     db.users.update_one({"_id": user["_id"]}, {"$set": {"uuid": ""}})
     response = make_response("Password reset successful")
