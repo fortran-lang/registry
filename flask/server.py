@@ -3,7 +3,7 @@ from flask import render_template
 from app import app
 from mongo import db
 import auth
-
+import user
 
 @app.route("/")
 def index():

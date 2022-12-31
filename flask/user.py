@@ -5,7 +5,7 @@ from flask import request, make_response, jsonify
 from datetime import datetime
 from auth import generate_uuid
 
-@app.route("/<username>/", methods=["GET"])
+@app.route("/users/<username>/", methods=["GET"])
 def profile(username):
     uuid = request.cookies.get("uuid")
     if not uuid:
@@ -25,8 +25,22 @@ def profile(username):
         "profile.html", user=user, packages=[package for package in packages]
     )
 
+@app.route('/packages', methods=["GET"])
+def create_packages():
+    query = request.args.get('query')
+    packages = db.packages.find(
+        {
+            "$or": [
+                {"name": {"$regex": query}},
+                {"tags": {"$in": [query]}},
+                {"description": {"$regex": query}},
+            ]
+        }
+    )
 
-@app.route("/<username>/upload", methods=["GET", "POST"])
+    return jsonify([package for package in packages])
+
+@app.route("/packages", methods=["POST"])
 def upload(username):
     uuid = request.cookies.get("uuid")
     if not uuid:
@@ -98,17 +112,3 @@ def upload(username):
     else:
         return render_template("upload.html")
 
-
-@app.route("/search/<query>", methods=["GET"])
-def search_packages(query):
-    packages = db.packages.find(
-        {
-            "$or": [
-                {"name": {"$regex": query}},
-                {"tags": {"$in": [query]}},
-                {"description": {"$regex": query}},
-            ]
-        }
-    )
-
-    return jsonify([package for package in packages])
