@@ -28,7 +28,7 @@ def profile(username):
     #     "profile.html", user=user, packages=[package for package in packages]
     # )
 
-@app.route("users/<username>/<package_name>/delete", methods=["GET", "POST"])
+@app.route("/users/<username>/<package_name>/delete", methods=["GET", "POST"])
 def delete_package(username, package_name):
     uuid = request.cookies.get("uuid")
     if not uuid:
