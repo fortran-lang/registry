@@ -21,7 +21,7 @@ def search_packages():
     return jsonify([package for package in packages])
 
 @app.route("/packages", methods=["POST"])
-def upload(username):
+def upload():
     uuid = request.cookies.get("uuid")
     if not uuid:
         return render_template("login.html")
