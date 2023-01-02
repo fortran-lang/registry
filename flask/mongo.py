@@ -8,6 +8,6 @@ try:
     mongo_uri = os.getenv("MONGO_URI")
     client = MongoClient(mongo_uri)
 except KeyError as err:
-    client = MongoClient("mongo:27017")
+    print("Add MONGO_URI to .env file")
 
 db = client.fpmregistry

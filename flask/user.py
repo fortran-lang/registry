@@ -26,7 +26,7 @@ def profile(username):
     )
 
 @app.route('/packages', methods=["GET"])
-def create_packages():
+def search_packages():
     query = request.args.get('query')
     packages = db.packages.find(
         {
@@ -108,7 +108,4 @@ def upload(username):
         db.users.update_one({"_id": user["_id"]}, {"$set": user})
 
         return jsonify({"message": "Package Uploaded Successfully.", "code": 200})
-
-    else:
-        return render_template("upload.html")
 
