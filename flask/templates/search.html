@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title> fpm - registry Search Packages</title>
+    <style>
+      body {
+        font-family: sans-serif;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      form {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+      }
+      input[type="text"] {
+        width: 60%;
+        padding: 12px 20px;
+        margin: 8px 0;
+        box-sizing: border-box;
+        border: 2px solid #ccc;
+        border-radius: 4px;
+      }
+      button[type="submit"] {
+        width: 20%;
+        background-color: #4caf50;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      button[type="submit"]:hover {
+        background-color: #45a049;
+      }
+      .result {
+        margin-bottom: 20px;
+      }
+      .result h2 {
+        margin: 0;
+        font-size: 18px;
+      }
+      .result p {
+        margin: 10px 0;
+        font-size: 14px;
+      }
+      .loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 300px;
+      }
+      .loading img {
+        width: 50px;
+        height: 50px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>fpm-registry Package Search</h1>
+      <form>
+        <input
+          type="text"
+          id="query"
+          name="query"
+          placeholder="Enter your search query"
+        />
+        <button type="submit">Search</button>
+      </form>
+      <div id="results"></div>
+    </div>
+    <script>
+      const form = document.querySelector("form");
+      const resultsContainer = document.querySelector("#results");
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const query = document.querySelector("#query").value;
+        const url = `/packages?query=${encodeURIComponent(
+          query
+        )}`;
+
+        resultsContainer.innerHTML = `
+          <div class="loading">
+            <img src="https://media.tenor.com/DPEfCqnChk0AAAAi/loading-slow-net.gif" alt="Loading">
+          </div>
+        `;
+
+        fetch(url)
+          .then((response) => response.json())
+          .then((data) => {
+            resultsContainer.innerHTML = "";
+            data.forEach((item) => {
+              const div = document.createElement("div");
+              div.classList.add("result");
+              div.innerHTML = `<h2>${item.name}</h2><p>${item.description}</p>`;
+              resultsContainer.appendChild(div);
+            });
+          });
+      });
+    </script>
+  </body>
+</html>

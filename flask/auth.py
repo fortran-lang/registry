@@ -33,7 +33,7 @@ def login():
             email = request.form.get("email")
             password = request.form.get("password")
             password+=salt
-            hashed_password = str(hashlib.md5(password.encode()))
+            hashed_password = hashlib.sha256(password.encode()).hexdigest()
             user = db.users.find_one({"email": email, "password": hashed_password})
             uuid = generate_uuid()
         else:
@@ -59,18 +59,16 @@ def login():
 def signup():
     if request.method == "POST":
         uuid = request.cookies.get("uuid")
-        if not uuid:
+        user = db.users.find_one({"uuid": uuid})
+        if not user:
             name = request.form.get("name")
             email = request.form.get("email")
             password = request.form.get("password")
             password+=salt
-            hashed_password = str(hashlib.md5(password.encode()))
+            hashed_password = hashlib.sha256(password.encode()).hexdigest()
             user = db.users.find_one({"email": email})
             uuid = generate_uuid()
         else:
-            user = db.users.find_one({"uuid": uuid})
-
-        if user:
             return "A user with this email already exists", 400
 
         user = {
@@ -111,35 +109,41 @@ def logout():
     return response
 
 
-@app.route("/auth/forgot-password", methods=["POST"])
+@app.route("/auth/forgot-password", methods=["POST", "GET"])
 def forgotpassword():
-    password = request.form.get("password")
-    uuid = request.form.get("uuid")
-    user = db.users.find_one({"uuid": uuid})
-    if not user:
-        return jsonify({"message": "User not found", "code": 404})
-
-    password+=salt
-    hashed_password = str(hashlib.md5(password.encode()))
-    db.users.update_one({"_id": user["_id"]}, {"$set": {"password": hashed_password}})
-    db.users.update_one({"_id": user["_id"]}, {"$set": {"uuid": ""}})
-    response = make_response("Password reset successful")
-    response.set_cookie("uuid", "", expires=0)
-    return response
-
-
-@app.route("/auth/reset-password", methods=["POST"])
-def reset_password():
     if request.method == "POST":
-        email = request.form["email"]
-        user = db.users.find_one({"email": email})
+        password = request.form.get("password")
+        uuid = request.cookies.get("uuid")
+        user = db.users.find_one({"uuid": uuid})
         if not user:
             return jsonify({"message": "User not found", "code": 404})
 
-        db.users.update_one({"_id": user["_id"]}, {"$set": {"uuid": generate_uuid()}})
+        password+=salt
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
+        db.users.update_one({"uuid": uuid}, {"$set": {"password": hashed_password,"uuid": ""}})
+        response = make_response("Password reset successful")
+        response.set_cookie("uuid", "", expires=0)
+        return response
+    if request.method == "GET":
+        return render_template("change-password.html")
 
-        # send the link in the email
+
+@app.route("/auth/reset-password", methods=["POST", "GET"])
+def reset_password():
+    if request.method == "POST":
+        email = request.form.get("email")
+        user = db.users.find({"email": email})
+        if not user:
+            return jsonify({"message": "User not found", "code": 404})
+
+        uuid = generate_uuid()
+        db.users.update_one({"email": email}, {"$set": {"uuid": uuid}})
+
+        # send the uuid link in the email
 
         return jsonify(
             {"message": "Password reset link sent to your email", "code": 200}
         )
+    if request.method == "GET":
+        return render_template("reset-password.html")
+

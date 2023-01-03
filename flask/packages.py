@@ -5,50 +5,63 @@ from flask import request, make_response, jsonify
 from datetime import datetime
 from auth import generate_uuid
 
-@app.route('/packages', methods=["GET"])
-def search_packages():
+@app.route('/packages/<package_name>', methods=["GET"])
+def search_packages(package_name):
     query = request.args.get('query')
-    packages = db.packages.find(
-        {
-            "$or": [
-                {"name": {"$regex": query}},
-                {"tags": {"$in": [query]}},
-                {"description": {"$regex": query}},
-            ]
-        }
-    )
+    if query:
+        query = query.lower()
+        packages = db.packages.find(
+            {
+                "$or": [
+                    {"name": {"$regex": query}},
+                    {"tags": {"$in": [query]}},
+                    {"description": {"$regex": query}},
+                ]
+            }
+        )
 
-    return jsonify([package for package in packages])
+        return jsonify([package for package in packages])
+
+    if package_name:
+        packages = db.packages.find_one({"name": package_name})
+        del packages['_id'] , packages['author'] , packages['maintainers']
+        return packages
 
 @app.route("/packages", methods=["POST"])
 def upload():
     uuid = request.cookies.get("uuid")
     if not uuid:
-        return render_template("login.html")
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
 
     user = db.users.find_one({"uuid": uuid})
 
-    if not user or user["name"] != username:
-        return render_template("login.html")
+    if not user:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
 
     if request.method == "POST":
         name = request.form.get("name")
         namespace = request.form.get("namespace")
-        tarball = request.form.get("tarball")
+        tarball  = request.files['tarball']
         version = request.form.get("version")
         license = request.form.get("license")
         copyright = request.form.get("copyright")
         description = request.form.get("description")
         namespace_description = request.form.get("namespace_description")
-        tags = request.form.get("tags").split(",")
-        dependencies = request.form.get("dependencies").trim().split(",")
-        for dependency in dependencies:
-            dependencies_id = []
-            if dependency == "":
-                dependencies.remove(dependency)
-            resp = db.packages.find_one({"name": dependency})
-            if resp:
-                dependencies_id.append(resp["_id"])
+        tags = request.form.get("tags").strip().split(",")
+        dependencies = request.form.get("dependencies").strip().split(",")
+        # for dependency in dependencies:
+        #     dependencies_id = []
+        #     if dependency == "":
+        #         dependencies.remove(dependency)
+        #     resp = db.packages.find_one({"name": dependency})
+        #     if resp:
+        #         dependencies_id.append(resp["_id"])
+        
+        package = db.packages.find_one({"name": name, "version": version})
+        if package is not None:
+            return jsonify({"status": "error", "message": "Package already exists"}), 400
+        
+        # tarball.save("{}-{}.tar.gz".format(name, version))
 
         package = {
             "name": name,
@@ -84,7 +97,7 @@ def upload():
             }
             db.namespaces.insert_one(namespace_doc)
 
-        user["authorOf"].append(package["_id"])
+        # user["authorOf"].append(package["_id"])
         db.users.update_one({"_id": user["_id"]}, {"$set": user})
 
         return jsonify({"message": "Package Uploaded Successfully.", "code": 200})

@@ -4,10 +4,11 @@ from app import app
 from mongo import db
 import auth
 import user
+import packages
 
 @app.route("/")
 def index():
-    return render_template("login.html")
+    return render_template("create.html")
 
 
 @app.errorhandler(404)
