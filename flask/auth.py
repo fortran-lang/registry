@@ -6,7 +6,7 @@ from datetime import datetime
 from uuid import uuid4
 from app import app
 from mongo import db
-import bcrypt
+import hashlib
 
 load_dotenv()
 
@@ -32,7 +32,8 @@ def login():
         if not uuid:
             email = request.form.get("email")
             password = request.form.get("password")
-            hashed_password = bcrypt.hashpw(password, salt)
+            password+=salt
+            hashed_password = str(hashlib.md5(password.encode()))
             user = db.users.find_one({"email": email, "password": hashed_password})
             uuid = generate_uuid()
         else:
@@ -62,7 +63,8 @@ def signup():
             name = request.form.get("name")
             email = request.form.get("email")
             password = request.form.get("password")
-            hashed_password = bcrypt.hashpw(password, salt)
+            password+=salt
+            hashed_password = str(hashlib.md5(password.encode()))
             user = db.users.find_one({"email": email})
             uuid = generate_uuid()
         else:
@@ -117,7 +119,8 @@ def forgotpassword():
     if not user:
         return jsonify({"message": "User not found", "code": 404})
 
-    hashed_password = bcrypt.hashpw(password, salt)
+    password+=salt
+    hashed_password = str(hashlib.md5(password.encode()))
     db.users.update_one({"_id": user["_id"]}, {"$set": {"password": hashed_password}})
     db.users.update_one({"_id": user["_id"]}, {"$set": {"uuid": ""}})
     response = make_response("Password reset successful")
