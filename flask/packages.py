@@ -9,7 +9,7 @@ from auth import generate_uuid
 def search_packages(package_name):
     query = request.args.get('query')
     if query:
-        query = query.lower()
+        query = query.lower().strip()
         packages = db.packages.find(
             {
                 "$or": [
@@ -19,13 +19,26 @@ def search_packages(package_name):
                 ]
             }
         )
-
-        return jsonify([package for package in packages])
+        package = []
+        maintainers =[]
+        if packages:
+            for i in packages:
+                for maintainer in i['maintainers']:
+                    name = db.users.find_one({"_id": maintainer})
+                    maintainers.append(name['name'])
+                i['maintainers'] = list(set(maintainers))
+                package.append(i)
+                del i['_id'] , i['author']
+            return jsonify(package)
 
     if package_name:
-        packages = db.packages.find_one({"name": package_name})
-        del packages['_id'] , packages['author'] , packages['maintainers']
-        return packages
+        package = db.packages.find_one({"name": package_name})
+        if package:
+            del package['_id'] , package['author'] , package['maintainers']
+            return package
+        else:
+            return jsonify({"status": "error", "message": "Package not found"}), 404
+
 
 @app.route("/packages", methods=["POST"])
 def upload():
@@ -49,24 +62,23 @@ def upload():
         namespace_description = request.form.get("namespace_description")
         tags = request.form.get("tags").strip().split(",")
         dependencies = request.form.get("dependencies").strip().split(",")
-        # for dependency in dependencies:
+        # for dependency in list(set(dependencies)):
         #     dependencies_id = []
-        #     if dependency == "":
-        #         dependencies.remove(dependency)
         #     resp = db.packages.find_one({"name": dependency})
         #     if resp:
         #         dependencies_id.append(resp["_id"])
-        
+
         package = db.packages.find_one({"name": name, "version": version})
         if package is not None:
             return jsonify({"status": "error", "message": "Package already exists"}), 400
         
-        # tarball.save("{}-{}.tar.gz".format(name, version))
+        tarball_name = "{}-{}.tar.gz".format(name, version)
+        tarball.save(tarball_name)
 
         package = {
             "name": name,
             "namespace": namespace,
-            "tarball": tarball,
+            "tarball": tarball_name,
             "version": version,
             "license": license,
             "createdAt": datetime.utcnow(),
@@ -74,7 +86,7 @@ def upload():
             "maintainers": [user["_id"]],
             "copyright": copyright,
             "description": description,
-            "tags": tags,
+            "tags": list(set(tags)),
             "dependencies": dependencies,
         }
         db.packages.insert_one(package)
