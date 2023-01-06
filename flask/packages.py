@@ -128,4 +128,4 @@ def get_package(namespace_name, package_name):
     else: 
         # Get the .tar file from online storage and add it to response.
         response = json.dumps(package, default=str)
-        return response
+        return jsonify({"data": response, "code": 200})
