@@ -4,6 +4,7 @@ from flask import render_template
 from flask import request, make_response, jsonify
 from datetime import datetime
 from auth import generate_uuid
+import json
 
 @app.route('/packages/<package_name>', methods=["GET"])
 def search_packages(package_name):
@@ -114,3 +115,17 @@ def upload():
 
         return jsonify({"message": "Package Uploaded Successfully.", "code": 200})
 
+
+@app.route("/packages/<namespace_name>/<package_name>", methods=["GET"])
+def get_package(namespace_name, package_name):
+    # Get package from a package and namespace_name
+    package = db.packages.find_one({"name": package_name, "namespace": namespace_name})
+
+    # Check if package is found.
+    if not package:
+        return jsonify({"message": "Package not found", "code": 404})
+
+    else: 
+        # Get the .tar file from online storage and add it to response.
+        response = json.dumps(package, default=str)
+        return response
