@@ -118,7 +118,7 @@ def upload():
 
 @app.route("/packages/<namespace_name>/<package_name>", methods=["GET"])
 def get_package(namespace_name, package_name):
-    # Get package from a package and namespace_name
+    # Get package from a package_name and namespace_name.
     package = db.packages.find_one({"name": package_name, "namespace": namespace_name})
 
     # Check if package is found.
@@ -126,6 +126,20 @@ def get_package(namespace_name, package_name):
         return jsonify({"message": "Package not found", "code": 404})
 
     else: 
+        # Get the .tar file from online storage and add it to response.
+        response = json.dumps(package, default=str)
+        return jsonify({"data": response, "code": 200})
+
+@app.route("/packages/<namespace_name>/<package_name>/<version>", methods=["GET"])
+def get_package_from_version(namespace_name, package_name, version):
+    # Get package from a package_name, namespace_name and version.
+    package = db.packages.find_one({"name": package_name, "namespace": namespace_name, "version": version})
+
+    # Check if package is found.
+    if not package:
+        return jsonify({"message": "Package not found", "code": 404})
+
+    else:
         # Get the .tar file from online storage and add it to response.
         response = json.dumps(package, default=str)
         return jsonify({"data": response, "code": 200})
