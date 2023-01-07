@@ -156,3 +156,32 @@ def update_package(namespace, package_name):
         return jsonify({"message": "Package Updated Successfully.", "code": 200})
     else:
         return jsonify({"status": "error", "message": "Invalid Request"}), 500
+@app.route("/packages/<username>/<namespace_name>/<package_name>/delete", methods=["GET", "POST"])
+def delete_package(username, namespace_name, package_name):
+    uuid = request.cookies.get("uuid")
+    if not uuid:
+        return render_template("login.html")
+
+    user = db.users.find_one({"uuid": uuid})
+
+    # If user is null or username does not matches with the username in the route.
+    if not user or user["name"] != username:
+        return render_template("login.html")
+
+    # Find package using package_name and namespace_name.
+    package = db.packages.find_one({"name": package_name, "namespace": namespace_name})
+
+    # If package is not found related to the package_id. Return 404.
+    if not package:
+        return jsonify({"message": "Package not found", "code": 404})
+
+    # Check if the user is authorized to delete the package.
+    if user["_id"] != package["author"] and user["_id"] not in package["maintainers"]:
+        return jsonify({"message": "User is not authorized to delete the package", "code": 401})
+
+    package_deleted = db.packages.delete_one({"name": package_name, "namespace": namespace_name})
+
+    if package_deleted.deleted_count > 0:
+        return jsonify({"message": "Package deleted successfully", "code": 200})
+    else:
+        return jsonify({"message": "Package not found", "code": 404})
