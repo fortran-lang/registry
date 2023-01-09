@@ -114,3 +114,57 @@ def upload():
 
         return jsonify({"message": "Package Uploaded Successfully.", "code": 200})
 
+@app.route("/packages/<package_name>", methods=["PUT"])
+def update_package():
+    uuid = request.cookies.get("uuid")
+    if not uuid:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
+
+    user = db.users.find_one({"uuid": uuid})
+
+    if not user:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
+
+    if request.method == "PUT":
+        name = request.form.get("name")
+        namespace = request.form.get("namespace")
+        tarball  = request.files['tarball']
+        version = request.form.get("version")
+        license = request.form.get("license")
+        copyright = request.form.get("copyright")
+        description = request.form.get("description")
+        namespace_description = request.form.get("namespace_description")
+        tags = request.form.get("tags").strip().split(",")
+        dependencies = request.form.get("dependencies").strip().split(",")
+        # for dependency in list(set(dependencies)):
+        #     dependencies_id = []
+        #     resp = db.packages.find_one({"name": dependency})
+        #     if resp:
+        #         dependencies_id.append(resp["_id"])
+
+        package = db.packages.find_one({"name": name, "version": version})
+        if package is not None:
+            return jsonify({"status": "error", "message": "Package already exists"}), 400
+        
+        tarball_name = "{}-{}.tar.gz".format(name, version)
+        tarball.save(tarball_name)
+
+        package = {
+            "name": name,
+            "namespace": namespace,
+            "tarball": tarball_name,
+            "version": version,
+            "license": license,
+            "createdAt": datetime.utcnow(),
+            "author": user["_id"],
+            "maintainers": [user["_id"]],
+            "copyright": copyright,
+            "description": description,
+            "tags": list(set(tags)),
+            "dependencies": dependencies,
+        }
+        db.packages.insert_one(package)
+        db.users.update_one({"_id": user["_id"]}, {"$set": user})
+
+        return jsonify({"message": "Package Updated Successfully.", "code": 200})
+

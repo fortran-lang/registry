@@ -25,34 +25,31 @@ def generate_uuid():
     return uuid
 
 
-@app.route("/auth/login", methods=["GET", "POST"])
+@app.route("/auth/login", methods=["POST"])
 def login():
-    if request.method == "POST":
-        uuid = request.cookies.get("uuid")
-        if not uuid:
-            email = request.form.get("email")
-            password = request.form.get("password")
-            password+=salt
-            hashed_password = hashlib.sha256(password.encode()).hexdigest()
-            user = db.users.find_one({"email": email, "password": hashed_password})
-            uuid = generate_uuid()
-        else:
-            user = db.users.find_one({"uuid": uuid})
-
-        if not user:
-            return "Invalid email or password", 401
-
-        db.users.update_one(
-            {"_id": user["_id"]}, {"$set": {"loginAt": datetime.utcnow()}}
-        )
-
-        db.users.update_one({"_id": user["_id"]}, {"$set": {"uuid": uuid}})
-
-        response = make_response("Login successful")
-        response.set_cookie("uuid", uuid)
-        return response
+    uuid = request.cookies.get("uuid")
+    if not uuid:
+        email = request.form.get("email")
+        password = request.form.get("password")
+        password+=salt
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
+        user = db.users.find_one({"email": email, "password": hashed_password})
+        uuid = generate_uuid()
     else:
-        return render_template("login.html")
+        user = db.users.find_one({"uuid": uuid})
+
+    if not user:
+        return "Invalid email or password", 401
+
+    db.users.update_one(
+        {"_id": user["_id"]}, {"$set": {"loginAt": datetime.utcnow()}}
+    )
+
+    db.users.update_one({"_id": user["_id"]}, {"$set": {"uuid": uuid}})
+
+    response = make_response("Login successful")
+    response.set_cookie("uuid", uuid)
+    return response
 
 
 @app.route("/auth/signup", methods=["GET", "POST"])
@@ -108,28 +105,22 @@ def logout():
     response.set_cookie("uuid", "", expires=0)
     return response
 
-
-@app.route("/auth/forgot-password", methods=["POST", "GET"])
-def forgotpassword():
-    if request.method == "POST":
-        password = request.form.get("password")
-        uuid = request.cookies.get("uuid")
-        user = db.users.find_one({"uuid": uuid})
-        if not user:
-            return jsonify({"message": "User not found", "code": 404})
-
-        password+=salt
-        hashed_password = hashlib.sha256(password.encode()).hexdigest()
-        db.users.update_one({"uuid": uuid}, {"$set": {"password": hashed_password,"uuid": ""}})
-        response = make_response("Password reset successful")
-        response.set_cookie("uuid", "", expires=0)
-        return response
-    if request.method == "GET":
-        return render_template("change-password.html")
-
-
-@app.route("/auth/reset-password", methods=["POST", "GET"])
+@app.route("/auth/reset-password", methods=["GET"])
 def reset_password():
+    password = request.form.get("password")
+    uuid = request.form.get("uuid")
+    user = db.users.find_one({"uuid": uuid})
+    if not user:
+        return jsonify({"message": "User not found", "code": 404})
+
+    password+=salt
+    hashed_password = hashlib.sha256(password.encode()).hexdigest()
+    db.users.update_one({"uuid": uuid}, {"$set": {"password": hashed_password,"uuid": ""}})
+    return jsonify({"message": "Password reset successful", "code": 200})
+
+
+@app.route("/auth/forgot-password", methods=["POST"])
+def forgotpassword():
     if request.method == "POST":
         email = request.form.get("email")
         user = db.users.find({"email": email})
@@ -144,6 +135,4 @@ def reset_password():
         return jsonify(
             {"message": "Password reset link sent to your email", "code": 200}
         )
-    if request.method == "GET":
-        return render_template("reset-password.html")
 
