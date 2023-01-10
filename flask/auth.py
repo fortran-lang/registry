@@ -52,37 +52,34 @@ def login():
     return response
 
 
-@app.route("/auth/signup", methods=["GET", "POST"])
+@app.route("/auth/signup", methods=["POST"])
 def signup():
-    if request.method == "POST":
-        uuid = request.cookies.get("uuid")
-        user = db.users.find_one({"uuid": uuid})
-        if not user:
-            name = request.form.get("name")
-            email = request.form.get("email")
-            password = request.form.get("password")
-            password+=salt
-            hashed_password = hashlib.sha256(password.encode()).hexdigest()
-            user = db.users.find_one({"email": email})
-            uuid = generate_uuid()
-        else:
-            return "A user with this email already exists", 400
-
-        user = {
-            "name": name,
-            "email": email,
-            "password": hashed_password,
-            "lastLogin": datetime.utcnow(),
-            "createdAt": datetime.utcnow(),
-            "uuid": uuid,
-        }
-        db.users.insert_one(user)
-
-        response = make_response("Signup successful")
-        response.set_cookie("uuid", uuid)
-        return response
+    uuid = request.cookies.get("uuid")
+    user = db.users.find_one({"uuid": uuid})
+    if not user:
+        name = request.form.get("name")
+        email = request.form.get("email")
+        password = request.form.get("password")
+        password+=salt
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
+        user = db.users.find_one({"email": email})
+        uuid = generate_uuid()
     else:
-        return render_template("signup.html")
+        return "A user with this email already exists", 400
+
+    user = {
+        "name": name,
+        "email": email,
+        "password": hashed_password,
+        "lastLogin": datetime.utcnow(),
+        "createdAt": datetime.utcnow(),
+        "uuid": uuid,
+    }
+    db.users.insert_one(user)
+
+    response = make_response("Signup successful")
+    response.set_cookie("uuid", uuid)
+    return response
 
 
 @app.route("/auth/logout", methods=["POST"])
@@ -108,7 +105,7 @@ def logout():
 @app.route("/auth/reset-password", methods=["GET"])
 def reset_password():
     password = request.form.get("password")
-    uuid = request.form.get("uuid")
+    uuid = request.cookies.get("uuid")
     user = db.users.find_one({"uuid": uuid})
     if not user:
         return jsonify({"message": "User not found", "code": 404})
@@ -121,18 +118,15 @@ def reset_password():
 
 @app.route("/auth/forgot-password", methods=["POST"])
 def forgotpassword():
-    if request.method == "POST":
-        email = request.form.get("email")
-        user = db.users.find({"email": email})
-        if not user:
-            return jsonify({"message": "User not found", "code": 404})
+    email = request.form.get("email")
+    user = db.users.find({"email": email})
+    if not user:
+        return jsonify({"message": "User not found", "code": 404})
 
-        uuid = generate_uuid()
-        db.users.update_one({"email": email}, {"$set": {"uuid": uuid}})
+    uuid = generate_uuid()
+    db.users.update_one({"email": email}, {"$set": {"uuid": uuid}})
 
-        # send the uuid link in the email
+    # send the uuid link in the email
 
-        return jsonify(
-            {"message": "Password reset link sent to your email", "code": 200}
-        )
+    return jsonify({"message": "Password reset link sent to your email", "code": 200})
 
