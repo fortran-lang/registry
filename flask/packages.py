@@ -168,18 +168,21 @@ def delete_package(username, namespace_name, package_name):
     if not user or user["name"] != username:
         return render_template("login.html")
 
-    # Find package using package_name and namespace_name.
-    package = db.packages.find_one({"name": package_name, "namespace": namespace_name})
+    # Get the namespace from the namespace name.
+    namespace = db.namespaces.find_one({"namespace": namespace_name})
+
+    # Find package using package_name and namespace's id.
+    package = db.packages.find_one({"name": package_name, "namespace": namespace["_id"]})
 
     # If package is not found related to the package_id. Return 404.
     if not package:
         return jsonify({"message": "Package not found", "code": 404})
 
     # Check if the user is authorized to delete the package.
-    if user["_id"] != package["author"] and user["_id"] not in package["maintainers"]:
+    if user["_id"] != package["author"]:
         return jsonify({"message": "User is not authorized to delete the package", "code": 401})
 
-    package_deleted = db.packages.delete_one({"name": package_name, "namespace": namespace_name})
+    package_deleted = db.packages.delete_one({"name": package_name, "namespace": namespace["_id"]})
 
     if package_deleted.deleted_count > 0:
         return jsonify({"message": "Package deleted successfully", "code": 200})
