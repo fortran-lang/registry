@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title> fpm - registry Search Packages</title>
+    <title>fpm - registry Search Packages</title>
     <style>
       body {
         font-family: sans-serif;
@@ -72,34 +72,31 @@
         />
         <button type="submit">Search</button>
       </form>
-      <div id="results"></div>
+      <div id="result"></div>
     </div>
     <script>
       const form = document.querySelector("form");
-      const resultsContainer = document.querySelector("#results");
+      const resultsContainer = document.querySelector("#result");
 
       form.addEventListener("submit", (event) => {
         event.preventDefault();
         const query = document.querySelector("#query").value;
-        const url = `/packages?query=${encodeURIComponent(
-          query
-        )}`;
+        const url = `/packages?query=${encodeURIComponent(query)}`;
 
         resultsContainer.innerHTML = `
-          <div class="loading">
-            <img src="https://media.tenor.com/DPEfCqnChk0AAAAi/loading-slow-net.gif" alt="Loading">
-          </div>
-        `;
+                <div class="loading">
+                  <img src="https://media.tenor.com/DPEfCqnChk0AAAAi/loading-slow-net.gif" alt="Loading">
+                </div>
+              `;
 
         fetch(url)
           .then((response) => response.json())
           .then((data) => {
             resultsContainer.innerHTML = "";
-            data.forEach((item) => {
-              const div = document.createElement("div");
-              div.classList.add("result");
-              div.innerHTML = `<h2>${item.name}</h2><p>${item.description}</p>`;
-              resultsContainer.appendChild(div);
+            data["packages"].forEach(function (element) {
+              let createDiv = document.createElement("div");
+              createDiv.innerHTML = `<h2>${element.name}</h2><p>${element.description}</p><p>${element.author}</p><p>${element.description}</p><p>${element.namespace}</p>`;
+              resultsContainer.appendChild(createDiv);
             });
           });
       });

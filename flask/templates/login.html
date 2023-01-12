@@ -57,13 +57,30 @@
     </style>
   </head>
   <body>
-    <form id="login-form" method="POST" action="/auth/login">
+    <form id="login-form" action="javascript:sendData()">
       <h1>Welcome to fpm Registry!</h1>
       <p>Please enter your email and password to log in.</p>
       <input type="email" name="email" placeholder="Email" />
       <input type="password" name="password" placeholder="Password" />
-      <p class="error">Invalid email or password</p>
+      <p id="error" class="error">Invalid email or password</p>
       <input type="submit" value="Log In" />
     </form>
+    <script>
+      const form = document.getElementById("login-form");
+      function sendData() {
+        let formData = new FormData(form);
+
+        fetch("/auth/login", {
+          method: "POST",
+          body: formData,
+        }).then((res) => {
+          if (res.ok) {
+            window.location.replace("/manage/projects/");
+          } else {
+            console.error("Error while sending request");
+          }
+        });
+      }
+    </script>
   </body>
 </html>

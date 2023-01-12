@@ -45,13 +45,15 @@
   <body>
     <div class="container">
       <h1>Create a Package</h1>
-      <form id="package-form" method="POST" action="/packages" enctype="multipart/form-data">
+      <!-- <form id="package-form" method="POST" action="/packages" enctype="multipart/form-data"> -->
+        <form id="package-form" action="javascript:sendData()">
+
         <label for="name">Name:</label>
         <input type="text" id="name" name="name"><br>
         <label for="namespace">Namespace:</label>
         <input type="text" id="namespace" name="namespace"><br>
         <label for="tarball">Tarball:</label>
-        <input type="file" id="tarball" name="tarball"><br>
+        <input type="text" id="tarball" name="tarball"><br>
         <label for="version">Version:</label>
         <input type="text" id="version" name="version"><br>
         <label for="license">License:</label>
@@ -68,6 +70,39 @@
         <input type="text" id="dependencies" name="dependencies"><br>
         <button type="submit">Add Package</button>
       </form> 
+      <script>window.onload = function() {
+        var cookieValue = document.cookie.split(';')
+          .map(function(x){ return x.trim().split('='); })
+          .filter(function(x){ return x[0]==='uuid'; })
+          .pop()[1];
+
+        fetch("/auth/login", {
+          method: "POST",
+          body: JSON.stringify({ uuid: cookieValue }),
+        }).then((res) => {
+          if (res.ok) {
+            console.log("success while sending request");
+          } else {
+            window.location.replace("/auth/login/");
+          }
+        });
+     
+      }
+      const form = document.getElementById("package-form");
+      function sendData() {
+        let formData = new FormData(form);
+
+        fetch("/packages", {
+          method: "POST",
+          body: formData,
+        }).then((res) => {
+          if (res.ok) {
+            console.log("created");
+          } else {
+            console.error("Error while sending request");
+          }
+        });
+      }</script>
     </div>
   </body>
   </html>      

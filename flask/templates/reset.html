@@ -68,7 +68,7 @@
           const formData = new FormData(form);
           const data = Object.fromEntries(formData);
       
-          fetch('/auth/reset-password', {
+          fetch('/auth/forgot-password', {
             method: 'POST',
             body: JSON.stringify(data),
             headers: {

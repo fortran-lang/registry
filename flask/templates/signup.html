@@ -57,7 +57,7 @@
   </style>
 </head>
 <body>
-  <form id="signup-form" method="POST" action="/auth/signup">
+    <form id="signup-form" action="javascript:sendData()">
     <h1>Sign Up to fpm Registry</h1>
     <p>Please enter your name, email, and password to create an account.</p>
     <input type="text" name="name" placeholder="Name">
@@ -66,5 +66,22 @@
     <p class="error">An account with this email address already exists</p>
     <input type="submit" value="Sign Up">
   </form>
+  <script>
+    const form = document.getElementById("signup-form");
+      function sendData() {
+        let formData = new FormData(form);
+
+        fetch("/auth/signup", {
+          method: "POST",
+          body: formData,
+        }).then((res) => {
+          if (res.ok) {
+            window.location.replace("/manage/projects/");
+          } else {
+            console.error("Error while sending request");
+          }
+        });
+      }
+  </script>
 </body>
 </html>
