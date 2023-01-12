@@ -15,12 +15,8 @@ All of the routes are mounted under the `/` path (see the lines that look like `
 Each API route definition looks like this:
 
 ```python
-@app.route('/auth/logout', methods=["POST"])
+@app.route('/path', methods=["POST"])
 ```
-
-This line defines a route that responds to a POST request made to
-`/auth/logout` with the 
-
 
 ## Code having to do with running a web application
 
@@ -30,7 +26,7 @@ This is Flask application with routes for fpm-registry. The code is using MongoD
 
 The following routes are defined:
 
-* `/auth/login`: This route allows a user to log in to the application. It accepts both GET and POST requests. If a POST request is received, the route will attempt to log the user in by checking their email and password against the database. If the email and password are valid, the user's loginAt field in the database will be updated and a cookie containing a unique user identifier (UUID) will be set in the response. If the email and password are not valid, a 401 status code will be returned. If a GET request is received, the route will return a rendered template for the login form.
+* `/auth/login`: This route allows a user to log in to the application. It accepts POST requests. If a POST request is received, the route will attempt to log the user in by checking their email and password against the database. If the email and password are valid, the user's loginAt field in the database will be updated and a cookie containing a unique user identifier (UUID) will be set in the response. If the email and password are not valid, a 401 status code will be returned. If a GET request is received, the route will return a rendered template for the login form.
 
 Request : 
 ```bash
