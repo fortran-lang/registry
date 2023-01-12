@@ -76,6 +76,19 @@ def upload():
     #     if resp:
     #         dependencies_id.append(resp["_id"])
 
+    package_namespace = db.namespaces.find_one({"namespace": namespace})
+    if package_namespace is None:
+        namespace_doc = {
+            "namespace": namespace,
+            "createdAt": datetime.utcnow(),
+            "createdBy": user["_id"],
+            "description": namespace_description,
+            "tags": tags,
+            "authors": user["_id"],
+            "packages": [package["_id"]],
+        }
+        db.namespaces.insert_one(namespace_doc)
+    
     namespace = db.namespaces.find_one({"namespace": namespace})
     package = db.packages.find_one(
         {"name": name, "version": version, "namespace": namespace["_id"]}
@@ -105,21 +118,9 @@ def upload():
     package = db.packages.find_one(
         {"name": name, "version": version, "namespace": namespace["_id"]}
     )
-    if namespace:
-        namespace["packages"].append(package["_id"])
-        db.namespaces.update_one({"_id": namespace["_id"]}, {"$set": namespace})
-    else:
-        namespace_doc = {
-            "namespace": namespace,
-            "createdAt": datetime.utcnow(),
-            "createdBy": user["_id"],
-            "description": namespace_description,
-            "tags": tags,
-            "authors": user["_id"],
-            "packages": [package["_id"]],
-        }
-        db.namespaces.insert_one(namespace_doc)
 
+    namespace["packages"].append(package["_id"])
+    db.namespaces.update_one({"_id": namespace["_id"]}, {"$set": namespace})
     user["authorOf"].append(package["_id"])
     db.users.update_one({"_id": user["_id"]}, {"$set": user})
 
