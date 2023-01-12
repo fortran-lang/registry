@@ -45,7 +45,7 @@ def search_packages():
             i["namespace"] = namespace["namespace"]
             i["author"] = author["name"]
             search_packages.append(i)
-        return jsonify({"status": "success", "packages": search_packages}), 200
+        return jsonify({"status": 200, "packages": search_packages}), 200
     else:
         return jsonify({"status": "error", "message": "packages not found"}), 404
 
