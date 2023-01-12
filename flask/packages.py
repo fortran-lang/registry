@@ -7,9 +7,9 @@ from datetime import datetime
 @app.route("/packages", methods=["GET"])
 def search_packages():
     query = request.args.get("query")
-    query = query if query else "fortran"
     page = request.args.get("page")
     sort = request.args.get("sorted_by")
+    query = query if query else "fortran"
     sort = -1 if sort == "desc" else 1
     page = int(page) if page else 0
 
@@ -38,12 +38,14 @@ def search_packages():
         ).sort("name", sort).limit(10).skip(page * 10)
     
     if packages:
+        search_packages = []
         for i in packages:
             namespace = db.namespaces.find_one({"_id": i["namespace"]})
             author = db.users.find_one({"_id": i["author"]})
-            i["namespace"] = namespace["name"]
+            i["namespace"] = namespace["namespace"]
             i["author"] = author["name"]
-        return jsonify({"status": "success", "packages": [i for i in packages]}), 200
+            search_packages.append(i)
+        return jsonify({"status": "success", "packages": search_packages}), 200
     else:
         return jsonify({"status": "error", "message": "packages not found"}), 404
 
