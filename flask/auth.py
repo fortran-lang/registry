@@ -105,7 +105,7 @@ def logout():
 @app.route("/auth/reset-password", methods=["GET"])
 def reset_password():
     password = request.form.get("password")
-    uuid = request.cookies.get("uuid")
+    uuid = request.args.get("uuid")
     user = db.users.find_one({"uuid": uuid})
     if not user:
         return jsonify({"message": "User not found", "code": 404})
@@ -117,7 +117,7 @@ def reset_password():
 
 
 @app.route("/auth/forgot-password", methods=["POST"])
-def forgotpassword():
+def forgot_password():
     email = request.form.get("email")
     user = db.users.find({"email": email})
     if not user:
