@@ -23,8 +23,12 @@ def register_UI():
     return render_template("signup.html")
 
 @app.route("/account/reset-password", methods=["GET"])
-def reset_password():
+def render_reset():
     return render_template("reset.html")
+
+@app.route("/account/update-password", methods=["GET"])
+def update_password():
+    return render_template("update.html")
 
 @app.route("/manage/projects/", methods=["GET"])
 def manage_projects():

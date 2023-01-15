@@ -3,14 +3,16 @@ from mongo import db
 from flask import request, jsonify
 from datetime import datetime
 
-
+parameters = ['name', 'author', 'createdAt', 'updatedAt',"downloads"]
 @app.route("/packages", methods=["GET"])
 def search_packages():
     query = request.args.get("query")
     page = request.args.get("page")
-    sort = request.args.get("sorted_by")
+    sorted_by = request.args.get("sorted_by")
+    sort = request.args.get("sort")
     query = query if query else "fortran"
     sort = -1 if sort == "desc" else 1
+    sorted_by = sorted_by if sorted_by in parameters else "name"
     page = int(page) if page else 0
 
     query = query.strip()
@@ -35,7 +37,7 @@ def search_packages():
                 "description": 1,
                 "tags": 1,
             },
-        ).sort("name", sort).limit(10).skip(page * 10)
+        ).sort(sorted_by, sort).limit(10).skip(page * 10)
     
     if packages:
         search_packages = []
@@ -127,8 +129,8 @@ def upload():
     return jsonify({"message": "Package Uploaded Successfully.", "code": 200})
 
 
-@app.route("/packages/<namespace>/<package_name>", methods=["PUT"])
-def update_package(namespace, package_name):
+@app.route("/packages", methods=["PUT"])
+def update_package():
     uuid = request.cookies.get("uuid")
     if not uuid:
         return jsonify({"status": "error", "message": "Unauthorized"}), 401
@@ -148,11 +150,9 @@ def update_package(namespace, package_name):
         {"name": name, "version": version, "namespace": namespace["_id"]}
     )
     if package is None:
-        return jsonify({"status": "error", "message": "Package doesn't exist"}), 400
-
-    if isDeprecated == True or isDeprecated == False:
-        package["isDeprecated"] = isDeprecated
-        db.packages.update_one({"_id": package["_id"]}, {"$set": package})
-        return jsonify({"message": "Package Updated Successfully.", "code": 200})
-    else:
-        return jsonify({"status": "error", "message": "Invalid Request"}), 500
+        return jsonify({"status": "error", "message": "Package doesn't exist"}), 404
+    
+    isDeprecated = True if isDeprecated == "true" else False
+    package["isDeprecated"] = isDeprecated
+    db.packages.update_one({"_id": package["_id"]}, {"$set": package})
+    return jsonify({"message": "Package Updated Successfully.", "code": 200})
