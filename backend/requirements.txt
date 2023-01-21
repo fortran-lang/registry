@@ -1,5 +1,0 @@
-pymongo
-flask
-python-dateutil
-python-dotenv
-bcrypt
