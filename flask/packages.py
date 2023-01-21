@@ -2,6 +2,8 @@ from app import app
 from mongo import db
 from flask import request, jsonify
 from datetime import datetime
+from auth import generate_uuid
+import json
 
 parameters = ['name', 'author', 'createdAt', 'updatedAt',"downloads"]
 @app.route("/packages", methods=["GET"])
@@ -211,3 +213,68 @@ def check_version(current_version, new_version):
     current_list = list(map(int, current_version.split(".")))
     new_list = list(map(int, new_version.split(".")))
     return (new_list > current_list)
+    
+@app.route("/packages/<namespace_name>/<package_name>", methods=["GET"])
+def get_package(namespace_name, package_name):
+    # Get namespace from namespace name.
+    namespace = db.namespaces.find_one({"namespace": namespace_name})
+
+    # Get package from a package_name and namespace's id.
+    package = db.packages.find_one({
+        "name": package_name, "namespace": namespace["_id"]
+    })
+
+    # Check if package is not found.
+    if not package:
+        return jsonify({"message": "Package not found", "code": 404})
+
+    else:
+        # Get the package author from id. 
+        package_author = db.users.find_one({"_id": package["author"]})
+
+        # Only latest version of the package will be sent as a response.
+        package_response_data = {
+            "name": package["name"],
+            "namespace": namespace["namespace"],
+            "latest_version_data": package["versions"][-1],
+            "author": package_author["name"],
+            "tags": package["tags"],
+            "license": package["license"],
+            "createdAt": package["createdAt"],
+            "version_history": package["versions"]
+        }
+
+        return jsonify({"data": package_response_data, "code": 200})
+
+@app.route("/packages/<namespace_name>/<package_name>/<version>", methods=["GET"])
+def get_package_from_version(namespace_name, package_name, version):
+    # Get namespace from namespace name.
+    namespace = db.namespaces.find_one({"namespace": namespace_name})
+
+    # Get package from a package_name, namespace's id and version.
+    package = db.packages.find_one({"name": package_name, "namespace": namespace["_id"], "versions.version": version})
+
+    # Check if package is not found.
+    if not package:
+        return jsonify({"message": "Package not found", "code": 404})
+
+    else:
+        # Get the package author from id. 
+        package_author = db.users.find_one({"_id": package["author"]})
+
+        # Extract version data from the list of versions.
+        version_history = package["versions"]
+        version_data = next(filter(lambda obj: obj['version'] == version, version_history), None)
+        
+        # Only queried version should be sent as response.
+        package_response_data = {
+            "name": package["name"],
+            "namespace": namespace["namespace"],
+            "author": package_author["name"],
+            "tags": package["tags"],
+            "license": package["license"],
+            "createdAt": package["createdAt"],
+            "version_data": version_data
+        }
+
+        return jsonify({"data": package_response_data, "code": 200})
