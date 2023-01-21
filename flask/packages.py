@@ -53,7 +53,7 @@ def search_packages():
 
 @app.route("/packages", methods=["POST"])
 def upload():
-    uuid = request.cookies.get("uuid")
+    uuid = request.form.get("uuid")
     if not uuid:
         return jsonify({"status": "error", "message": "Unauthorized"}), 401
 
@@ -180,7 +180,7 @@ def upload():
 
 @app.route("/packages", methods=["PUT"])
 def update_package():
-    uuid = request.cookies.get("uuid")
+    uuid = request.form.get("uuid")
     if not uuid:
         return jsonify({"status": "error", "message": "Unauthorized"}), 401
 

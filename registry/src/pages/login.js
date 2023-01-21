@@ -1,9 +1,13 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { Navigate } from "react-router-dom";
+import { useCookies } from 'react-cookie';
+
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [cookies, setCookie] = useCookies(['uuid']);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,13 +28,17 @@ const Login = () => {
       if (response.status === 200) {
         //login successful
         console.log(response.data.uuid);
-        // setToken(response.data.statusText);
+        setCookie('uuid', response.data.uuid, { path: '/' });
+        // setCookie("uuid", response.data.uuid, "100");
+        return <Navigate to="/search" replace={true} />;
+
+
       }
     } catch (error) {
       console.log(error.response.data);
       console.log(error.response.status);
       console.log(error.response.statusText);
-
+      setCookie("uuid", "", "100");
       const responseText = error.response.data;
       const errorMsg = `${responseText}`;
       const errorDiv = document.getElementById("error");
