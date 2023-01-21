@@ -213,6 +213,7 @@ def check_version(current_version, new_version):
     current_list = list(map(int, current_version.split(".")))
     new_list = list(map(int, new_version.split(".")))
     return (new_list > current_list)
+    
 @app.route("/packages/<namespace_name>/<package_name>", methods=["GET"])
 def get_package(namespace_name, package_name):
     # Get namespace from namespace name.
