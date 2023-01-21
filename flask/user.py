@@ -7,13 +7,19 @@ from auth import generate_uuid
 
 @app.route("/users/<username>", methods=["GET"])
 def profile(username):
-    uuid = request.cookies.get("uuid")
+    uuid = request.form.get("uuid")
     if not uuid:
-        return jsonify({"message": "only info", "code": 401})
+        user = db.users.find_one({"name": username})
+        #write code to return user profile for not logged in 
+    else:
+        user = db.users.find_one({"uuid": uuid})
+        if not user:
+            return jsonify({"message": "User not found", "code": 401})
+        print(user)
+        #write code to return user profile for logged in user
 
-    user = db.users.find_one({"uuid": uuid})
-    if not user or user["name"] != username:
-        return jsonify({"message": "only info", "code": 401})
+    # if not user or user["name"] != username:
+    #     return jsonify({"message": "User not found", "code": 401})
 
     # return his owned and maintained packages
     packages = db.packages.find(
@@ -24,6 +30,18 @@ def profile(username):
     # user['']                   
     return jsonify({"message": "Password reset successful", "code": 200})
 
-    # return render_template(
-    #     "profile.html", user=user, packages=[package for package in packages]
-    # )
+
+@app.route("/users/delete", methods=["POST"])
+def delete_user():
+    uuid = request.form.get("uuid")
+    if not uuid:
+        return jsonify({"message": "User not found", "code": 401})
+    else:
+        user = db.users.find_one({"uuid": uuid})
+
+    if not user:
+        return "Invalid email or password", 401
+
+    db.users.delete_one({'uuid': uuid})
+
+    return jsonify({"message": "User deleted", "code": 200})
