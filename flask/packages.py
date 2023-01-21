@@ -83,6 +83,7 @@ def upload():
         namespace_doc = {
             "namespace": namespace,
             "createdAt": datetime.utcnow(),
+            "UpdatedAt": datetime.utcnow(),
             "createdBy": user["_id"],
             "description": namespace_description,
             "tags": tags,
@@ -122,6 +123,7 @@ def upload():
             "description": description,
             "license": license,
             "createdAt": datetime.utcnow(),
+            "UpdatedAt": datetime.utcnow(),
             "author": user["_id"],
             "maintainers": [user["_id"]],
             "copyright": copyright,
@@ -131,7 +133,7 @@ def upload():
         version_document = {    
             "version": version,
             "tarball": tarball_name,
-            "dependencies": dependencies
+            "dependencies": dependencies,
         }
 
         package["versions"] = []
@@ -148,7 +150,8 @@ def upload():
         namespace["packages"] = []
 
         # Add the package id to the namespace.
-        namespace["packages"].append(package["_id"])
+        namespace["packages"].append(package["_id"])            
+        namespace["UpdatedAt"] = datetime.utcnow()
         db.namespaces.update_one({"_id": namespace["_id"]}, {"$set": namespace})
 
         if "authorOf" not in user:
@@ -174,7 +177,8 @@ def upload():
             "dependencies": dependencies,
         }
 
-        package_previously_uploaded["versions"].append(new_version)
+        package_previously_uploaded["versions"].append(new_version)  
+        package_previously_uploaded["UpdatedAt"] = datetime.utcnow()
         db.packages.update_one({"_id": package_previously_uploaded["_id"]}, {"$set": package_previously_uploaded})
         
         return jsonify({"message": "Package Uploaded Successfully.", "code": 200})
@@ -205,6 +209,7 @@ def update_package():
     
     isDeprecated = True if isDeprecated == "true" else False
     package["isDeprecated"] = isDeprecated
+    package["UpdatedAt"] = datetime.utcnow()
     db.packages.update_one({"_id": package["_id"]}, {"$set": package})
     return jsonify({"message": "Package Updated Successfully.", "code": 200})
 
@@ -241,7 +246,8 @@ def get_package(namespace_name, package_name):
             "tags": package["tags"],
             "license": package["license"],
             "createdAt": package["createdAt"],
-            "version_history": package["versions"]
+            "version_history": package["versions"],
+            "UpdatedAt": package["UpdatedAt"],
         }
 
         return jsonify({"data": package_response_data, "code": 200})
@@ -274,7 +280,8 @@ def get_package_from_version(namespace_name, package_name, version):
             "tags": package["tags"],
             "license": package["license"],
             "createdAt": package["createdAt"],
-            "version_data": version_data
+            "version_data": version_data,
+            "UpdatedAt": package["UpdatedAt"],
         }
 
         return jsonify({"data": package_response_data, "code": 200})
