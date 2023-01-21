@@ -72,13 +72,11 @@ def upload():
     namespace_description = request.form.get("namespace_description")
     tags = request.form.get("tags").strip().split(",")
     dependencies = request.form.get("dependencies").strip().split(",")
-    # for dependency in list(set(dependencies)):
-    #     dependencies_id = []
-    #     resp = db.packages.find_one({"name": dependency})
-    #     if resp:
-    #         dependencies_id.append(resp["_id"])
 
+    # Check if namespace already exists.
     package_namespace = db.namespaces.find_one({"namespace": namespace})
+
+    # If namespace does not exists. Then, create it.
     if package_namespace is None:
         namespace_doc = {
             "namespace": namespace,
@@ -87,46 +85,97 @@ def upload():
             "description": namespace_description,
             "tags": tags,
             "authors": user["_id"],
-            "packages": [package["_id"]],
         }
+
         db.namespaces.insert_one(namespace_doc)
     
+    # Get the namespace document.
     namespace = db.namespaces.find_one({"namespace": namespace})
+
+    # Try to get the package with exact same version to be uploaded.
     package = db.packages.find_one(
-        {"name": name, "version": version, "namespace": namespace["_id"]}
+        {"name": name, "versions.version": version, "namespace": namespace["_id"]}
     )
+
+    # Check if package with particular version number already exits.
     if package is not None:
         return jsonify({"status": "error", "message": "Package already exists"}), 400
 
+    # Get the previous uploaded package.
+    package_previously_uploaded = db.packages.find_one({
+        "name": name, "namespace": namespace["_id"]
+    })
+
+    # TODO: Replace this code with Storage Service.
     tarball_name = "{}-{}.tar.gz".format(name, version)
     tarball.save(tarball_name)
 
-    package = {
-        "name": name,
-        "namespace": namespace["_id"],
-        "tarball": tarball_name,
-        "version": version,
-        "license": license,
-        "createdAt": datetime.utcnow(),
-        "author": user["_id"],
-        "maintainers": [user["_id"]],
-        "copyright": copyright,
-        "description": description,
-        "tags": list(set(tags)),
-        "dependencies": dependencies,
-    }
-    db.packages.insert_one(package)
+    # If there are no previous versions of package.
+    # This means user is trying to upload a new package.
+    # There are no previous recorded versions of package present in registry.
+    if package_previously_uploaded is None:
+        package = {
+            "name": name,
+            "namespace": namespace["_id"],
+            "description": description,
+            "license": license,
+            "createdAt": datetime.utcnow(),
+            "author": user["_id"],
+            "maintainers": [user["_id"]],
+            "copyright": copyright,
+            "tags": list(set(tags)),
+        }
 
-    package = db.packages.find_one(
-        {"name": name, "version": version, "namespace": namespace["_id"]}
-    )
+        version_document = {    
+            "version": version,
+            "tarball": tarball_name,
+            "dependencies": dependencies
+        }
 
-    namespace["packages"].append(package["_id"])
-    db.namespaces.update_one({"_id": namespace["_id"]}, {"$set": namespace})
-    user["authorOf"].append(package["_id"])
-    db.users.update_one({"_id": user["_id"]}, {"$set": user})
+        package["versions"] = []
 
-    return jsonify({"message": "Package Uploaded Successfully.", "code": 200})
+        # Append the first version document.
+        package["versions"].append(version_document)
+
+        db.packages.insert_one(package)
+        
+        package = db.packages.find_one(
+            {"name": name, "versions.version": version, "namespace": namespace["_id"]}
+        )
+
+        namespace["packages"] = []
+
+        # Add the package id to the namespace.
+        namespace["packages"].append(package["_id"])
+        db.namespaces.update_one({"_id": namespace["_id"]}, {"$set": namespace})
+
+        if "authorOf" not in user:
+            user["authorOf"] = []
+        
+        # Current user is the author of the package.
+        user["authorOf"].append(package["_id"])
+        db.users.update_one({"_id": user["_id"]}, {"$set": user})
+
+        return jsonify({"message": "Package Uploaded Successfully.", "code": 200})     
+    else:
+        # This block of code runs if there are previous recorded versions of a package present in registry.
+        # This means user is uploading a new version of already existing package.
+        # Check if the version to be uploaded is valid or not.
+        is_valid = check_version(package_previously_uploaded["versions"][-1]["version"], version)
+
+        if not is_valid:
+            return jsonify({"status": "error", "message": "Incorrect version"}), 400
+            
+        new_version = {
+            "tarball": tarball_name,
+            "version": version,
+            "dependencies": dependencies,
+        }
+
+        package_previously_uploaded["versions"].append(new_version)
+        db.packages.update_one({"_id": package_previously_uploaded["_id"]}, {"$set": package_previously_uploaded})
+        
+        return jsonify({"message": "Package Uploaded Successfully.", "code": 200})
 
 
 @app.route("/packages", methods=["PUT"])
@@ -156,3 +205,9 @@ def update_package():
     package["isDeprecated"] = isDeprecated
     db.packages.update_one({"_id": package["_id"]}, {"$set": package})
     return jsonify({"message": "Package Updated Successfully.", "code": 200})
+
+
+def check_version(current_version, new_version):
+    current_list = list(map(int, current_version.split(".")))
+    new_list = list(map(int, new_version.split(".")))
+    return (new_list > current_list)
