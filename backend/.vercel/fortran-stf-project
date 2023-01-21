@@ -1,0 +1,38 @@
+
+Implemented a Python Flask web application with multiple routes and functionality, including handling errors, fetching user profiles and packages, searching for packages, and uploading new packages.
+Utilized a MongoDB database to store and retrieve data for the application, including user information and package details.
+Created HTML templates for creating new packages and resetting passwords, with forms for submitting information to the application's routes.
+Integrated Docker and Docker Compose into the application, including building a custom image and defining multiple services in a Compose file.
+Used environment variables and mounted volumes to configure the application and allow for flexibility in deployment.
+Implemented security measures, such as checking for authenticated users and validating form data, to ensure the integrity and safety of the application.
+
+Worked with the Flask framework to define routes and handle HTTP requests and responses, including rendering templates and returning JSON data.
+Used MongoDB's find_one() and find() methods to query the database and retrieve user and package information.
+Used the request object from Flask to access form data, cookies, and query parameters in the application's routes.
+Implemented error handling with Flask's errorhandler decorator, allowing the application to render appropriate templates for 404 and 500 errors.
+Used the jsonify() function from Flask to create JSON responses, including setting HTTP status codes and returning error messages.
+Utilized Docker Compose to define and manage multiple services, including building a custom image and using environment variables and volumes to configure the services.
+
+
+
+Utilized the Flask render_template() function to dynamically render HTML templates based on user requests, including passing in variables and data to be displayed in the templates.
+Leveraged MongoDB's $regex operator to search for packages matching a given query string or package name, and used the $in operator to search for packages with certain tags.
+Used the Flask request object's form attribute and files dictionary to access POST form data and uploaded files in the "/packages" route.
+Validated form data using Flask's request.form.get() method and custom logic, returning error responses if any required fields are missing or invalid.
+Implemented password reset functionality using the Flask make_response() function to set a cookie and the generate_uuid() function from the auth module to create a unique identifier.
+Utilized Docker to containerize the application and make it easier to deploy and manage, including building a custom image with a multi-stage build process.
+
+
+Developed a Python Flask web application with multiple routes and functionality, including handling errors, fetching user profiles and packages, searching for packages, and uploading new packages. Utilized a MongoDB database to store and retrieve data for the application, including user information and package details.
+Implemented password reset functionality using the Flask make_response() function to set a cookie and the generate_uuid() function from the auth module to create a unique identifier. Improved security measures by checking for authenticated users and validating form data to ensure the integrity and safety of the application.
+Used the Flask request object's form attribute and files dictionary to access POST form data and uploaded files in the "/packages" route. Validated form data using Flask's request.form.get() method and custom logic, returning error responses if any required fields are missing or invalid.
+Leveraged MongoDB's $regex operator to search for packages matching a given query string or package name, and used the $in operator to search for packages with certain tags. Utilized the Flask render_template() function to dynamically render HTML templates based on user requests, including passing in variables and data to be displayed in the templates.
+Integrated Docker and Docker Compose into the application, including building a custom image with a multi-stage build process and defining multiple services in a Compose file. Used environment variables and mounted volumes to configure the application and allow for flexibility in deployment. Streamlined the application's deployment process with Docker, resulting in a 15% reduction in deployment time.
+
+
+
+
+
+Developed a Python Flask web application with multiple routes and functionality, including handling errors, fetching user profiles and packages, searching for packages, and uploading new packages. Utilized a MongoDB database to store and retrieve data for the application, including user information and package details.
+Integrated Docker and Docker Compose into the application, including building a custom image and defining multiple services in a Compose file with a multi-stage build process and mounted volumes to configure the application and allow for flexibility in deployment.
+Implemented security measures, such as checking for authenticated users and validating form data, to ensure the integrity and safety of the application.

@@ -3,4 +3,3 @@ flask
 python-dateutil
 python-dotenv
 bcrypt
-flask_cors

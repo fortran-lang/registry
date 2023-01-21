@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Login Page</title>
+    <style>
+      body {
+        background-color: #f1f1f1;
+        font-family: Arial, sans-serif;
+        text-align: center;
+      }
+      #login-form {
+        width: 300px;
+        margin: auto;
+        background-color: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      #login-form h1 {
+        margin-top: 0;
+        font-size: 24px;
+      }
+      #login-form p {
+        margin-bottom: 20px;
+        font-size: 14px;
+        color: #777;
+      }
+      #login-form input {
+        display: block;
+        width: 100%;
+        margin-bottom: 20px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        outline: none;
+        font-size: 14px;
+        color: #555;
+        border-radius: 4px;
+      }
+      #login-form input[type="submit"] {
+        background-color: #3d94f6;
+        color: white;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        border: none;
+        border-radius: 4px;
+      }
+      #login-form input[type="submit"]:hover {
+        background-color: #3382e5;
+      }
+      #login-form .error {
+        color: red;
+        font-size: 12px;
+        margin-bottom: 10px;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <form id="login-form" action="javascript:sendData()">
+      <h1>Welcome to fpm Registry!</h1>
+      <p>Please enter your email and password to log in.</p>
+      <input type="email" name="email" placeholder="Email" />
+      <input type="password" name="password" placeholder="Password" />
+      <p id="error" class="error">Invalid email or password</p>
+      <input type="submit" value="Log In" />
+    </form>
+    <script>
+      const form = document.getElementById("login-form");
+      function sendData() {
+        let formData = new FormData(form);
+
+        fetch("/auth/login", {
+          method: "POST",
+          body: formData,
+        }).then((res) => {
+          if (res.ok) {
+            window.location.replace("/manage/projects/");
+          } else {
+            console.error("Error while sending request");
+          }
+        });
+      }
+    </script>
+  </body>
+</html>
