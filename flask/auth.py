@@ -27,7 +27,7 @@ def generate_uuid():
 
 @app.route("/auth/login", methods=["POST"])
 def login():
-    uuid = request.cookies.get("uuid")
+    uuid = request.form.get("uuid")
     if not uuid:
         email = request.form.get("email")
         password = request.form.get("password")
@@ -47,14 +47,12 @@ def login():
 
     db.users.update_one({"_id": user["_id"]}, {"$set": {"uuid": uuid}})
 
-    response = make_response("Login successful")
-    response.set_cookie("uuid", uuid)
-    return response
+    return jsonify({"message": "Login successful","uuid":uuid, "code": 200})
 
 
 @app.route("/auth/signup", methods=["POST"])
 def signup():
-    uuid = request.cookies.get("uuid")
+    uuid = request.form.get("uuid")
     user = db.users.find_one({"uuid": uuid})
     if not user:
         name = request.form.get("name")
@@ -77,14 +75,12 @@ def signup():
     }
     db.users.insert_one(user)
 
-    response = make_response("Signup successful")
-    response.set_cookie("uuid", uuid)
-    return response
+    return jsonify({"message": "Signup successful","uuid":uuid, "code": 200})
 
 
 @app.route("/auth/logout", methods=["POST"])
 def logout():
-    uuid = request.cookies.get("uuid")
+    uuid = request.form.get("uuid")
     if not uuid:
         return jsonify({"message": "User not found", "code": 404})
 
@@ -98,9 +94,7 @@ def logout():
 
     db.users.update_one({"_id": user["_id"]}, {"$set": {"uuid": ""}})
 
-    response = make_response("Logout successful")
-    response.set_cookie("uuid", "", expires=0)
-    return response
+    return jsonify({"message": "Logout successful","uuid":"", "code": 200})
 
 @app.route("/auth/reset-password", methods=["GET"])
 def reset_password():
