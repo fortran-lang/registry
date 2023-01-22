@@ -53,8 +53,7 @@ def login():
 @app.route("/auth/signup", methods=["POST"])
 def signup():
     uuid = request.form.get("uuid")
-    user = db.users.find_one({"uuid": uuid})
-    if not user:
+    if not uuid:
         name = request.form.get("name")
         email = request.form.get("email")
         password = request.form.get("password")
@@ -63,7 +62,7 @@ def signup():
         user = db.users.find_one({"email": email})
         uuid = generate_uuid()
     else:
-        return "A user with this email already exists", 400
+        user = db.users.find_one({"uuid": uuid})
 
     user = {
         "name": name,
@@ -73,9 +72,11 @@ def signup():
         "createdAt": datetime.utcnow(),
         "uuid": uuid,
     }
-    db.users.insert_one(user)
-
-    return jsonify({"message": "Signup successful","uuid":uuid, "code": 200})
+    if not user:
+        db.users.insert_one(user)
+        return jsonify({"message": "Signup successful","uuid":uuid, "code": 200})
+    else:
+        return "A user with this email already exists", 400
 
 
 @app.route("/auth/logout", methods=["POST"])
