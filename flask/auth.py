@@ -31,7 +31,7 @@ def login():
     if not uuid:
         email = request.form.get("email")
         password = request.form.get("password")
-        password+=salt
+        password += salt
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
         user = db.users.find_one({"email": email, "password": hashed_password})
         uuid = generate_uuid()
@@ -41,13 +41,11 @@ def login():
     if not user:
         return "Invalid email or password", 401
 
-    db.users.update_one(
-        {"_id": user["_id"]}, {"$set": {"loginAt": datetime.utcnow()}}
-    )
+    db.users.update_one({"_id": user["_id"]}, {"$set": {"loginAt": datetime.utcnow()}})
 
     db.users.update_one({"_id": user["_id"]}, {"$set": {"uuid": uuid}})
 
-    return jsonify({"message": "Login successful","uuid":uuid, "code": 200})
+    return jsonify({"message": "Login successful", "uuid": uuid, "code": 200})
 
 
 @app.route("/auth/signup", methods=["POST"])
@@ -57,9 +55,9 @@ def signup():
         name = request.form.get("name")
         email = request.form.get("email")
         password = request.form.get("password")
-        password+=salt
+        password += salt
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
-        user = db.users.find_one({"email": email})
+        user = db.users.find_one({"$or": [{"name": name}, {"email": email}]})
         uuid = generate_uuid()
     else:
         user = db.users.find_one({"uuid": uuid})
@@ -74,7 +72,7 @@ def signup():
     }
     if not user:
         db.users.insert_one(user)
-        return jsonify({"message": "Signup successful","uuid":uuid, "code": 200})
+        return jsonify({"message": "Signup successful", "uuid": uuid, "code": 200})
     else:
         return "A user with this email already exists", 400
 
@@ -95,7 +93,8 @@ def logout():
 
     db.users.update_one({"_id": user["_id"]}, {"$set": {"uuid": ""}})
 
-    return jsonify({"message": "Logout successful","uuid":"", "code": 200})
+    return jsonify({"message": "Logout successful", "uuid": "", "code": 200})
+
 
 @app.route("/auth/reset-password", methods=["GET"])
 def reset_password():
@@ -105,9 +104,11 @@ def reset_password():
     if not user:
         return jsonify({"message": "User not found", "code": 404})
 
-    password+=salt
+    password += salt
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
-    db.users.update_one({"uuid": uuid}, {"$set": {"password": hashed_password,"uuid": ""}})
+    db.users.update_one(
+        {"uuid": uuid}, {"$set": {"password": hashed_password, "uuid": ""}}
+    )
     return jsonify({"message": "Password reset successful", "code": 200})
 
 
@@ -124,4 +125,3 @@ def forgot_password():
     # send the uuid link in the email
 
     return jsonify({"message": "Password reset link sent to your email", "code": 200})
-
