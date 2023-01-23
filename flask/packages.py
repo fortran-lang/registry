@@ -88,6 +88,7 @@ def upload():
             "description": namespace_description,
             "tags": tags,
             "authors": user["_id"],
+            "isDeprecated": False,
         }
 
         db.namespaces.insert_one(namespace_doc)
@@ -128,12 +129,14 @@ def upload():
             "maintainers": [user["_id"]],
             "copyright": copyright,
             "tags": list(set(tags)),
+            "isDeprecated": False,
         }
 
         version_document = {    
             "version": version,
             "tarball": tarball_name,
             "dependencies": dependencies,
+            "isDeprecated": False,
         }
 
         package["versions"] = []
@@ -175,6 +178,7 @@ def upload():
             "tarball": tarball_name,
             "version": version,
             "dependencies": dependencies,
+            "isDeprecated": False,
         }
 
         package_previously_uploaded["versions"].append(new_version)  

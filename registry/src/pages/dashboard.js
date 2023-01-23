@@ -8,7 +8,6 @@ const Dashboard = () => {
   if (!cookies.uuid) {
     return <Navigate to="/account/login" replace={true} />;
   } else {
-  
     return <p>Dashboard</p>;
   }
 };

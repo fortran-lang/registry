@@ -7,8 +7,9 @@ const Search = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    const url = `http://127.0.0.1:9090/packages?query=${encodeURIComponent(query)}`;
-
+    const url = `${
+      process.env.REACT_APP_REGISTRY_API_URL
+    }/packages?query=${encodeURIComponent(query)}`;
     fetch(url)
       .then((response) => response.json())
       .then((data) => {
@@ -18,7 +19,7 @@ const Search = () => {
 
   return (
     <div class="container">
-     fpm-registry Package Search
+      fpm-registry Package Search
       <form onSubmit={handleSubmit}>
         <input
           type="text"

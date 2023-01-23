@@ -24,7 +24,7 @@ const Register = () => {
     try {
       response = await axios({
         method: "post",
-        url: "http://127.0.0.1:9090/auth/signup",
+        url: `${process.env.REACT_APP_REGISTRY_API_URL}/auth/signup`,
         data: formData,
         headers: {
           "Content-Type": "multipart/form-data",

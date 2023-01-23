@@ -23,7 +23,7 @@ const Login = () => {
     try {
       response = await axios({
         method: "post",
-        url: "http://127.0.0.1:9090/auth/login",
+        url: `${process.env.REACT_APP_REGISTRY_API_URL}/auth/login`,
         data: formData,
         headers: {
           "Content-Type": "multipart/form-data",
@@ -43,7 +43,7 @@ const Login = () => {
   if (navigate) {
     return <Navigate to="/manage/projects" replace={true} />;
   }
-  
+
   return (
     <form id="login-form" onSubmit={handleSubmit}>
       <h1>Welcome to fpm Registry!</h1>

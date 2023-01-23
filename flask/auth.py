@@ -1,7 +1,6 @@
 import os
 from dotenv import load_dotenv
-from flask import render_template
-from flask import request, make_response, jsonify
+from flask import request, jsonify
 from datetime import datetime
 from uuid import uuid4
 from app import app
@@ -17,12 +16,11 @@ except KeyError as err:
 
 
 def generate_uuid():
-    uuid = uuid4().hex
-    user = db.users.find_one({"uuid": uuid})
-    while user:
+    while True:
         uuid = uuid4().hex
         user = db.users.find_one({"uuid": uuid})
-    return uuid
+        if not user:
+            return uuid
 
 
 @app.route("/auth/login", methods=["POST"])
