@@ -286,9 +286,9 @@ def get_package_from_version(namespace_name, package_name, version):
 
         return jsonify({"data": package_response_data, "code": 200})
 
-@app.route("/packages/<namespace_name>/<package_name>", methods=["POST"])
+@app.route("/packages/<namespace_name>/<package_name>/delete", methods=["POST"])
 def delete_package(namespace_name, package_name):
-    uuid = request.cookies.get("uuid")
+    uuid = request.form.get("uuid")
 
     if not uuid:
         return jsonify({"status": "error", "message": "Unauthorized"}), 401
@@ -319,9 +319,9 @@ def delete_package(namespace_name, package_name):
     else:
         return jsonify({"message": "Package not found", "code": 404})
 
-@app.route("/packages/<namespace_name>/<package_name>/<version>", methods=["POST"])
+@app.route("/packages/<namespace_name>/<package_name>/<version>/delete", methods=["POST"])
 def delete_package_version(namespace_name, package_name, version):
-    uuid = request.cookies.get("uuid")
+    uuid = request.form.get("uuid")
 
     if not uuid:
         return jsonify({"status": "error", "message": "Unauthorized"}), 401
