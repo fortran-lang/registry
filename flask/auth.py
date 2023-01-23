@@ -60,7 +60,7 @@ def signup():
         user = db.users.find_one({"$or": [{"name": name}, {"email": email}]})
         uuid = generate_uuid()
     else:
-        user = db.users.find_one({"uuid": uuid})
+        return "A user with this email already exists", 400
 
     user = {
         "name": name,
