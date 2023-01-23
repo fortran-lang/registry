@@ -289,3 +289,69 @@ def get_package_from_version(namespace_name, package_name, version):
         }
 
         return jsonify({"data": package_response_data, "code": 200})
+
+@app.route("/packages/<namespace_name>/<package_name>/delete", methods=["POST"])
+def delete_package(namespace_name, package_name):
+    uuid = request.form.get("uuid")
+
+    if not uuid:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
+
+    user = db.users.find_one({"uuid": uuid})
+
+    if not user:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401  
+
+    # Get the namespace from the namespace name.
+    namespace = db.namespaces.find_one({"namespace": namespace_name}) 
+    
+    # Find package using package_name & namespace_name.
+    package = db.packages.find_one({"name": package_name, "namespace": namespace["_id"]})
+
+    # If package is not found. Return 404.
+    if not package:
+        return jsonify({"message": "Package not found", "code": 404})
+
+    # Check if the user is authorized to delete the package.
+    if user["_id"] not in package["maintainers"]:
+        return jsonify({"status": "error", "message": "User is not authorized to delete the package"}), 401
+
+    package_deleted = db.packages.delete_one({"name": package_name, "namespace": namespace["_id"]})
+    
+    if package_deleted.deleted_count > 0:
+        return jsonify({"message": "Package deleted successfully"}), 200
+    else:
+        return jsonify({"message": "Package not found", "code": 404})
+
+@app.route("/packages/<namespace_name>/<package_name>/<version>/delete", methods=["POST"])
+def delete_package_version(namespace_name, package_name, version):
+    uuid = request.form.get("uuid")
+
+    if not uuid:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
+
+    user = db.users.find_one({"uuid": uuid})
+
+    if not user:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401  
+    
+    # Get the namespace from the namespace name.
+    namespace = db.namespaces.find_one({"namespace": namespace_name}) 
+
+    package = db.packages.find_one({"name": package_name, "namespace": namespace["_id"]}) 
+
+    # Check if the user is authorized to delete the package.
+    if user["_id"] not in package["maintainers"]:
+        return jsonify({"status": "error", "message": "User is not authorized to delete the package"}), 401
+
+    # Perform the pull operation.
+    result = db.packages.update_one(
+        {"name": package_name, "namespace": namespace["_id"]},
+        {"$pull": {"versions": {"version": version}}}
+    )   
+
+    if result.matched_count:
+        return jsonify({"message": "Package version deleted successfully"}), 200
+    else:
+        return jsonify({"status": "error", "message": "Package version not found"}), 404
+
