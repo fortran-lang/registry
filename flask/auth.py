@@ -57,7 +57,7 @@ def signup():
         password = request.form.get("password")
         password += salt
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
-        user = db.users.find_one({"$or": [{"name": name}, {"email": email}]})
+        registry_user = db.users.find_one({"$or": [{"name": name}, {"email": email}]})
         uuid = generate_uuid()
     else:
         return "A user with this email already exists", 400
@@ -70,7 +70,7 @@ def signup():
         "createdAt": datetime.utcnow(),
         "uuid": uuid,
     }
-    if not user:
+    if not registry_user:
         db.users.insert_one(user)
         return jsonify({"message": "Signup successful", "uuid": uuid, "code": 200})
     else:
