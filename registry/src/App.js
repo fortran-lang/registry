@@ -6,6 +6,7 @@ import Help from "./pages/help";
 import Register from "./pages/register";
 import Home from "./pages/home";
 import Dashboard from "./pages/dashboard";
+import PackageForm from "./pages/upload";
 import Account from "./pages/account";
 import Search from "./pages/search";
 import NoPage from "./pages/404";
@@ -23,6 +24,7 @@ function App() {
         <Route path="/search" element={<Search />} />
         <Route path="/manage/projects" element={<Dashboard />} />
         <Route path="/manage/account" element={<Account />} />
+        <Route path="/package/create" element={<PackageForm />} />
         <Route path="*" element={<NoPage />} />
       </Routes>
     </BrowserRouter>

@@ -25,6 +25,7 @@ Project structure:
 ```
 $ sudo chmod 666 /var/run/docker.sock  (for root access)
 $ docker compose up -d
+$ REACT_APP_REGISTRY_API_URL="http://127.0.0.1:9090"  npm start run
 ```
 
 After the application starts, navigate to `http://localhost:80` in your web browser or run:
