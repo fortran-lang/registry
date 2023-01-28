@@ -6,6 +6,8 @@ from uuid import uuid4
 from app import app
 from mongo import db
 import hashlib
+from app import swagger
+from flasgger.utils import swag_from
 
 load_dotenv()
 
@@ -24,6 +26,7 @@ def generate_uuid():
 
 
 @app.route("/auth/login", methods=["POST"])
+@swag_from('documentation/login.yaml', methods=["POST"])
 def login():
     uuid = request.form.get("uuid")
     if not uuid:
@@ -37,16 +40,15 @@ def login():
         user = db.users.find_one({"uuid": uuid})
 
     if not user:
-        return "Invalid email or password", 401
-
-    db.users.update_one({"_id": user["_id"]}, {"$set": {"loginAt": datetime.utcnow()}})
-
-    db.users.update_one({"_id": user["_id"]}, {"$set": {"uuid": uuid}})
+        return jsonify({"message": "Invalid email or password","code": 401})
+ 
+    db.users.update_one({"_id": user["_id"]}, {"$set": {"loginAt": datetime.utcnow(), "uuid": uuid}})
 
     return jsonify({"message": "Login successful", "uuid": uuid, "code": 200})
 
 
 @app.route("/auth/signup", methods=["POST"])
+@swag_from('documentation/signup.yaml', methods=["POST"])
 def signup():
     uuid = request.form.get("uuid")
     if not uuid:
@@ -58,7 +60,7 @@ def signup():
         registry_user = db.users.find_one({"$or": [{"name": name}, {"email": email}]})
         uuid = generate_uuid()
     else:
-        return "A user with this email already exists", 400
+        return jsonify({"message": "A user with this email already exists", "code": 400})
 
     user = {
         "name": name,
@@ -72,7 +74,7 @@ def signup():
         db.users.insert_one(user)
         return jsonify({"message": "Signup successful", "uuid": uuid, "code": 200})
     else:
-        return "A user with this email already exists", 400
+        return jsonify({"message": "A user with this email already exists", "code": 400})
 
 
 @app.route("/auth/logout", methods=["POST"])
