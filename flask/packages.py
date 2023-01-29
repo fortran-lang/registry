@@ -3,10 +3,20 @@ from mongo import db
 from flask import request, jsonify
 from datetime import datetime
 from auth import generate_uuid
+from app import swagger
+from flasgger.utils import swag_from
 import json
 
-parameters = ['name', 'author', 'createdAt', 'updatedAt',"downloads"]
+parameters = {
+    "name": "name",
+    "author": "author",
+    "createdat": "createdAt",
+    "updatedat": "updatedAt",
+    "downloads": "downloads",
+}
+
 @app.route("/packages", methods=["GET"])
+@swag_from("documentation/search_packages.yaml", methods=["GET"])
 def search_packages():
     query = request.args.get("query")
     page = request.args.get("page")
@@ -14,11 +24,12 @@ def search_packages():
     sort = request.args.get("sort")
     query = query if query else "fortran"
     sort = -1 if sort == "desc" else 1
-    sorted_by = sorted_by if sorted_by in parameters else "name"
+    sorted_by = parameters[sorted_by.lower()] if sorted_by.lower() in parameters.keys() else "name"
     page = int(page) if page else 0
 
-    query = query.strip()
-    packages = db.packages.find(
+    query = query.strip().lower()
+    packages = (
+        db.packages.find(
             {
                 "$and": [
                     {
@@ -39,8 +50,12 @@ def search_packages():
                 "description": 1,
                 "tags": 1,
             },
-        ).sort(sorted_by, sort).limit(10).skip(page * 10)
-    
+        )
+        .sort(sorted_by, sort)
+        .limit(10)
+        .skip(page * 10)
+    )
+
     if packages:
         search_packages = []
         for i in packages:
@@ -52,6 +67,7 @@ def search_packages():
         return jsonify({"status": 200, "packages": search_packages}), 200
     else:
         return jsonify({"status": "error", "message": "packages not found"}), 404
+
 
 @app.route("/packages", methods=["POST"])
 def upload():
@@ -92,7 +108,7 @@ def upload():
         }
 
         db.namespaces.insert_one(namespace_doc)
-    
+
     # Get the namespace document.
     namespace = db.namespaces.find_one({"namespace": namespace})
 
@@ -106,9 +122,9 @@ def upload():
         return jsonify({"status": "error", "message": "Package already exists"}), 400
 
     # Get the previous uploaded package.
-    package_previously_uploaded = db.packages.find_one({
-        "name": name, "namespace": namespace["_id"]
-    })
+    package_previously_uploaded = db.packages.find_one(
+        {"name": name, "namespace": namespace["_id"]}
+    )
 
     # TODO: Replace this code with Storage Service.
     tarball_name = "{}-{}.tar.gz".format(name, version)
@@ -132,7 +148,7 @@ def upload():
             "isDeprecated": False,
         }
 
-        version_document = {    
+        version_document = {
             "version": version,
             "tarball": tarball_name,
             "dependencies": dependencies,
@@ -145,7 +161,7 @@ def upload():
         package["versions"].append(version_document)
 
         db.packages.insert_one(package)
-        
+
         package = db.packages.find_one(
             {"name": name, "versions.version": version, "namespace": namespace["_id"]}
         )
@@ -153,27 +169,29 @@ def upload():
         namespace["packages"] = []
 
         # Add the package id to the namespace.
-        namespace["packages"].append(package["_id"])            
+        namespace["packages"].append(package["_id"])
         namespace["updatedAt"] = datetime.utcnow()
         db.namespaces.update_one({"_id": namespace["_id"]}, {"$set": namespace})
 
         if "authorOf" not in user:
             user["authorOf"] = []
-        
+
         # Current user is the author of the package.
         user["authorOf"].append(package["_id"])
         db.users.update_one({"_id": user["_id"]}, {"$set": user})
 
-        return jsonify({"message": "Package Uploaded Successfully.", "code": 200})     
+        return jsonify({"message": "Package Uploaded Successfully.", "code": 200})
     else:
         # This block of code runs if there are previous recorded versions of a package present in registry.
         # This means user is uploading a new version of already existing package.
         # Check if the version to be uploaded is valid or not.
-        is_valid = check_version(package_previously_uploaded["versions"][-1]["version"], version)
+        is_valid = check_version(
+            package_previously_uploaded["versions"][-1]["version"], version
+        )
 
         if not is_valid:
             return jsonify({"status": "error", "message": "Incorrect version"}), 400
-            
+
         new_version = {
             "tarball": tarball_name,
             "version": version,
@@ -181,10 +199,13 @@ def upload():
             "isDeprecated": False,
         }
 
-        package_previously_uploaded["versions"].append(new_version)  
+        package_previously_uploaded["versions"].append(new_version)
         package_previously_uploaded["updatedAt"] = datetime.utcnow()
-        db.packages.update_one({"_id": package_previously_uploaded["_id"]}, {"$set": package_previously_uploaded})
-        
+        db.packages.update_one(
+            {"_id": package_previously_uploaded["_id"]},
+            {"$set": package_previously_uploaded},
+        )
+
         return jsonify({"message": "Package Uploaded Successfully.", "code": 200})
 
 
@@ -210,7 +231,7 @@ def update_package():
     )
     if package is None:
         return jsonify({"status": "error", "message": "Package doesn't exist"}), 404
-    
+
     isDeprecated = True if isDeprecated == "true" else False
     package["isDeprecated"] = isDeprecated
     package["updatedAt"] = datetime.utcnow()
@@ -221,24 +242,25 @@ def update_package():
 def check_version(current_version, new_version):
     current_list = list(map(int, current_version.split(".")))
     new_list = list(map(int, new_version.split(".")))
-    return (new_list > current_list)
-    
+    return new_list > current_list
+
+
 @app.route("/packages/<namespace_name>/<package_name>", methods=["GET"])
 def get_package(namespace_name, package_name):
     # Get namespace from namespace name.
     namespace = db.namespaces.find_one({"namespace": namespace_name})
 
     # Get package from a package_name and namespace's id.
-    package = db.packages.find_one({
-        "name": package_name, "namespace": namespace["_id"]
-    })
+    package = db.packages.find_one(
+        {"name": package_name, "namespace": namespace["_id"]}
+    )
 
     # Check if package is not found.
     if not package:
         return jsonify({"message": "Package not found", "code": 404})
 
     else:
-        # Get the package author from id. 
+        # Get the package author from id.
         package_author = db.users.find_one({"_id": package["author"]})
 
         # Only latest version of the package will be sent as a response.
@@ -256,26 +278,35 @@ def get_package(namespace_name, package_name):
 
         return jsonify({"data": package_response_data, "code": 200})
 
+
 @app.route("/packages/<namespace_name>/<package_name>/<version>", methods=["GET"])
 def get_package_from_version(namespace_name, package_name, version):
     # Get namespace from namespace name.
     namespace = db.namespaces.find_one({"namespace": namespace_name})
 
     # Get package from a package_name, namespace's id and version.
-    package = db.packages.find_one({"name": package_name, "namespace": namespace["_id"], "versions.version": version})
+    package = db.packages.find_one(
+        {
+            "name": package_name,
+            "namespace": namespace["_id"],
+            "versions.version": version,
+        }
+    )
 
     # Check if package is not found.
     if not package:
         return jsonify({"message": "Package not found", "code": 404})
 
     else:
-        # Get the package author from id. 
+        # Get the package author from id.
         package_author = db.users.find_one({"_id": package["author"]})
 
         # Extract version data from the list of versions.
         version_history = package["versions"]
-        version_data = next(filter(lambda obj: obj['version'] == version, version_history), None)
-        
+        version_data = next(
+            filter(lambda obj: obj["version"] == version, version_history), None
+        )
+
         # Only queried version should be sent as response.
         package_response_data = {
             "name": package["name"],
@@ -290,6 +321,7 @@ def get_package_from_version(namespace_name, package_name, version):
 
         return jsonify({"data": package_response_data, "code": 200})
 
+
 @app.route("/packages/<namespace_name>/<package_name>/delete", methods=["POST"])
 def delete_package(namespace_name, package_name):
     uuid = request.form.get("uuid")
@@ -299,31 +331,43 @@ def delete_package(namespace_name, package_name):
 
     user = db.users.find_one({"uuid": uuid})
 
-    if not user:
-        return jsonify({"status": "error", "message": "Unauthorized"}), 401  
+    # Check if the user is authorized to delete the package.
+    if not "admin" in user["roles"]:
+        return (
+            jsonify(
+                {
+                    "status": "error",
+                    "message": "User is not authorized to delete the package",
+                }
+            ),
+            401,
+        )
 
     # Get the namespace from the namespace name.
-    namespace = db.namespaces.find_one({"namespace": namespace_name}) 
-    
+    namespace = db.namespaces.find_one({"namespace": namespace_name})
+
     # Find package using package_name & namespace_name.
-    package = db.packages.find_one({"name": package_name, "namespace": namespace["_id"]})
+    package = db.packages.find_one(
+        {"name": package_name, "namespace": namespace["_id"]}
+    )
 
     # If package is not found. Return 404.
     if not package:
         return jsonify({"message": "Package not found", "code": 404})
 
-    # Check if the user is authorized to delete the package.
-    if user["_id"] not in package["maintainers"]:
-        return jsonify({"status": "error", "message": "User is not authorized to delete the package"}), 401
+    package_deleted = db.packages.delete_one(
+        {"name": package_name, "namespace": namespace["_id"]}
+    )
 
-    package_deleted = db.packages.delete_one({"name": package_name, "namespace": namespace["_id"]})
-    
     if package_deleted.deleted_count > 0:
         return jsonify({"message": "Package deleted successfully"}), 200
     else:
-        return jsonify({"message": "Package not found", "code": 404})
+        return jsonify({"message": "Internal Server Error", "code": 500})
 
-@app.route("/packages/<namespace_name>/<package_name>/<version>/delete", methods=["POST"])
+
+@app.route(
+    "/packages/<namespace_name>/<package_name>/<version>/delete", methods=["POST"]
+)
 def delete_package_version(namespace_name, package_name, version):
     uuid = request.form.get("uuid")
 
@@ -332,26 +376,28 @@ def delete_package_version(namespace_name, package_name, version):
 
     user = db.users.find_one({"uuid": uuid})
 
-    if not user:
-        return jsonify({"status": "error", "message": "Unauthorized"}), 401  
-    
-    # Get the namespace from the namespace name.
-    namespace = db.namespaces.find_one({"namespace": namespace_name}) 
-
-    package = db.packages.find_one({"name": package_name, "namespace": namespace["_id"]}) 
-
     # Check if the user is authorized to delete the package.
-    if user["_id"] not in package["maintainers"]:
-        return jsonify({"status": "error", "message": "User is not authorized to delete the package"}), 401
+    if not "admin" in user["roles"]:
+        return (
+            jsonify(
+                {
+                    "status": "error",
+                    "message": "User is not authorized to delete the package",
+                }
+            ),
+            401,
+        )
+
+    # Get the namespace from the namespace name.
+    namespace = db.namespaces.find_one({"namespace": namespace_name})
 
     # Perform the pull operation.
     result = db.packages.update_one(
         {"name": package_name, "namespace": namespace["_id"]},
-        {"$pull": {"versions": {"version": version}}}
-    )   
+        {"$pull": {"versions": {"version": version}}},
+    )
 
     if result.matched_count:
         return jsonify({"message": "Package version deleted successfully"}), 200
     else:
         return jsonify({"status": "error", "message": "Package version not found"}), 404
-

@@ -5,4 +5,4 @@
 /flask/vercel.json
 /flask/static/
 /flask/.vercel
-/frontend/
+/frontend/node_modules/
