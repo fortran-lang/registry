@@ -2,6 +2,7 @@ from app import app
 from mongo import db
 from flask import request, jsonify
 
+
 @app.route("/users/<username>", methods=["GET"])
 def profile(username):
     user = db.users.find_one({"name": username})
@@ -16,7 +17,7 @@ def profile(username):
     )
     if packages:
         packages = [package for package in packages]
-        return jsonify({"message": "User found","packages":packages, "code": 200})
+        return jsonify({"message": "User found", "packages": packages, "code": 200})
     else:
         return jsonify({"message": "User not found", "code": 404})
 

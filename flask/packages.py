@@ -15,6 +15,7 @@ parameters = {
     "downloads": "downloads",
 }
 
+
 @app.route("/packages", methods=["GET"])
 @swag_from("documentation/search_packages.yaml", methods=["GET"])
 def search_packages():
@@ -24,7 +25,11 @@ def search_packages():
     sort = request.args.get("sort")
     query = query if query else "fortran"
     sort = -1 if sort == "desc" else 1
-    sorted_by = parameters[sorted_by.lower()] if sorted_by.lower() in parameters.keys() else "name"
+    sorted_by = (
+        parameters[sorted_by.lower()]
+        if sorted_by.lower() in parameters.keys()
+        else "name"
+    )
     page = int(page) if page else 0
 
     query = query.strip().lower()
