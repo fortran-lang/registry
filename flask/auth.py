@@ -62,10 +62,7 @@ def signup():
         registry_user = db.users.find_one({"$or": [{"name": name}, {"email": email}]})
         uuid = generate_uuid()
     else:
-        return (
-            jsonify({"message": "A user with this email already exists", "code": 400}),
-            400,
-        )
+        return jsonify({"message": "A user with this email already exists", "code": 400}),400
 
     user = {
         "name": name,
@@ -79,10 +76,7 @@ def signup():
         db.users.insert_one(user)
         return jsonify({"message": "Signup successful", "uuid": uuid, "code": 200}), 200
     else:
-        return (
-            jsonify({"message": "A user with this email already exists", "code": 400}),
-            400,
-        )
+        return jsonify({"message": "A user with this email already exists", "code": 400}),400
 
 
 @app.route("/auth/logout", methods=["POST"])
@@ -131,7 +125,4 @@ def forgot_password():
 
     # send the uuid link in the email
 
-    return (
-        jsonify({"message": "Password reset link sent to your email", "code": 200}),
-        200,
-    )
+    return jsonify({"message": "Password reset link sent to your email", "code": 200}),200
