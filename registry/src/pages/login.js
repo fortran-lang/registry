@@ -9,7 +9,6 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [cookies, setCookie] = useCookies(["uuid"]);
   const navigate = useNavigate();
-
   const dispatch = useDispatch();
 
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
@@ -24,7 +23,7 @@ const Login = () => {
       const errorDiv = document.getElementById("error");
       errorDiv.innerHTML = errorMessage;
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, errorMessage]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

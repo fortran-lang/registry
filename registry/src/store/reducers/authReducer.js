@@ -1,4 +1,9 @@
-import { LOGIN_SUCCESS, LOGIN_FAILURE } from "../actions/authActions";
+import {
+  LOGIN_SUCCESS,
+  LOGIN_FAILURE,
+  SIGNUP_SUCCESS,
+  SIGNUP_FAILURE,
+} from "../actions/authActions";
 
 const initialState = {
   isAuthenticated: false,
@@ -23,6 +28,19 @@ const authReducer = (state = initialState, action) => {
         error: action.payload.error,
       };
 
+    case SIGNUP_SUCCESS:
+      return {
+        ...state,
+        isAuthenticated: true,
+        uuid: action.payload.uuid,
+      };
+
+    case SIGNUP_FAILURE:
+      return {
+        ...state,
+        isAuthenticated: false,
+        error: action.payload.error,
+      };
     default:
       return state;
   }
