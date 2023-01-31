@@ -1,0 +1,35 @@
+description: Deletes a user by uuid.
+parameters:
+  - name: uuid
+    description: The uuid of the user to be deleted.
+    required: true
+    type: string
+
+responses:
+  200:
+    description: User deleted
+    schema: 
+      type: array
+      items:
+        type: object
+        properties:
+          message:
+            type: string
+            description: The message of successful deletion
+          code:
+            type: string
+            description: response status code
+
+  401:
+    description: User not found
+    schema: 
+      type: array
+      items:
+        type: object
+        properties:
+          message:
+            type: string
+            description: User not found
+          code:
+            type: string
+            description: response status code

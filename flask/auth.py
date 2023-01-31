@@ -98,6 +98,7 @@ def logout():
 
 
 @app.route("/auth/reset-password", methods=["GET"])
+@swag_from("documentation/reset_password.yaml", methods=["GET"])
 def reset_password():
     password = request.form.get("password")
     uuid = request.form.get("uuid")
@@ -114,6 +115,7 @@ def reset_password():
 
 
 @app.route("/auth/forgot-password", methods=["POST"])
+@swag_from("documentation/forgot_password.yaml", methods=["POST"])
 def forgot_password():
     email = request.form.get("email")
     user = db.users.find({"email": email})

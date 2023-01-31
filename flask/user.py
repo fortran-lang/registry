@@ -1,9 +1,12 @@
 from app import app
 from mongo import db
 from flask import request, jsonify
+from app import swagger
+from flasgger.utils import swag_from
 
 
 @app.route("/users/<username>", methods=["GET"])
+@swag_from("documentation/user.yaml", methods=["GET"])
 def profile(username):
     user = db.users.find_one({"name": username})
     packages = db.packages.find(
@@ -23,6 +26,7 @@ def profile(username):
 
 
 @app.route("/users/delete", methods=["POST"])
+@swag_from("documentation/delete_user.yaml", methods=["POST"])
 def delete_user():
     uuid = request.form.get("uuid")
     if not uuid:

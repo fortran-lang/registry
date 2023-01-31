@@ -251,6 +251,7 @@ def check_version(current_version, new_version):
 
 
 @app.route("/packages/<namespace_name>/<package_name>", methods=["GET"])
+@swag_from("documentation/get_package.yaml", methods=["GET"])
 def get_package(namespace_name, package_name):
     # Get namespace from namespace name.
     namespace = db.namespaces.find_one({"namespace": namespace_name})
@@ -285,6 +286,7 @@ def get_package(namespace_name, package_name):
 
 
 @app.route("/packages/<namespace_name>/<package_name>/<version>", methods=["GET"])
+@swag_from("documentation/get_version.yaml", methods=["GET"])
 def get_package_from_version(namespace_name, package_name, version):
     # Get namespace from namespace name.
     namespace = db.namespaces.find_one({"namespace": namespace_name})
