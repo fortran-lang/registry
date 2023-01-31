@@ -1,15 +1,23 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import { CookiesProvider } from 'react-cookie';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import App from "./App";
+import { CookiesProvider } from "react-cookie";
+import { configureStore } from "@reduxjs/toolkit";
+import { Provider } from "react-redux";
+import rootReducer from "./store/reducers/rootReducer";
 
-
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById("root"));
+const store = configureStore({
+  reducer: rootReducer,
+});
 root.render(
   // <React.StrictMode>import { CookiesProvider } from 'react-cookie';
-<CookiesProvider><App /></CookiesProvider>
-    
+  <Provider store={store}>
+    <CookiesProvider>
+      <App />
+    </CookiesProvider>
+  </Provider>
   // </React.StrictMode>
 );
 

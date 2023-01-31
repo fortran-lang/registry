@@ -1,48 +1,34 @@
-import React, { useState } from "react";
-import axios from "axios";
-import { Navigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "../store/actions/authActions";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [cookies, setCookie] = useCookies(["uuid"]);
-  const [navigate, setNavigate] = useState(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const errorMessage = useSelector((state) => state.auth.error);
+  const uuid = useSelector((state) => state.auth.uuid);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      setCookie("uuid", uuid);
+      navigate("/manage/projects");
+    } else if (errorMessage !== null) {
+      const errorDiv = document.getElementById("error");
+      errorDiv.innerHTML = errorMessage;
+    }
+  }, [isAuthenticated, errorMessage]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const formData = new FormData();
-    if (!cookies.uuid) {
-      formData.append("email", email);
-      formData.append("password", password);
-    } else {
-      formData.append("uuid", cookies.uuid);
-    }
-    var response;
-    try {
-      response = await axios({
-        method: "post",
-        url: `${process.env.REACT_APP_REGISTRY_API_URL}/auth/login`,
-        data: formData,
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-    } catch (error) {
-      setCookie("uuid", "", "100");
-      const errorMsg = `${error.response.data}`;
-      const errorDiv = document.getElementById("error");
-      errorDiv.innerHTML = errorMsg;
-    }
-    if (response.status === 200) {
-      setCookie("uuid", response.data.uuid, { path: "/" });
-      setNavigate(true);
-    }
+    dispatch(login(email, password));
   };
-  if (navigate) {
-    return <Navigate to="/manage/projects" replace={true} />;
-  }
 
   return (
     <form id="login-form" onSubmit={handleSubmit}>
