@@ -14,9 +14,11 @@ const Login = () => {
 
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const errorMessage = useSelector((state) => state.auth.error);
+  const uuid = useSelector((state) => state.auth.uuid);
 
   useEffect(() => {
     if (isAuthenticated) {
+      setCookie("uuid", uuid);
       navigate("/manage/projects");
     } else if (errorMessage !== null) {
       const errorDiv = document.getElementById("error");
