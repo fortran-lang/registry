@@ -14,13 +14,24 @@ def profile(username):
         {
             "name": 1,
             "updatedAt": 1,
+            "namespace": 1,
             "_id": 0,
             "description": {"$substr": ["$description", 0, 80]},
         },
     )
     if packages:
-        packages = [package for package in packages]
-        return jsonify({"message": "User found", "packages": packages, "code": 200})
+        response_packages = []
+        for package in packages:
+            # Get namespace from namespace id.
+            namespace = db.namespaces.find_one({"_id": package["namespace"]})
+            response_packages.append({
+                "name": package["name"],
+                "namespace_name": namespace["namespace"],
+                "description": package["description"],
+                "updatedAt": package["updatedAt"],
+            })
+
+        return jsonify({"message": "User found", "packages": response_packages, "code": 200})
     else:
         return jsonify({"message": "User not found", "code": 404})
 

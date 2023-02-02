@@ -46,7 +46,7 @@ def login():
         {"_id": user["_id"]}, {"$set": {"loginAt": datetime.utcnow(), "uuid": uuid}}
     )
 
-    return jsonify({"message": "Login successful", "uuid": uuid, "code": 200}), 200
+    return jsonify({"message": "Login successful", "uuid": uuid, "code": 200, "name": user["name"]}), 200
 
 
 @app.route("/auth/signup", methods=["POST"])
@@ -74,7 +74,9 @@ def signup():
     }
     if not registry_user:
         db.users.insert_one(user)
-        return jsonify({"message": "Signup successful", "uuid": uuid, "code": 200}), 200
+        user_doc = db.users.find_one({"email": email})
+
+        return jsonify({"message": "Signup successful", "uuid": uuid, "code": 200, "name": user_doc["name"]}), 200
     else:
         return jsonify({"message": "A user with this email already exists", "code": 400}),400
 

@@ -122,7 +122,7 @@ def upload():
         {"name": name, "versions.version": version, "namespace": namespace["_id"]}
     )
 
-    # Check if package with particular version number already exits.
+    # Check if package with particular version number already exists.
     if package is not None:
         return jsonify({"status": "error", "message": "Package already exists"}), 400
 
