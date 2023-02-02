@@ -88,3 +88,7 @@ body {
   margin-bottom: 10px;
   /* display: none; */
 }
+
+#card-text {
+  text-align: justify;
+}

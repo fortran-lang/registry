@@ -12,6 +12,8 @@ import Search from "./pages/search";
 import NoPage from "./pages/404";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+import 'bootstrap/dist/css/bootstrap.css';
+
 function App() {
   return (
     <BrowserRouter>

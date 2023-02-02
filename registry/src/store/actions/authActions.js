@@ -25,6 +25,7 @@ export const login = (email, password) => async (dispatch) => {
         type: LOGIN_SUCCESS,
         payload: {
           uuid: result.data.uuid,
+          username: result.data.name,
         },
       });
     } else {
@@ -56,7 +57,6 @@ export const signup = (name, email, password) => async (dispatch) => {
   formData.append("email", email);
   formData.append("password", password);
 
-  console.log("Signup Called");
   // Make the api call to register.
   try {
     let result = await axios({
@@ -68,13 +68,12 @@ export const signup = (name, email, password) => async (dispatch) => {
       },
     });
 
-    console.log(result);
-
     if (result.data.code === 200) {
       dispatch({
         type: SIGNUP_SUCCESS,
         payload: {
           uuid: result.data.uuid,
+          username: result.data.name,
         },
       });
     } else {
