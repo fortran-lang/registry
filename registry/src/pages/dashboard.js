@@ -29,8 +29,8 @@ const Dashboard = () => {
     <Container>
       <Row>
         {packages.map((element, index) => (
-          <Col xs={6} md={4}>
-            <Card key={index}>
+          <Col key={element.name + element.namespace_name} xs={6} md={4}>
+            <Card>
               <Card.Body>
                 <Card.Title>{element.name}</Card.Title>
                 <Card.Subtitle className="mb-2 text-muted">
