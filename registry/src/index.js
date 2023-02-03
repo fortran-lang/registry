@@ -6,17 +6,30 @@ import { CookiesProvider } from "react-cookie";
 import { configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
 import rootReducer from "./store/reducers/rootReducer";
+import { persistStore, persistReducer } from "redux-persist";
+import storage from "redux-persist/lib/storage";
+import { PersistGate } from "redux-persist/integration/react";
+
+const persistConfig = {
+  key: "root",
+  storage,
+};
+
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 const store = configureStore({
-  reducer: rootReducer,
+  reducer: persistedReducer,
 });
+const persistor = persistStore(store);
+
 root.render(
-  // <React.StrictMode>import { CookiesProvider } from 'react-cookie';
   <Provider store={store}>
-    <CookiesProvider>
-      <App />
-    </CookiesProvider>
+    <PersistGate persistor={persistor}>
+      <CookiesProvider>
+        <App />
+      </CookiesProvider>
+    </PersistGate>
   </Provider>
   // </React.StrictMode>
 );
