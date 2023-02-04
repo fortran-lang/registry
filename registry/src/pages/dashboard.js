@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useCookies } from "react-cookie";
 import { fetchPackages } from "../store/actions/dashboardActions";
+import { useNavigate } from "react-router-dom";
 import Card from "react-bootstrap/Card";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
@@ -14,10 +15,15 @@ const Dashboard = () => {
   const packages = useSelector((state) => state.dashboard.packages);
   const isLoading = useSelector((state) => state.dashboard.isLoading);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (packages === null) {
       dispatch(fetchPackages(username));
+    }
+
+    if (username === null) {
+      navigate("/");
     }
   });
 
