@@ -410,8 +410,11 @@ def delete_package_version(namespace_name, package_name, version):
         return jsonify({"status": "error", "message": "Package version not found"}), 404
 
 
-@app.route("/", methods=["GET"])
+@app.route("/packages/list", methods=["GET"])
 def get_packages():
+    limit = int(request.args.get('limit', 10))
+    offset = int(request.args.get('offset', 0))
+
     packages = db.packages.find()
     response_packages = []
     for package in packages:
@@ -424,29 +427,12 @@ def get_packages():
         # Get the latest version of the package.
         latest_version = package["versions"][-1]["version"]
 
-        # Get the latest tarball of the package.
-        latest_tarball = package["versions"][-1]["tarball"]
-
-        # Get the latest dependencies of the package.
-        latest_dependencies = package["versions"][-1]["dependencies"]
-
-        # Get the author from the id.
-        author = db.users.find_one({"_id": package["author"]})
-
         response_packages.append({
             "package_name": package["name"],
             "namespace_name": namespace["namespace"],
-            "version": latest_version,
-            "tarball": latest_tarball,
-            "dependencies": latest_dependencies,
-            "version_history": package["versions"],
-            "tags": package["tags"],
-            "createdAt": package["createdAt"],
-            "updatedAt": package["updatedAt"],
             "description": package["description"],
-            "author": author["email"],
-            "license": package["license"],
-            "copyright": package["copyright"],
         })
 
-    return jsonify(response_packages)
+    result = response_packages[offset:offset + limit]
+
+    return jsonify(result)
