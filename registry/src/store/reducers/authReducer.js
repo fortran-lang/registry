@@ -9,7 +9,6 @@ const initialState = {
   isAuthenticated: false,
   uuid: null,
   error: null,
-  isLoading: false,
   username: null,
 };
 
