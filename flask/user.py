@@ -24,16 +24,23 @@ def profile(username):
         for package in packages:
             # Get namespace from namespace id.
             namespace = db.namespaces.find_one({"_id": package["namespace"]})
-            response_packages.append({
-                "name": package["name"],
-                "namespace_name": namespace["namespace"],
-                "description": package["description"],
-                "updatedAt": package["updatedAt"],
-            })
+            response_packages.append(
+                {
+                    "name": package["name"],
+                    "namespace_name": namespace["namespace"],
+                    "description": package["description"],
+                    "updatedAt": package["updatedAt"],
+                }
+            )
 
-        return jsonify({"message": "User found", "packages": response_packages, "code": 200})
+        return (
+            jsonify(
+                {"message": "User found", "packages": response_packages, "code": 200}
+            ),
+            200,
+        )
     else:
-        return jsonify({"message": "User not found", "code": 404})
+        return jsonify({"message": "User not found", "code": 404}), 404
 
 
 @app.route("/users/delete", methods=["POST"])
@@ -41,7 +48,7 @@ def profile(username):
 def delete_user():
     uuid = request.form.get("uuid")
     if not uuid:
-        return jsonify({"message": "User not found", "code": 401})
+        return jsonify({"message": "User not found", "code": 401}), 401
     else:
         user = db.users.find_one({"uuid": uuid})
 
@@ -50,4 +57,4 @@ def delete_user():
 
     db.users.delete_one({"uuid": uuid})
 
-    return jsonify({"message": "User deleted", "code": 200})
+    return jsonify({"message": "User deleted", "code": 200}), 200

@@ -23,6 +23,7 @@ def search_packages():
     page = request.args.get("page")
     sorted_by = request.args.get("sorted_by")
     sort = request.args.get("sort")
+    sorted_by = sorted_by.lower() if sorted_by else "name"
     query = query if query else "fortran"
     sort = -1 if sort == "desc" else 1
     sorted_by = (

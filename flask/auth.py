@@ -46,7 +46,17 @@ def login():
         {"_id": user["_id"]}, {"$set": {"loginAt": datetime.utcnow(), "uuid": uuid}}
     )
 
-    return jsonify({"message": "Login successful", "uuid": uuid, "code": 200, "name": user["name"]}), 200
+    return (
+        jsonify(
+            {
+                "message": "Login successful",
+                "uuid": uuid,
+                "code": 200,
+                "name": user["name"],
+            }
+        ),
+        200,
+    )
 
 
 @app.route("/auth/signup", methods=["POST"])
@@ -62,7 +72,10 @@ def signup():
         registry_user = db.users.find_one({"$or": [{"name": name}, {"email": email}]})
         uuid = generate_uuid()
     else:
-        return jsonify({"message": "A user with this email already exists", "code": 400}),400
+        return (
+            jsonify({"message": "A user with this email already exists", "code": 400}),
+            400,
+        )
 
     user = {
         "name": name,
@@ -76,9 +89,22 @@ def signup():
         db.users.insert_one(user)
         user_doc = db.users.find_one({"email": email})
 
-        return jsonify({"message": "Signup successful", "uuid": uuid, "code": 200, "name": user_doc["name"]}), 200
+        return (
+            jsonify(
+                {
+                    "message": "Signup successful",
+                    "uuid": uuid,
+                    "code": 200,
+                    "name": user_doc["name"],
+                }
+            ),
+            200,
+        )
     else:
-        return jsonify({"message": "A user with this email already exists", "code": 400}),400
+        return (
+            jsonify({"message": "A user with this email already exists", "code": 400}),
+            400,
+        )
 
 
 @app.route("/auth/logout", methods=["POST"])
@@ -99,8 +125,8 @@ def logout():
     return jsonify({"message": "Logout successful", "code": 200}), 200
 
 
-@app.route("/auth/reset-password", methods=["GET"])
-@swag_from("documentation/reset_password.yaml", methods=["GET"])
+@app.route("/auth/reset-password", methods=["POST"])
+@swag_from("documentation/reset_password.yaml", methods=["POST"])
 def reset_password():
     password = request.form.get("password")
     uuid = request.form.get("uuid")
@@ -129,4 +155,7 @@ def forgot_password():
 
     # send the uuid link in the email
 
-    return jsonify({"message": "Password reset link sent to your email", "code": 200}),200
+    return (
+        jsonify({"message": "Password reset link sent to your email", "code": 200}),
+        200,
+    )
