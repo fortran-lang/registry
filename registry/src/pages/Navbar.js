@@ -41,6 +41,21 @@ const Navbar = () => {
               Login
             </NavLink>
           )}
+          {isAuthenticated && (
+            <NavLink to="/package/create" activeStyle>
+              Create
+            </NavLink>
+          )}
+          {isAuthenticated && (
+            <NavLink to="/manage/projects" activeStyle>
+              Packages
+            </NavLink>
+          )}
+          {isAuthenticated && (
+            <NavLink to="/manage/account" activeStyle>
+              Account
+            </NavLink>
+          )}
           {!isAuthenticated && (
             <NavLink to="/account/register" activeStyle>
               Register
@@ -48,9 +63,6 @@ const Navbar = () => {
           )}
           <NavLink to="/search" activeStyle>
             Search
-          </NavLink>
-          <NavLink to="/blogs" activeStyle>
-            Blogs
           </NavLink>
           {isAuthenticated && (
             <NavLink onClick={signOut} activeStyle>

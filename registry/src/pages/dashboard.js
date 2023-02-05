@@ -33,6 +33,7 @@ const Dashboard = () => {
     </Spinner>
   ) : (
     <Container>
+    <Container>Packages</Container>
       <Row>
         {packages.map((element, index) => (
           <Col key={element.name + element.namespace_name} xs={6} md={4}>
