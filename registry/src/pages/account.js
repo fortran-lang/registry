@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { useCookies } from "react-cookie";
-import { fetchPackages } from "../store/actions/dashboardActions";
 import { useNavigate } from "react-router-dom";
+import {
+  reset,
+  getUserAccount,
+  deleteAccount,
+} from "../store/actions/accountActions";
+import { fetchPackages } from "../store/actions/dashboardActions";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { MDBIcon } from "mdbreact";
-import { MDBBtn } from 'mdb-react-ui-kit';
+import { MDBBtn } from "mdb-react-ui-kit";
 import Image from "react-bootstrap/Image";
 import Table from "react-bootstrap/Table";
 import Spinner from "react-bootstrap/Spinner";
@@ -20,12 +24,13 @@ import "bootstrap-css-only/css/bootstrap.min.css";
 import "mdbreact/dist/css/mdb.css";
 
 const Account = () => {
-  const [email, setEmail] = useState("");
-  const [error, setError] = useState("");
-  const [cookies, setCookie] = useCookies(["uuid"]);
+  const email = useSelector((state) => state.account.email);
+  const error = useSelector((state) => state.account.error);
   const [password, setPassword] = useState("");
   const [oldpassword, setOldpassword] = useState("");
-  const [dateJoined, setdateJoined] = useState("");
+  const [Newpassword, setNewpassword] = useState("");
+  const [show, setShow] = useState(false);
+  const dateJoined = useSelector((state) => state.account.dateJoined);
   const username = useSelector((state) => state.auth.username);
   const uuid = useSelector((state) => state.auth.uuid);
   const packages = useSelector((state) => state.dashboard.packages);
@@ -38,74 +43,19 @@ const Account = () => {
       navigate("/");
     } else if (packages === null) {
       dispatch(fetchPackages(username));
-
-      let formData = new FormData();
-      formData.append("uuid", uuid);
-
-      axios({
-        method: "post",
-        url: `${process.env.REACT_APP_REGISTRY_API_URL}/users/account`,
-        data: formData,
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
-        .then((result) => {
-          setEmail(result.data.user.email);
-          setdateJoined(result.data.user.createdAt.slice(0, 16));
-        })
-        .catch((error) => {
-          console.log(cookies.uuid);
-        });
+      dispatch(getUserAccount(uuid));
     }
   });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    let formData = new FormData();
-    formData.append("oldpassword", oldpassword);
-    formData.append("password", password);
-    formData.append("uuid", uuid);
-
-    axios({
-      method: "post",
-      url: `${process.env.REACT_APP_REGISTRY_API_URL}/auth/reset-password`,
-      data: formData,
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    })
-      .then((result) => {
-        // console.log(result);
-        setError(result.data.message);
-      })
-      .catch((error) => {
-        console.log(error);
-        setError(error.response.data.message);
-      });
+    dispatch(reset(oldpassword, Newpassword, uuid));
+    setShow(true);
   };
+
   const handleDelete = async (e) => {
     e.preventDefault();
-    let formData = new FormData();
-    formData.append("password", password);
-    formData.append("uuid", uuid);
-
-    axios({
-      method: "post",
-      url: `${process.env.REACT_APP_REGISTRY_API_URL}/users/delete`,
-      data: formData,
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    })
-      .then((result) => {
-        // console.log(result);
-        setError(result.data.message);
-      })
-      .catch((error) => {
-        console.log(error);
-        setError(error.response.data.message);
-      });
+    dispatch(deleteAccount(password, uuid));
   };
 
   return isLoading ? (
@@ -131,7 +81,7 @@ const Account = () => {
               />
             </td>
             <td>
-              We use <a href="gravatar.com">gravatar.com</a> to generate your
+              We use <a href="https://gravatar.com">gravatar.com</a> to generate your
               profile picture based on your primary email address —
               <code className="break"> {email} </code>.
             </td>
@@ -188,8 +138,8 @@ const Account = () => {
               type="password"
               placeholder="Enter New Password"
               name="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={Newpassword}
+              onChange={(e) => setNewpassword(e.target.value)}
             />
           </Col>
         </Form.Group>
@@ -198,11 +148,10 @@ const Account = () => {
           Submit
         </Button>
         <Form.Text id="error" className="text-muted">
-          {error}
+        {show && (error)}
         </Form.Text>
       </Form>
       <Container>
-        {" "}
         <Table>
           <thead>
             <h3>Delete account</h3>
@@ -222,7 +171,6 @@ const Account = () => {
         <Form onSubmit={handleDelete} className="text-danger">
           <Form.Group as={Row} className="mb-4">
             <Form.Label column sm="4">
-              {" "}
               Password
             </Form.Label>
             <Col sm="8">
@@ -235,14 +183,11 @@ const Account = () => {
               />{" "}
             </Col>
           </Form.Group>
-          <MDBBtn className='me-1' color='danger' type="submit">
-          Delete Account
-      </MDBBtn>
-          {/* <Button variant="secondary" >
+          <MDBBtn className="me-1" color="danger" type="submit">
             Delete Account
-          </Button> */}
+          </MDBBtn>
           <Form.Text id="error" className="text-muted">
-            {error}
+            {!show && (error)}
           </Form.Text>
         </Form>
       </Container>

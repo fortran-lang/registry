@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import "./search.css";
+// import "./search.css";
 
 const Search = () => {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -17,8 +19,21 @@ const Search = () => {
       });
   };
 
+  const loadQuery = () => {
+    console.log("urlParams.get(query)");
+    setQuery(urlParams.get("query"));
+    const url = `${
+      process.env.REACT_APP_REGISTRY_API_URL
+    }/packages?query=${encodeURIComponent(query)}`;
+    fetch(url)
+      .then((response) => response.json())
+      .then((data) => {
+        setResults(data["packages"]);
+      });
+  };
+
   return (
-    <div class="container">
+    <div class="container" onLoad={loadQuery}>
       fpm-registry Package Search
       <form onSubmit={handleSubmit}>
         <input
