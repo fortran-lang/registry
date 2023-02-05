@@ -59,7 +59,7 @@ def delete_user():
     password = request.form.get("password")
 
     if not uuid:
-        return jsonify({"message": "User not found", "code": 404}), 404
+        return jsonify({"message": "Unauthorized", "code": 401}), 401
     else:
         user = db.users.find_one({"uuid": uuid})
 
@@ -83,12 +83,12 @@ def delete_user():
 def account():
     uuid = request.form.get("uuid")
     if not uuid:
-        return jsonify({"message": "User not found", "code": 401}), 401
+        return jsonify({"message": "Unauthorized", "code": 401}), 401
     else:
         user = db.users.find_one({"uuid": uuid})
 
     if not user:
-        return "Invalid email or password", 401
+        return jsonify({"message": "User not found", "code": 404}), 404
 
     user_account = {
         "name": user["name"],
