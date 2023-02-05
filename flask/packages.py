@@ -412,10 +412,9 @@ def delete_package_version(namespace_name, package_name, version):
 
 @app.route("/packages/list", methods=["GET"])
 def get_packages():
-    limit = int(request.args.get('limit', 10))
-    offset = int(request.args.get('offset', 0))
+    page = int(request.args.get("page", 0))
 
-    packages = db.packages.find()
+    packages = db.packages.find().limit(10).skip(page * 10)
     response_packages = []
     for package in packages:
         # Get the namespace id of the package.
@@ -424,15 +423,10 @@ def get_packages():
         # Get the namespace document from namespace id.
         namespace = db.namespaces.find_one({"_id": namespace_id})
 
-        # Get the latest version of the package.
-        latest_version = package["versions"][-1]["version"]
-
         response_packages.append({
             "package_name": package["name"],
             "namespace_name": namespace["namespace"],
             "description": package["description"],
         })
 
-    result = response_packages[offset:offset + limit]
-
-    return jsonify(result)
+    return jsonify({"packages": response_packages})
