@@ -129,10 +129,18 @@ def logout():
 @swag_from("documentation/reset_password.yaml", methods=["POST"])
 def reset_password():
     password = request.form.get("password")
+    oldpassword = request.form.get("oldpassword")
     uuid = request.form.get("uuid")
     user = db.users.find_one({"uuid": uuid})
+
     if not user:
         return jsonify({"message": "User not found", "code": 404}), 404
+    
+    if oldpassword:
+        oldpassword += salt
+        hashed_password = hashlib.sha256(oldpassword.encode()).hexdigest()
+        if hashed_password != user["password"]:
+            return jsonify({"message": "Invalid password", "code": 401}), 401
 
     password += salt
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
