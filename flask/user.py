@@ -1,9 +1,18 @@
+import os
+from dotenv import load_dotenv
+import hashlib
 from app import app
 from mongo import db
 from flask import request, jsonify
 from app import swagger
 from flasgger.utils import swag_from
 
+load_dotenv()
+
+try:
+    salt = os.getenv("SALT")
+except KeyError as err:
+    print("Add SALT to .env file")
 
 @app.route("/users/<username>", methods=["GET"])
 @swag_from("documentation/user.yaml", methods=["GET"])
@@ -47,6 +56,32 @@ def profile(username):
 @swag_from("documentation/delete_user.yaml", methods=["POST"])
 def delete_user():
     uuid = request.form.get("uuid")
+    password = request.form.get("password")
+
+    if not uuid:
+        return jsonify({"message": "User not found", "code": 404}), 404
+    else:
+        user = db.users.find_one({"uuid": uuid})
+
+    if not user:
+        return "Invalid email or password", 401
+    
+    if password:
+        password += salt
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
+        if hashed_password != user["password"]:
+            return jsonify({"message": "Invalid email or password", "code": 401}), 401
+        else:
+            db.users.delete_one({"uuid": uuid})
+            return jsonify({"message": "User deleted", "code": 200}), 200
+    else:
+        return jsonify({"message": "Invalid email or password", "code": 401}), 401
+
+
+@app.route("/users/account", methods=["POST"])
+@swag_from("documentation/account.yaml", methods=["POST"])
+def account():
+    uuid = request.form.get("uuid")
     if not uuid:
         return jsonify({"message": "User not found", "code": 401}), 401
     else:
@@ -55,6 +90,12 @@ def delete_user():
     if not user:
         return "Invalid email or password", 401
 
-    db.users.delete_one({"uuid": uuid})
-
-    return jsonify({"message": "User deleted", "code": 200}), 200
+    user_account = {
+        "name": user["name"],
+        "email": user["email"],
+        "lastLogin": user["lastLogin"],
+        "createdAt": user["createdAt"],
+        "loginAt": user["loginAt"],
+        "lastLogout": user["lastLogout"],
+    }
+    return jsonify({"message": "User Found", "user": user_account, "code": 200}), 200
