@@ -1,0 +1,68 @@
+description: Makes a GET request to check whether local registry has the latest version of a package.
+
+parameters:
+  - name: body
+    description: The list of versions in local registry.
+    required: true
+    type: array
+    items:
+      type: string
+
+responses:
+  200:
+    description: Package already exists in local registry.
+    schema: 
+      type: object
+      properties:
+        message:
+          type: string
+          description: Latest version is already there in local registry
+
+  200: 
+    description: Latest package sent from backend.
+    schema: 
+      type: object
+      properties:
+        package:
+          type: object
+          description: package data
+          properties:
+            name:
+              type: string
+              description: name of package.
+            namespace:
+              type: string
+              description: namespace of package.
+            description:
+              type: string
+              descripion: description of package.
+            latest_version:
+              type: object
+              properties:
+                version: 
+                  type: string
+                  description: latest version number.
+                tarball: 
+                  type: string
+                  description: tarball of the latest version package.
+
+  404:
+    description: Namespace not found.
+    schema:
+      type: array
+      items:
+        type: object
+        properties:
+          message:
+            type: string
+            description: Namespace not found.
+
+  404:
+    description: Package not found.
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Package not found.
+          
