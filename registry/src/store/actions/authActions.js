@@ -41,7 +41,7 @@ export const login = (email, password) => async (dispatch) => {
     dispatch({
       type: LOGIN_FAILURE,
       payload: {
-        error: error,
+        error: error.response.data.message,
       },
     });
   }
@@ -129,7 +129,7 @@ export const signup = (name, email, password) => async (dispatch) => {
     dispatch({
       type: SIGNUP_FAILURE,
       payload: {
-        error: error,
+        error: error.response.data.message,
       },
     });
   }

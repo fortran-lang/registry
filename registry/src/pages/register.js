@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import { useDispatch, useSelector } from "react-redux";
 import { signup } from "../store/actions/authActions";
+import { Link } from "react-router-dom";
 
 const Register = () => {
   const [email, setEmail] = useState("");
@@ -25,11 +26,8 @@ const Register = () => {
     if (isAuthenticated) {
       setCookie("uuid", uuid);
       navigate("/manage/projects");
-    } else if (errorMessage !== null) {
-      const errorDiv = document.getElementById("error");
-      errorDiv.innerHTML = errorMessage;
     }
-  }, [isAuthenticated, errorMessage]);
+  }, [isAuthenticated]);
 
   return (
     <form id="login-form" onSubmit={handleSubmit}>
@@ -56,8 +54,15 @@ const Register = () => {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
-      <p id="error" className="error"></p>
+      {errorMessage != null ? (
+        <p id="error" className="error">
+          {errorMessage}
+        </p>
+      ) : null}
       <input type="submit" value="Sign Up" />
+      <p>
+        Already have an account?<Link to="/account/login"> Log in </Link>
+      </p>
     </form>
   );
 };
