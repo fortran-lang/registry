@@ -9,11 +9,31 @@ import rootReducer from "./store/reducers/rootReducer";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import { PersistGate } from "redux-persist/integration/react";
+import { createTransform } from "redux-persist";
+
+const authTransform = createTransform(
+  // Transform state on its way to being serialized and stored
+  (inboundState, key) => {
+    return {
+      isAuthenticated: inboundState.isAuthenticated,
+      username: inboundState.username,
+      uuid: inboundState.uuid,
+    };
+  },
+  // Transform state on its way back from storage to be rehydrated
+  (outboundState, key) => {
+    return {
+      ...outboundState,
+    };
+  },
+  // Specify the key for the persistable state, in this case it is 'auth'
+  { whitelist: ["auth"] }
+);
 
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["auth"],
+  transforms: [authTransform],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
