@@ -1,5 +1,7 @@
 import axios from "axios";
 
+export const RESET_ERROR_MESSAGE = "RESET_ERROR_MESSAGE";
+
 export const LOGIN_SUCCESS = "LOGIN_SUCCESS";
 export const LOGIN_FAILURE = "LOGIN_FAILURE";
 
@@ -133,4 +135,10 @@ export const signup = (name, email, password) => async (dispatch) => {
       },
     });
   }
+};
+
+export const resetErrorMessage = () => async (dispatch) => {
+  dispatch({
+    type: RESET_ERROR_MESSAGE,
+  });
 };

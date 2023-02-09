@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import { useDispatch, useSelector } from "react-redux";
-import { signup } from "../store/actions/authActions";
+import { signup, resetErrorMessage } from "../store/actions/authActions";
 import { Link } from "react-router-dom";
 
 const Register = () => {
@@ -26,6 +26,10 @@ const Register = () => {
     if (isAuthenticated) {
       setCookie("uuid", uuid);
       navigate("/manage/projects");
+    }
+
+    if (errorMessage != null) {
+      dispatch(resetErrorMessage());
     }
   }, [isAuthenticated]);
 

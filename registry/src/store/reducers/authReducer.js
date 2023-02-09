@@ -5,6 +5,7 @@ import {
   SIGNUP_FAILURE,
   LOGOUT_SUCCESS,
   LOGOUT_FAILURE,
+  RESET_ERROR_MESSAGE,
 } from "../actions/authActions";
 
 const initialState = {
@@ -59,6 +60,11 @@ const authReducer = (state = initialState, action) => {
         ...state,
         isAuthenticated: false,
         error: action.payload.error,
+      };
+    case RESET_ERROR_MESSAGE:
+      return {
+        ...state,
+        error: null,
       };
     default:
       return state;

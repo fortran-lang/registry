@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import { useDispatch, useSelector } from "react-redux";
-import { login } from "../store/actions/authActions";
+import { login, resetErrorMessage } from "../store/actions/authActions";
 import { Link } from "react-router-dom";
 
 const Login = () => {
@@ -20,6 +20,10 @@ const Login = () => {
     if (isAuthenticated) {
       setCookie("uuid", uuid);
       navigate("/manage/projects");
+    }
+
+    if (errorMessage != null) {
+      dispatch(resetErrorMessage());
     }
   }, [isAuthenticated]);
 
