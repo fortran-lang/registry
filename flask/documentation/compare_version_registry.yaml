@@ -8,21 +8,15 @@ parameters:
     items:
       type: string
 
-responses:
-  200:
-    description: Package already exists in local registry.
+responses:        
+  200: 
+    description: Latest package sent from backend or the local registry already has the latest package.
     schema: 
       type: object
       properties:
         message:
           type: string
-          description: Latest version is already there in local registry
-
-  200: 
-    description: Latest package sent from backend.
-    schema: 
-      type: object
-      properties:
+          description: Latest version is already there in local registry. (If this gets returned the package will not be returned from the API and vice versa). 
         package:
           type: object
           description: package data
