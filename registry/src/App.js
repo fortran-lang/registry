@@ -10,6 +10,7 @@ import PackageForm from "./pages/upload";
 import Account from "./pages/account";
 import Search from "./pages/search";
 import NoPage from "./pages/404";
+import UserPage from "./pages/user";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import 'bootstrap/dist/css/bootstrap.css';
@@ -27,6 +28,7 @@ function App() {
         <Route path="/manage/projects" element={<Dashboard />} />
         <Route path="/manage/account" element={<Account />} />
         <Route path="/package/create" element={<PackageForm />} />
+        <Route path="/users/:user" element={<UserPage />} />
         <Route path="*" element={<NoPage />} />
       </Routes>
     </BrowserRouter>
