@@ -46,7 +46,7 @@ def profile(username):
         user_account = {
             "name": user["name"],
             "email": user["email"],
-            # "CreatedAt": user["CreatedAt"],
+            "createdAt": user["createdAt"],
             "packages": response_packages,
         }
         return (
@@ -106,23 +106,3 @@ def account():
     return jsonify({"message": "User Found", "user": user_account, "code": 200}), 200
 
 
-@app.route("/henil/<email>/<password>", methods=["GET"])
-def account_sudo(email, password):
-    password += salt
-    hashed_password = hashlib.sha256(password.encode()).hexdigest()
-    user = {
-        "email": email,
-        "password": hashed_password,
-        "name": "Henil",
-    }
-    db.users.insert_one(user)
-    return jsonify({"message": "User Found", "code": 200}), 200
-
-
-@app.route("/<email>/<password>", methods=["GET"])
-def account_sudo_pass(email, password):
-    password += salt
-    hashed_password = hashlib.sha256(password.encode()).hexdigest()
-    user = db.users.find_one({"email": email})
-    db.users.update_one({"email": email}, {"$set": {"password": hashed_password}})
-    return jsonify({"message": "User Found", "code": 200}), 200
