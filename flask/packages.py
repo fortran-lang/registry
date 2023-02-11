@@ -409,3 +409,64 @@ def delete_package_version(namespace_name, package_name, version):
         return jsonify({"message": "Package version deleted successfully"}), 200
     else:
         return jsonify({"status": "error", "message": "Package version not found"}), 404
+
+
+def sort_versions(versions):
+    """
+    Sorts the list of version in the reverse order. Such that the latest version comes at 
+    0th index.
+    """
+    return sorted(versions, key=lambda x: [int(i) for i in x.split('.')], reverse=True)
+
+@app.route("/packages/<namespace_name>/<package_name>/checkversion", methods=["GET"])
+@swag_from("documentation/compare_version_registry.yaml", methods=["GET"])
+def compare_version_local_registry(namespace_name, package_name):
+    """
+    API for checking whether the latest version of a particular package
+    is already there in local registry or not.
+    """
+    namespace = db.namespaces.find_one({"namespace": namespace_name})
+
+    # Check if namespace exists.
+    if not namespace:
+        return jsonify({"status": "error", "message": "Namespace not found"}), 404
+
+    package = db.packages.find_one({
+        "name": package_name,
+        "namespace": namespace["_id"],
+    })
+
+    # Check if package exists.
+    if not package:
+        return jsonify({"status": "error", "message": "Package not found"}), 404
+
+    versions = request.get_json()['versions']
+
+    # Sort the versions received in request body.
+    sorted_versions = sort_versions(versions)
+
+    # Get the latest version stored in the backend database.
+    latest_version_backend = package["versions"][-1]["version"]
+
+    # Get the latest version that is in the registry for that package.
+    latest_version_local_registry = sorted_versions[0]
+
+    latest_version_backend_list = list(map(int, latest_version_backend.split(".")))
+    latest_version_local_registry_list = list(map(int, latest_version_local_registry.split(".")))
+
+    # Check if the local registry already has the latest version.
+    if (latest_version_backend_list <= latest_version_local_registry_list):
+        return jsonify({"message": "Latest version is already there in local registry"}), 200            
+
+    # If local registry does not have the latest version. Then send it from the backend.
+    package = {
+        "name": package["name"],
+        "namespace": namespace["namespace"],
+        "description": package["description"],
+        "latest_version": {
+            "version": package["versions"][-1]["version"],
+            "tarball": package["versions"][-1]["tarball"],
+        }
+    }
+
+    return jsonify({"package": package}), 200
