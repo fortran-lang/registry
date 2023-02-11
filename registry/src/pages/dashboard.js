@@ -18,14 +18,14 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (packages === null) {
+    if (!packages) {
       dispatch(fetchPackages(username));
     }
 
     if (username === null) {
       navigate("/");
     }
-  });
+  }, [packages, username]);
 
   return isLoading ? (
     <Spinner animation="border" role="status">
@@ -33,7 +33,7 @@ const Dashboard = () => {
     </Spinner>
   ) : (
     <Container>
-    <Container>Packages</Container>
+      <Container>Packages</Container>
       <Row>
         {packages.map((element, index) => (
           <Col key={element.name + element.namespace_name} xs={6} md={4}>
