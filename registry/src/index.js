@@ -9,7 +9,7 @@ import rootReducer from "./store/reducers/rootReducer";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import { PersistGate } from "redux-persist/integration/react";
-import { createTransform } from "redux-persist";
+import { createTransform, REGISTER } from "redux-persist";
 
 const authTransform = createTransform(
   // Transform state on its way to being serialized and stored
@@ -41,7 +41,13 @@ const persistedReducer = persistReducer(persistConfig, rootReducer);
 const root = ReactDOM.createRoot(document.getElementById("root"));
 const store = configureStore({
   reducer: persistedReducer,
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+    serializableCheck: {
+      ignoreActions: [REGISTER]
+    }
+  }),
 });
+
 const persistor = persistStore(store);
 
 root.render(
