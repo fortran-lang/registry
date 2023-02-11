@@ -281,6 +281,7 @@ def get_package(namespace_name, package_name):
             "createdAt": package["createdAt"],
             "version_history": package["versions"],
             "updatedAt": package["updatedAt"],
+            "description": package["description"],
         }
 
         return jsonify({"data": package_response_data, "code": 200})
@@ -325,6 +326,7 @@ def get_package_from_version(namespace_name, package_name, version):
             "createdAt": package["createdAt"],
             "version_data": version_data,
             "updatedAt": package["updatedAt"],
+            "description": package["description"],
         }
 
         return jsonify({"data": package_response_data, "code": 200})
@@ -424,21 +426,24 @@ def get_packages():
         # Get the namespace document from namespace id.
         namespace = db.namespaces.find_one({"_id": namespace_id})
 
-        response_packages.append({
-            "package_name": package["name"],
-            "namespace_name": namespace["namespace"],
-            "description": package["description"],
-        })
+        response_packages.append(
+            {
+                "package_name": package["name"],
+                "namespace_name": namespace["namespace"],
+                "description": package["description"],
+            }
+        )
 
     return jsonify({"packages": response_packages})
 
 
 def sort_versions(versions):
     """
-    Sorts the list of version in the reverse order. Such that the latest version comes at 
+    Sorts the list of version in the reverse order. Such that the latest version comes at
     0th index.
     """
-    return sorted(versions, key=lambda x: [int(i) for i in x.split('.')], reverse=True)
+    return sorted(versions, key=lambda x: [int(i) for i in x.split(".")], reverse=True)
+
 
 @app.route("/packages/<namespace_name>/<package_name>/checkversion", methods=["GET"])
 @swag_from("documentation/compare_version_registry.yaml", methods=["GET"])
@@ -453,16 +458,18 @@ def compare_version_local_registry(namespace_name, package_name):
     if not namespace:
         return jsonify({"status": "error", "message": "Namespace not found"}), 404
 
-    package = db.packages.find_one({
-        "name": package_name,
-        "namespace": namespace["_id"],
-    })
+    package = db.packages.find_one(
+        {
+            "name": package_name,
+            "namespace": namespace["_id"],
+        }
+    )
 
     # Check if package exists.
     if not package:
         return jsonify({"status": "error", "message": "Package not found"}), 404
 
-    versions = request.get_json()['versions']
+    versions = request.get_json()["versions"]
 
     # Sort the versions received in request body.
     sorted_versions = sort_versions(versions)
@@ -474,11 +481,16 @@ def compare_version_local_registry(namespace_name, package_name):
     latest_version_local_registry = sorted_versions[0]
 
     latest_version_backend_list = list(map(int, latest_version_backend.split(".")))
-    latest_version_local_registry_list = list(map(int, latest_version_local_registry.split(".")))
+    latest_version_local_registry_list = list(
+        map(int, latest_version_local_registry.split("."))
+    )
 
     # Check if the local registry already has the latest version.
-    if (latest_version_backend_list <= latest_version_local_registry_list):
-        return jsonify({"message": "Latest version is already there in local registry"}), 200            
+    if latest_version_backend_list <= latest_version_local_registry_list:
+        return (
+            jsonify({"message": "Latest version is already there in local registry"}),
+            200,
+        )
 
     # If local registry does not have the latest version. Then send it from the backend.
     package = {
@@ -488,7 +500,7 @@ def compare_version_local_registry(namespace_name, package_name):
         "latest_version": {
             "version": package["versions"][-1]["version"],
             "tarball": package["versions"][-1]["tarball"],
-        }
+        },
     }
 
     return jsonify({"package": package}), 200
