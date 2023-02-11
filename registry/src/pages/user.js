@@ -3,7 +3,6 @@ import { MDBIcon } from "mdbreact";
 import { useNavigate, useParams } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 import Card from "react-bootstrap/Card";
-import Image from "react-bootstrap/Image";
 import Figure from "react-bootstrap/Figure";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -35,7 +34,6 @@ const UserPage = () => {
         setDateJoined(data["user"].createdAt);
         setProjects(data["user"].packages);
         setEmail(data["user"].email);
-        console.log(data);
         setIsLoading(false);
       });
   }
