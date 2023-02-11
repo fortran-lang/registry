@@ -411,6 +411,28 @@ def delete_package_version(namespace_name, package_name, version):
         return jsonify({"status": "error", "message": "Package version not found"}), 404
 
 
+@app.route("/packages/list", methods=["GET"])
+def get_packages():
+    page = int(request.args.get("page", 0))
+
+    packages = db.packages.find().limit(10).skip(page * 10)
+    response_packages = []
+    for package in packages:
+        # Get the namespace id of the package.
+        namespace_id = package["namespace"]
+
+        # Get the namespace document from namespace id.
+        namespace = db.namespaces.find_one({"_id": namespace_id})
+
+        response_packages.append({
+            "package_name": package["name"],
+            "namespace_name": namespace["namespace"],
+            "description": package["description"],
+        })
+
+    return jsonify({"packages": response_packages})
+
+
 def sort_versions(versions):
     """
     Sorts the list of version in the reverse order. Such that the latest version comes at 
