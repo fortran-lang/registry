@@ -11,7 +11,7 @@ import Account from "./pages/account";
 import Search from "./pages/search";
 import NoPage from "./pages/404";
 import UserPage from "./pages/user";
-// import PackagePage from "../../flask/static/package";
+// import PackagePage from "./pages/package";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import 'bootstrap/dist/css/bootstrap.css';
