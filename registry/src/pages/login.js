@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import { useDispatch, useSelector } from "react-redux";
-import { login } from "../store/actions/authActions";
+import { login, resetErrorMessage } from "../store/actions/authActions";
+import { Link } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -19,11 +20,12 @@ const Login = () => {
     if (isAuthenticated) {
       setCookie("uuid", uuid);
       navigate("/manage/projects");
-    } else if (errorMessage !== null) {
-      const errorDiv = document.getElementById("error");
-      errorDiv.innerHTML = errorMessage;
     }
-  }, [isAuthenticated, errorMessage]);
+
+    if (errorMessage != null) {
+      dispatch(resetErrorMessage());
+    }
+  }, [isAuthenticated]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -48,8 +50,15 @@ const Login = () => {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
-      <p id="error" className="error"></p>
+      {errorMessage != null ? (
+        <p id="error" className="error">
+          {errorMessage}
+        </p>
+      ) : null}
       <input type="submit" value="Log In" />
+      <p>
+        Don't have an account?<Link to="/account/register"> Sign up </Link>
+      </p>
     </form>
   );
 };

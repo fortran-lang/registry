@@ -63,19 +63,26 @@ def login():
 @swag_from("documentation/signup.yaml", methods=["POST"])
 def signup():
     uuid = request.form.get("uuid")
+
     if not uuid:
-        name = request.form.get("name")
-        email = request.form.get("email")
-        password = request.form.get("password")
-        password += salt
-        hashed_password = hashlib.sha256(password.encode()).hexdigest()
-        registry_user = db.users.find_one({"$or": [{"name": name}, {"email": email}]})
         uuid = generate_uuid()
-    else:
-        return (
-            jsonify({"message": "A user with this email already exists", "code": 400}),
-            400,
-        )
+
+    name = request.form.get("name")
+    email = request.form.get("email")
+    password = request.form.get("password")
+
+    if not name:
+        return jsonify({"message": "Name is required", "code": 400}), 400
+
+    if not email:
+        return jsonify({"message": "Email is required", "code": 400}), 400
+
+    if not password:
+        return jsonify({"message": "Password is required", "code": 400}), 400
+
+    password += salt
+    hashed_password = hashlib.sha256(password.encode()).hexdigest()
+    registry_user = db.users.find_one({"$or": [{"name": name}, {"email": email}]})
 
     user = {
         "name": name,
