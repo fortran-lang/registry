@@ -21,25 +21,12 @@ const UserPage = () => {
   const isLoading = useSelector((state) => state.user.isLoading);
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    dispatch(fetchUserData(user));
+  }, [user, notFound]);
 
-  if (isLoading) {
-    fetch(url)
-      .then((res) => {
-        if (res.ok) {
-          console.log("success");
-          return res.json();
-        } else {
-          console.error("Error while sending request");
-          setIsLoading(false);
-          navigate("/404");
-        }
-      })
-      .then((data) => {
-        setDateJoined(data["user"].createdAt);
-        setProjects(data["user"].packages);
-        setEmail(data["user"].email);
-        setIsLoading(false);
-      });
+  if (notFound) {
+    navigate("/404");
   }
 
   return !isLoading ? (
