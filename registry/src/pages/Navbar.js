@@ -50,7 +50,7 @@ const Navbar = () => {
           <MDBIcon icon="bars" fas />
         </MDBNavbarToggler>
         <MDBCollapse navbar show={showNavSecond}>
-          <MDBNavbarNav right={true} className="mr-auto mb-2 mb-lg-0">
+          <MDBNavbarNav className="mr-auto mb-2 mb-lg-0">
             {!isAuthenticated && (
               <MDBNavbarLink href="/account/login">Login</MDBNavbarLink>
             )}
