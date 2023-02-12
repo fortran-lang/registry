@@ -10,6 +10,7 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [cookies, setCookie] = useCookies(["uuid"]);
+  const [fromValidationErrors, setFormValidationError] = useState({});
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -19,7 +20,9 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    dispatch(signup(name, email, password));
+    if (validateForm()) {
+      dispatch(signup(name, email, password));
+    }
   };
 
   useEffect(() => {
@@ -33,6 +36,26 @@ const Register = () => {
     }
   }, [isAuthenticated]);
 
+  const validateForm = () => {
+    let errors = {};
+
+    if (!name) {
+      errors.name = "Name is required";
+    }
+
+    if (!email) {
+      errors.email = "Email is required";
+    }
+
+    if (!password) {
+      errors.password = "Password is required";
+    }
+
+    setFormValidationError(errors);
+
+    return Object.keys(errors).length === 0;
+  };
+
   return (
     <form id="login-form" onSubmit={handleSubmit}>
       <h1>Welcome to fpm Registry!</h1>
@@ -40,10 +63,13 @@ const Register = () => {
       <input
         type="text"
         name="name"
-        placeholder="name"
+        placeholder="Name"
         value={name}
         onChange={(e) => setName(e.target.value)}
       />
+      {fromValidationErrors.email && (
+        <p className="error">{fromValidationErrors.name}</p>
+      )}
       <input
         type="email"
         name="email"
@@ -51,6 +77,9 @@ const Register = () => {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
+      {fromValidationErrors.email && (
+        <p className="error">{fromValidationErrors.email}</p>
+      )}
       <input
         type="password"
         name="password"
@@ -58,11 +87,10 @@ const Register = () => {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
-      {errorMessage != null ? (
-        <p id="error" className="error">
-          {errorMessage}
-        </p>
-      ) : null}
+      {fromValidationErrors.email && (
+        <p className="error">{fromValidationErrors.password}</p>
+      )}
+      {errorMessage != null ? <p className="error">{errorMessage}</p> : null}
       <input type="submit" value="Sign Up" />
       <p>
         Already have an account?<Link to="/account/login"> Log in </Link>

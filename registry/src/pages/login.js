@@ -9,6 +9,7 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [cookies, setCookie] = useCookies(["uuid"]);
+  const [fromValidationErrors, setFormValidationError] = useState({});
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -27,9 +28,27 @@ const Login = () => {
     }
   }, [isAuthenticated]);
 
+  const validateForm = () => {
+    let errors = {};
+
+    if (!email) {
+      errors.email = "Email is required";
+    }
+
+    if (!password) {
+      errors.password = "Password is required";
+    }
+
+    setFormValidationError(errors);
+
+    return Object.keys(errors).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    dispatch(login(email, password));
+    if (validateForm()) {
+      dispatch(login(email, password));
+    }
   };
 
   return (
@@ -43,6 +62,9 @@ const Login = () => {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
+      {fromValidationErrors.email && (
+        <p className="error">{fromValidationErrors.email}</p>
+      )}
       <input
         type="password"
         name="password"
@@ -50,11 +72,10 @@ const Login = () => {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
-      {errorMessage != null ? (
-        <p id="error" className="error">
-          {errorMessage}
-        </p>
-      ) : null}
+      {fromValidationErrors.password && (
+        <p className="error">{fromValidationErrors.password}</p>
+      )}
+      {errorMessage != null ? <p className="error">{errorMessage}</p> : null}
       <input type="submit" value="Log In" />
       <p>
         Don't have an account?<Link to="/account/register"> Sign up </Link>
