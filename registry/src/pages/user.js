@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchUserData } from "../store/actions/userActions";
 import { MDBIcon } from "mdbreact";
 import { useNavigate, useParams } from "react-router-dom";
 import Container from "react-bootstrap/Container";
@@ -6,17 +8,19 @@ import Card from "react-bootstrap/Card";
 import Figure from "react-bootstrap/Figure";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import Spinner from "react-bootstrap/Spinner";
 import "./upload.css";
 
 const UserPage = () => {
   const { user } = useParams();
   const navigate = useNavigate();
-  const [email, setEmail] = React.useState("");
-  const [dateJoined, setDateJoined] = React.useState("");
-  const [projects, setProjects] = React.useState([]);
-  const [isLoading, setIsLoading] = React.useState(true);
+  const email = useSelector((state) => state.user.email);
+  const dateJoined = useSelector((state) => state.user.dateJoined);
+  const projects = useSelector((state) => state.user.projects);
+  const notFound = useSelector((state) => state.user.notFound);
+  const isLoading = useSelector((state) => state.user.isLoading);
+  const dispatch = useDispatch();
 
-  const url = `${process.env.REACT_APP_REGISTRY_API_URL}/users/${user}`;
 
   if (isLoading) {
     fetch(url)
@@ -38,7 +42,7 @@ const UserPage = () => {
       });
   }
 
-  return (
+  return !isLoading ? (
     <Container>
       <Row>
         <Col sm={4}>
@@ -103,6 +107,12 @@ const UserPage = () => {
           ))}
         </Col>
       </Row>
+    </Container>
+  ) : (
+    <Container style={{ margin: "200px" }}>
+      <Spinner animation="border" role="status">
+        <span className="visually-hidden">Loading...</span>
+      </Spinner>
     </Container>
   );
 };
