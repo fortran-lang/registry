@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Outlet, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   MDBContainer,
   MDBNavbar,
@@ -23,6 +23,7 @@ const Navbar = () => {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const username = useSelector((state) => state.auth.username);
   const uuid = useSelector((state) => state.auth.uuid);
+  const navigate = useNavigate();
   const [showNavSecond, setShowNavSecond] = useState(false);
   const dispatch = useDispatch();
 
@@ -52,10 +53,14 @@ const Navbar = () => {
         <MDBCollapse navbar show={showNavSecond}>
           <MDBNavbarNav className="mr-auto mb-2 mb-lg-0">
             {!isAuthenticated && (
-              <MDBNavbarLink href="/account/login">Login</MDBNavbarLink>
+              <MDBNavbarLink onClick={() => navigate("/account/login")}>
+                Login
+              </MDBNavbarLink>
             )}
             {!isAuthenticated && (
-              <MDBNavbarLink href="/account/register">Register</MDBNavbarLink>
+              <MDBNavbarLink onClick={() => navigate("/account/register")}>
+                Register
+              </MDBNavbarLink>
             )}
             {isAuthenticated && (
               <MDBNavbarItem>
@@ -65,16 +70,37 @@ const Navbar = () => {
                   </MDBDropdownToggle>
 
                   <MDBDropdownMenu>
-                    <MDBDropdownItem link="/package/create">
+                    <MDBDropdownItem
+                      className="dropdown-item"
+                      onClick={() => navigate("/package/create")}
+                    >
                       Create Package
                     </MDBDropdownItem>
-                    <MDBDropdownItem link="/manage/projects">
+
+                    <MDBDropdownItem
+                      className="dropdown-item"
+                      onClick={() => navigate("/manage/projects")}
+                    >
                       Packages
                     </MDBDropdownItem>
-                    <MDBDropdownItem link="/manage/account">
+                    <MDBDropdownItem
+                      className="dropdown-item"
+                      onClick={() => navigate("/search")}
+                    >
+                      Search
+                    </MDBDropdownItem>
+
+                    <MDBDropdownItem
+                      className="dropdown-item"
+                      onClick={() => navigate("/manage/account")}
+                    >
                       Account
                     </MDBDropdownItem>
-                    <MDBDropdownItem link onClick={signOut}>
+
+                    <MDBDropdownItem
+                      className="dropdown-item"
+                      onClick={signOut}
+                    >
                       Logout
                     </MDBDropdownItem>
                   </MDBDropdownMenu>
@@ -87,19 +113,19 @@ const Navbar = () => {
       </MDBContainer>
     </MDBNavbar>
   );
-
-  function SearchBar() {
-    return (
-      <div className="d-flex">
-        <input
-          type="text"
-          className="flex-fill form-control"
-          placeholder="Search"
-        />
-        <button className="btn btn-primary">Search</button>
-      </div>
-    );
-  }
 };
 
 export default Navbar;
+
+function SearchBar() {
+  return (
+    <div className="d-flex">
+      <input
+        type="text"
+        className="flex-fill form-control"
+        placeholder="Search"
+      />
+      <button className="btn btn-primary">Search</button>
+    </div>
+  );
+}
