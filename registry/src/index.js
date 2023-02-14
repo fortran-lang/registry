@@ -34,6 +34,7 @@ const persistConfig = {
   key: "root",
   storage,
   transforms: [authTransform],
+  whitelist: ["auth"],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -41,11 +42,12 @@ const persistedReducer = persistReducer(persistConfig, rootReducer);
 const root = ReactDOM.createRoot(document.getElementById("root"));
 const store = configureStore({
   reducer: persistedReducer,
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware({
-    serializableCheck: {
-      ignoreActions: [REGISTER]
-    }
-  }),
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoreActions: [REGISTER],
+      },
+    }),
 });
 
 const persistor = persistStore(store);
