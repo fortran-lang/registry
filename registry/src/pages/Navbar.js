@@ -18,6 +18,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import Image from "react-bootstrap/Image";
 import { logout } from "../store/actions/authActions";
+import { searchPackage } from "../store/actions/searchActions";
 
 const Navbar = () => {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
@@ -117,15 +118,30 @@ const Navbar = () => {
 
 export default Navbar;
 
-function SearchBar() {
+const SearchBar = () => {
+  const [query, setQuery] = useState("");
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const search = () => {
+    if (query.trim().length != 0) {
+      dispatch(searchPackage(query));
+      navigate("/search");
+    }
+  };
+
   return (
     <div className="d-flex">
       <input
         type="text"
         className="flex-fill form-control"
         placeholder="Search"
+        value={query}
+        onChange={(event) => setQuery(event.target.value)}
       />
-      <button className="btn btn-primary">Search</button>
+      <button className="btn btn-primary" onClick={search}>
+        Search
+      </button>
     </div>
   );
-}
+};

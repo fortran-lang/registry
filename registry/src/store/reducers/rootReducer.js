@@ -2,6 +2,7 @@ import authReducer from "./authReducer";
 import accountReducer from "./accountReducer";
 import dashboardReducer from "./dashboardReducer";
 import userReducer from "./userReducer";
+import searchReducer from "./searchReducer";
 import { combineReducers } from "redux";
 
 const rootReducer = combineReducers({
@@ -9,6 +10,7 @@ const rootReducer = combineReducers({
   dashboard: dashboardReducer,
   account: accountReducer,
   user: userReducer,
+  search: searchReducer,
 });
 
 export default rootReducer;
