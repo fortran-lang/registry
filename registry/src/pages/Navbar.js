@@ -124,7 +124,7 @@ const SearchBar = () => {
   const dispatch = useDispatch();
 
   const search = () => {
-    if (query.trim().length != 0) {
+    if (query.trim().length !== 0) {
       dispatch(searchPackage(query));
       navigate("/search");
     }
