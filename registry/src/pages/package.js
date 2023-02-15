@@ -1,116 +1,67 @@
-import React from "react";
-import { MDBIcon } from "mdbreact";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchPackageData } from "../store/actions/packageActions";
 import { useNavigate, useParams } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 import Card from "react-bootstrap/Card";
-import Image from "react-bootstrap/Image";
-import Figure from "react-bootstrap/Figure";
+import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import "./upload.css";
+import Spinner from "react-bootstrap/Spinner";
 
 const PackagePage = () => {
-  const { package_name,namespace_name } = useParams();
+  const { namespace_name, package_name } = useParams();
   const navigate = useNavigate();
-  const [email, setEmail] = React.useState("");
-  const [dateJoined, setDateJoined] = React.useState("");
-  const [projects, setProjects] = React.useState([]);
-  const [isLoading, setIsLoading] = React.useState(true);
+  const author = useSelector((state) => state.package.author);
+  const tags = useSelector((state) => state.package.tags);
+  const license = useSelector((state) => state.package.license);
+  const createdAt = useSelector((state) => state.package.createdAt);
+  const versionData = useSelector((state) => state.package.versionData);
+  const updatedAt = useSelector((state) => state.package.updatedAt);
+  const description = useSelector((state) => state.package.description);
+  const notFound = useSelector((state) => state.package.notFound);
+  const isLoading = useSelector((state) => state.package.isLoading);
+  const dispatch = useDispatch();
 
-  const url = `${process.env.REACT_APP_REGISTRY_API_URL}/packages/${namespace_name}/${package_name}`;
+  useEffect(() => {
+    dispatch(fetchPackageData(namespace_name, package_name));
+  }, [namespace_name, package_name]);
 
-  if (isLoading) {
-    fetch(url)
-      .then((res) => {
-        if (res.ok) {
-          console.log("success");
-          return res.json();
-        } else {
-          console.error("Error while sending request");
-          setIsLoading(false);
-          navigate("/404");
-        }
-      })
-      .then((data) => {
-        // setDateJoined(data["user"].createdAt);
-        // setProjects(data["user"].packages);
-        // setEmail(data["user"].email);
-        
-     {/*  "name": package["name"],
-            "namespace": namespace["namespace"],
-            "latest_version_data": package["versions"][-1],
-            "author": package_author["name"],
-            "tags": package["tags"],
-            "license": package["license"],
-            "createdAt": package["createdAt"],
-            "version_history": package["versions"],
-            "updatedAt": package["updatedAt"],
-      "description": package["description"], */}
-        console.log(data);
-        setIsLoading(false);
-      });
+  if (notFound) {
+    navigate("/404");
   }
 
-  return (
+  return !isLoading ? (
     <Container>
-      <Row  style={{ marginLeft: "10px", marginTop: "20px" }}>
-        {{package_name}}
-     
-        <Col sm={4}>
-          <Row style={{ marginLeft: "10px", marginTop: "20px" }}>
-            hi
-          </Row>
-           <Row
-            style={{ marginLeft: "10px", marginTop: "10px", fontSize: "20px" }}
-          >
-            {/* <MDBIcon style={{ marginTop: "5px" }} far icon="user-circle">
-              {" " + user}
-            </MDBIcon>
-            <MDBIcon style={{ marginTop: "5px" }} far icon="calendar-alt">
-              {" Joined " + Date(dateJoined).slice(4, 15)}
-            </MDBIcon>
-
-            <MDBIcon style={{ marginTop: "5px" }} far icon="envelope">
-              {" " + email}
-            </MDBIcon>  */}
-          </Row>
-        </Col>
-        <Col sm={8}>
-          <Row style={{ fontSize: 24, marginTop: "20px" }}>
-            {projects.length === 0
-              ? "0 projects"
-              : projects.length + " projects"}
-          </Row>
-          {projects.map((element, index) => (
-            <Row
-              className="mb-2"
-              key={element.name + element.namespace_name}
-              xs={8}
-              md={8}
-            >
-              <Card>
-                {" "}
-                <Card.Link
-                  style={{ textDecoration: "none" }}
-                  href={`/packages/${element.namespace_name}/${element.name}`}
-                >
-                  <Card.Body>
-                    <Card.Title>{element.name}</Card.Title>
-                    <Card.Subtitle className="mb-2 text-muted">
-                      {element.namespace_name} / {element.name}{" "}
-                    </Card.Subtitle>
-
-                    <Card.Text id="card-text">
-                      <div>Last released {element.updatedAt}</div>
-                      <div> {element.description.slice(0, 40)}</div>
-                    </Card.Text>
-                  </Card.Body>
-                </Card.Link>
-              </Card>
-            </Row>
-          ))}
+      <Row>
+        <Col>
+          <Card>
+            <Card.Body>
+              {/*    WIP - Psckage Description Page
+               <Card.Title>{package_name}</Card.Title>
+              <Card.Subtitle>{namespace_name} / {package_name}</Card.Subtitle>
+              <Card.Text>
+                <p>Author: {author}</p>    
+                <p>Tags: {tags.join(",")}</p>
+                <p>License: {license}</p>
+                <p>Created At: {createdAt}</p>
+                <p>Version Data: {versionData.join(",")}</p>
+                <p>Updated At: {updatedAt}</p>
+                <p>{description}</p>
+              </Card.Text> */}
+              <Button variant="primary" href={`/download/${namespace_name}/${package_name}`}>
+                Download
+              </Button>
+            </Card.Body>
+          </Card>
         </Col>
       </Row>
+    </Container>
+  ) : (
+    <Container style={{ margin: "200px" }}>
+      <Spinner animation="border" role="status">
+        <span className="visually-hidden">Loading...</span>
+      </Spinner>
     </Container>
   );
 };

@@ -17,9 +17,6 @@ const userReducer = (state = initialState, action) => {
     case FETCH_USER_DATA:
       return {
         ...state,
-        // email: "",
-        // dateJoined: "",
-        // projects: [],
         isLoading: true,
         notFound: false,
       };
