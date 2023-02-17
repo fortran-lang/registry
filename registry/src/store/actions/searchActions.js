@@ -23,6 +23,7 @@ export const searchPackage = (query) => async (dispatch) => {
       type: SEARCH_SUCCESS,
       payload: {
         packages: result.data["packages"],
+        totalPages: result.data["total_pages"],
       },
     });
   } catch (error) {

@@ -6,6 +6,9 @@ import { MDBListGroup } from "mdbreact";
 const Search = () => {
   const packages = useSelector((state) => state.search.packages);
   const error = useSelector((state) => state.search.error);
+  const totalPages = useSelector((state) => state.search.totalPages);
+
+  console.log(totalPages);
 
   return error !== null ? (
     <div className="container">
