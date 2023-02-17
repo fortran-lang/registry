@@ -6,6 +6,7 @@ from auth import generate_uuid
 from app import swagger
 from flasgger.utils import swag_from
 import json
+import math
 
 parameters = {
     "name": "name",
@@ -33,6 +34,24 @@ def search_packages():
     )
     page = int(page) if page else 0
 
+    packages_per_page = 10
+
+    # Count the number of documents in the database related to query.
+    total_documents = db.packages.count_documents({
+                "$and": [
+                    {
+                        "$or": [
+                            {"name": {"$regex": query}},
+                            {"tags": {"$in": [query]}},
+                            {"description": {"$regex": query}},
+                        ]
+                    },
+                    {"isDeprecated": False},
+                ]
+            })
+    
+    total_pages = math.ceil(total_documents / packages_per_page)
+
     query = query.strip().lower()
     packages = (
         db.packages.find(
@@ -58,8 +77,8 @@ def search_packages():
             },
         )
         .sort(sorted_by, sort)
-        .limit(10)
-        .skip(page * 10)
+        .limit(packages_per_page)
+        .skip(page * packages_per_page)
     )
 
     if packages:
@@ -70,7 +89,7 @@ def search_packages():
             i["namespace"] = namespace["namespace"]
             i["author"] = author["name"]
             search_packages.append(i)
-        return jsonify({"status": 200, "packages": search_packages}), 200
+        return jsonify({"status": 200, "packages": search_packages, "total_pages": total_pages}), 200
     else:
         return jsonify({"status": "error", "message": "packages not found"}), 404
 
