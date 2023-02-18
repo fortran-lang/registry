@@ -1,9 +1,15 @@
-import { SEARCH_SUCCESS, SEARCH_FAILURE } from "../actions/searchActions";
+import {
+  SEARCH_SUCCESS,
+  SEARCH_FAILURE,
+  SET_QUERY,
+} from "../actions/searchActions";
 
 const initialState = {
   packages: null,
   totalPages: null,
   error: null,
+  currentPage: 0,
+  query: "",
 };
 
 const searchReducer = (state = initialState, action) => {
@@ -13,6 +19,7 @@ const searchReducer = (state = initialState, action) => {
         ...state,
         packages: action.payload.packages,
         totalPages: action.payload.totalPages,
+        currentPage: action.payload.currentPage,
       };
 
     case SEARCH_FAILURE:
@@ -21,6 +28,12 @@ const searchReducer = (state = initialState, action) => {
         packages: null,
         totalPages: action.payload.totalPages,
         error: action.payload.error,
+      };
+
+    case SET_QUERY:
+      return {
+        ...state,
+        query: action.payload.query,
       };
 
     default:

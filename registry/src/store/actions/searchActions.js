@@ -4,10 +4,12 @@ export const SEARCH_PACKAGE = "SEARCH_PACKAGE";
 export const SEARCH_SUCCESS = "SEARCH_SUCCESS";
 export const SEARCH_FAILURE = "SEARCH_FAILURE";
 
-export const searchPackage = (query) => async (dispatch) => {
+export const searchPackage = (query, page) => async (dispatch) => {
   const url = `${
     process.env.REACT_APP_REGISTRY_API_URL
-  }/packages?query=${encodeURIComponent(query)}`;
+  }/packages?query=${encodeURIComponent(query)}&page=${encodeURIComponent(
+    page
+  )}`;
 
   dispatch({
     type: SEARCH_PACKAGE,
@@ -24,6 +26,7 @@ export const searchPackage = (query) => async (dispatch) => {
       payload: {
         packages: result.data["packages"],
         totalPages: result.data["total_pages"],
+        currentPage: page,
       },
     });
   } catch (error) {
@@ -34,4 +37,15 @@ export const searchPackage = (query) => async (dispatch) => {
       },
     });
   }
+};
+
+export const SET_QUERY = "SET_QUERY";
+
+export const setQuery = (query) => (dispatch) => {
+  dispatch({
+    type: SET_QUERY,
+    payload: {
+      query: query,
+    },
+  });
 };
