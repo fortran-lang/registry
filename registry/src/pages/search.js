@@ -27,7 +27,12 @@ const Search = () => {
             alignItems: "center",
           }}
         >
-          {packages.map((packageEntity) => PackageItem(packageEntity))}
+          {packages.map((packageEntity) => (
+            <PackageItem
+              key={packageEntity.name + packageEntity.namespace}
+              packageEntity={packageEntity}
+            />
+          ))}
           <br />
           <Pagination currentPage={currentPage} totalPages={totalPages} />
         </MDBListGroup>

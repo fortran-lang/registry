@@ -1,7 +1,7 @@
 import { MDBListGroupItem } from "mdb-react-ui-kit";
 import { Row, Col, Image } from "react-bootstrap";
 
-const PackageItem = (packageEntity) => {
+const PackageItem = ({ packageEntity }) => {
   return (
     <MDBListGroupItem id="list-item">
       <Row>
@@ -17,7 +17,7 @@ const PackageItem = (packageEntity) => {
           <div>
             <h5 id="list-item-package-name">{packageEntity.name}</h5>
           </div>
-          <h7 className="mb-2 text-muted">{packageEntity.description}</h7>
+          <h6 className="mb-2 text-muted">{packageEntity.description}</h6>
           <h6 className="mb-2 text-muted">
             Namespace {packageEntity.namespace}
           </h6>

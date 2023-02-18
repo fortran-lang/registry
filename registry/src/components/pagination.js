@@ -32,6 +32,7 @@ const Pagination = ({ currentPage, totalPages }) => {
           (_, i) => i + startPage
         ).map((page) => (
           <MDBPaginationItem
+            key={page}
             active={currentPage + 1 === page}
             onClick={() => handlePageChange(page - 1)}
           >
