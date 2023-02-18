@@ -25,9 +25,7 @@ const Pagination = ({ currentPage, totalPages }) => {
           disabled={currentPage + 1 === 1}
           onClick={() => handlePageChange(currentPage - 1)}
         >
-          <MDBPaginationLink tabIndex={-1} aria-disabled="true">
-            Previous
-          </MDBPaginationLink>
+          <MDBPaginationLink aria-disabled="true">Previous</MDBPaginationLink>
         </MDBPaginationItem>
         {Array.from(
           { length: endPage - startPage + 1 },
