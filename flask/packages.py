@@ -5,6 +5,7 @@ from datetime import datetime
 from auth import generate_uuid
 from app import swagger
 from flasgger.utils import swag_from
+from urllib.parse import unquote
 import json
 
 parameters = {
@@ -33,7 +34,7 @@ def search_packages():
     )
     page = int(page) if page else 0
 
-    query = query.strip().lower()
+    query = unquote(query.strip().lower())
     packages = (
         db.packages.find(
             {
