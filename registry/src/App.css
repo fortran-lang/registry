@@ -101,3 +101,8 @@ body {
    color: #3382e5;
 }
 
+#dropdown-orderby {
+  display: flex;
+  align-items: center;
+}
+

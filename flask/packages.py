@@ -63,7 +63,7 @@ def search_packages():
                 "tags": 1,
             },
         )
-        .sort(sorted_by, sort)
+        .sort(sorted_by, -1)
         .limit(packages_per_page)
         .skip(page * packages_per_page)
     )

@@ -8,6 +8,7 @@ import { searchPackage } from "../store/actions/searchActions";
 
 const Pagination = ({ currentPage, totalPages }) => {
   const query = useSelector((state) => state.search.query);
+  const orderBy = useSelector((state) => state.search.orderBy);
 
   const maxVisibleItems = 5;
   let startPage = Math.max(currentPage - Math.floor(maxVisibleItems / 2), 1);
@@ -15,11 +16,11 @@ const Pagination = ({ currentPage, totalPages }) => {
   const dispatch = useDispatch();
 
   const handlePageChange = (page) => {
-    dispatch(searchPackage(query, page));
+    dispatch(searchPackage(query, page, orderBy));
   };
 
   return (
-    <nav aria-label="...">
+    <nav aria-label="Pagination">
       <MDBPagination className="mb-0">
         <MDBPaginationItem
           disabled={currentPage + 1 === 1}

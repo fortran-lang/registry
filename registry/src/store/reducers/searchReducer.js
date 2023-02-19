@@ -2,6 +2,7 @@ import {
   SEARCH_SUCCESS,
   SEARCH_FAILURE,
   SET_QUERY,
+  SET_ORDER_BY,
 } from "../actions/searchActions";
 
 const initialState = {
@@ -10,6 +11,7 @@ const initialState = {
   error: null,
   currentPage: 0,
   query: "",
+  orderBy: "None",
 };
 
 const searchReducer = (state = initialState, action) => {
@@ -34,6 +36,12 @@ const searchReducer = (state = initialState, action) => {
       return {
         ...state,
         query: action.payload.query,
+      };
+
+    case SET_ORDER_BY:
+      return {
+        ...state,
+        orderBy: action.payload.orderBy,
       };
 
     default:
