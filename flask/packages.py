@@ -36,8 +36,7 @@ def search_packages():
 
     packages_per_page = 10
 
-    # Count the number of documents in the database related to query.
-    total_documents = db.packages.count_documents({
+    mongo_db_query = {
                 "$and": [
                     {
                         "$or": [
@@ -48,25 +47,12 @@ def search_packages():
                     },
                     {"isDeprecated": False},
                 ]
-            })
-    
-    total_pages = math.ceil(total_documents / packages_per_page)
+            }
 
     query = query.strip().lower()
     packages = (
         db.packages.find(
-            {
-                "$and": [
-                    {
-                        "$or": [
-                            {"name": {"$regex": query}},
-                            {"tags": {"$in": [query]}},
-                            {"description": {"$regex": query}},
-                        ]
-                    },
-                    {"isDeprecated": False},
-                ]
-            },
+            mongo_db_query,
             {
                 "_id": 0,
                 "name": 1,
@@ -82,6 +68,11 @@ def search_packages():
     )
 
     if packages:
+        # Count the number of documents in the database related to query.
+        total_documents = db.packages.count_documents(mongo_db_query)
+    
+        total_pages = math.ceil(total_documents / packages_per_page)
+
         search_packages = []
         for i in packages:
             namespace = db.namespaces.find_one({"_id": i["namespace"]})
