@@ -5,6 +5,7 @@ from datetime import datetime
 from auth import generate_uuid
 from app import swagger
 from flasgger.utils import swag_from
+from urllib.parse import unquote
 import json
 import math
 
@@ -33,7 +34,7 @@ def search_packages():
         else "name"
     )
     page = int(page) if page else 0
-
+    query = unquote(query.strip().lower())
     packages_per_page = 10
 
     mongo_db_query = {
@@ -49,7 +50,7 @@ def search_packages():
                 ]
             }
 
-    query = query.strip().lower()
+
     packages = (
         db.packages.find(
             mongo_db_query,
