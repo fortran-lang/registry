@@ -4,20 +4,22 @@ export const SEARCH_PACKAGE = "SEARCH_PACKAGE";
 export const SEARCH_SUCCESS = "SEARCH_SUCCESS";
 export const SEARCH_FAILURE = "SEARCH_FAILURE";
 
+const sortedByMap = new Map()
+  .set("Date last updated", "updatedat")
+  .set("None", "");
+
 export const searchPackage =
-  (query, page, sorted_by = "") =>
+  (query, page, sortedBy = "") =>
   async (dispatch) => {
-    if (sorted_by === "Date last updated") {
-      sorted_by = "updatedat";
-    } else {
-      sorted_by = "";
+    if (sortedBy.length !== 0) {
+      sortedBy = sortedByMap.get(sortedBy);
     }
 
     const url = `${
       process.env.REACT_APP_REGISTRY_API_URL
     }/packages?query=${encodeURIComponent(query)}&page=${encodeURIComponent(
       page
-    )}&sorted_by=${encodeURIComponent(sorted_by)}`;
+    )}&sorted_by=${encodeURIComponent(sortedBy)}`;
 
     dispatch({
       type: SEARCH_PACKAGE,
