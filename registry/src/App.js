@@ -14,7 +14,7 @@ import UserPage from "./pages/user";
 // import PackagePage from "./pages/package";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import 'bootstrap/dist/css/bootstrap.css';
+import "bootstrap/dist/css/bootstrap.css";
 
 function App() {
   return (

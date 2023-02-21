@@ -92,3 +92,17 @@ body {
 #card-text {
   text-align: justify;
 }
+
+#list-item {
+  width: 80%;
+}
+
+#list-item-package-name {
+   color: #3382e5;
+}
+
+#dropdown-orderby {
+  display: flex;
+  align-items: center;
+}
+

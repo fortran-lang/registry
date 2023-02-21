@@ -7,6 +7,7 @@ from app import swagger
 from flasgger.utils import swag_from
 from urllib.parse import unquote
 import json
+import math
 
 parameters = {
     "name": "name",
@@ -33,11 +34,10 @@ def search_packages():
         else "name"
     )
     page = int(page) if page else 0
-
     query = unquote(query.strip().lower())
-    packages = (
-        db.packages.find(
-            {
+    packages_per_page = 10
+
+    mongo_db_query = {
                 "$and": [
                     {
                         "$or": [
@@ -48,7 +48,12 @@ def search_packages():
                     },
                     {"isDeprecated": False},
                 ]
-            },
+            }
+
+
+    packages = (
+        db.packages.find(
+            mongo_db_query,
             {
                 "_id": 0,
                 "name": 1,
@@ -58,12 +63,17 @@ def search_packages():
                 "tags": 1,
             },
         )
-        .sort(sorted_by, sort)
-        .limit(10)
-        .skip(page * 10)
+        .sort(sorted_by, -1)
+        .limit(packages_per_page)
+        .skip(page * packages_per_page)
     )
 
     if packages:
+        # Count the number of documents in the database related to query.
+        total_documents = db.packages.count_documents(mongo_db_query)
+    
+        total_pages = math.ceil(total_documents / packages_per_page)
+
         search_packages = []
         for i in packages:
             namespace = db.namespaces.find_one({"_id": i["namespace"]})
@@ -71,7 +81,7 @@ def search_packages():
             i["namespace"] = namespace["namespace"]
             i["author"] = author["name"]
             search_packages.append(i)
-        return jsonify({"status": 200, "packages": search_packages}), 200
+        return jsonify({"status": 200, "packages": search_packages, "total_pages": total_pages}), 200
     else:
         return jsonify({"status": "error", "message": "packages not found"}), 404
 

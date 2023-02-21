@@ -1,64 +1,69 @@
-import React, { useState } from "react";
-// import "./search.css";
+import React from "react";
+import { useSelector, useDispatch } from "react-redux";
+import PackageItem from "../components/packageItem";
+import { MDBListGroup } from "mdbreact";
+import Pagination from "../components/pagination";
+import Dropdown from "react-bootstrap/Dropdown";
+import DropdownButton from "react-bootstrap/DropdownButton";
+import { searchPackage, setOrderBy } from "../store/actions/searchActions";
 
 const Search = () => {
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState([]);
-  const queryString = window.location.search;
-  const urlParams = new URLSearchParams(queryString);
+  const packages = useSelector((state) => state.search.packages);
+  const error = useSelector((state) => state.search.error);
+  const totalPages = useSelector((state) => state.search.totalPages);
+  const currentPage = useSelector((state) => state.search.currentPage);
+  const orderBy = useSelector((state) => state.search.orderBy);
+  const query = useSelector((state) => state.search.query);
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const url = `${
-      process.env.REACT_APP_REGISTRY_API_URL
-    }/packages?query=${encodeURIComponent(query)}`;
-    fetch(url)
-      .then((response) => response.json())
-      .then((data) => {
-        setResults(data["packages"]);
-      });
-  };
+  const dropdownOptions = ["None", "Date last updated"];
 
-  const loadQuery = () => {
-    console.log("urlParams.get(query)");
-    setQuery(urlParams.get("query"));
-    const url = `${
-      process.env.REACT_APP_REGISTRY_API_URL
-    }/packages?query=${encodeURIComponent(query)}`;
-    fetch(url)
-      .then((response) => response.json())
-      .then((data) => {
-        setResults(data["packages"]);
-      });
-  };
+  const dispatch = useDispatch();
 
-  return (
-    <div class="container" onLoad={loadQuery}>
-      fpm-registry Package Search
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          id="query"
-          name="query"
-          placeholder="Enter your search query"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-        />
-        <button type="submit">Search</button>
-      </form>
-      <div id="result">
-        {results.map((result) => (
-          <div>
-            <h2>{result.name}</h2>
-            <p>{result.description}</p>
-            <p>{result.author}</p>
-            <p>{result.description}</p>
-            <p>{result.namespace}</p>
-          </div>
-        ))}
-      </div>
+  return error !== null ? (
+    <div className="container">
+      <div id="result">{error}</div>
     </div>
-  );
+  ) : packages !== null ? (
+    packages.length === 0 ? (
+      <div className="container">
+        <div>No packages found.</div>
+      </div>
+    ) : (
+      <div className="container">
+        <br />
+        <div className="d-flex justify-content-end" id="dropdown-orderby">
+          <label>Order by</label>
+          <DropdownButton title={orderBy}>
+            {dropdownOptions.map((option) => (
+              <Dropdown.Item
+                key={option}
+                onClick={() => {
+                  dispatch(setOrderBy(option));
+                  dispatch(searchPackage(query, 0, option));
+                }}
+              >
+                {option}
+              </Dropdown.Item>
+            ))}
+          </DropdownButton>
+        </div>
+        <MDBListGroup
+          style={{
+            alignItems: "center",
+          }}
+        >
+          {packages.map((packageEntity) => (
+            <PackageItem
+              key={packageEntity.name + packageEntity.namespace}
+              packageEntity={packageEntity}
+            />
+          ))}
+          <br />
+          <Pagination currentPage={currentPage} totalPages={totalPages} />
+        </MDBListGroup>
+      </div>
+    )
+  ) : null;
 };
 
 export default Search;
