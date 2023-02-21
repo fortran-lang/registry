@@ -61,6 +61,7 @@ def search_packages():
                 "author": 1,
                 "description": 1,
                 "tags": 1,
+                "updatedAt": 1,
             },
         )
         .sort(sorted_by, -1)
