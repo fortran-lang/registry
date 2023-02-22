@@ -21,12 +21,13 @@ import { logout } from "../store/actions/authActions";
 import { searchPackage, setQuery } from "../store/actions/searchActions";
 
 const Navbar = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [showNavSecond, setShowNavSecond] = useState(false);
+
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const username = useSelector((state) => state.auth.username);
   const uuid = useSelector((state) => state.auth.uuid);
-  const navigate = useNavigate();
-  const [showNavSecond, setShowNavSecond] = useState(false);
-  const dispatch = useDispatch();
 
   const signOut = () => {
     dispatch(logout(uuid));

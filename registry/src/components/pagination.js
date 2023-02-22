@@ -7,16 +7,23 @@ import {
 import { searchPackage } from "../store/actions/searchActions";
 
 const Pagination = ({ currentPage, totalPages }) => {
+  const dispatch = useDispatch();
   const query = useSelector((state) => state.search.query);
   const orderBy = useSelector((state) => state.search.orderBy);
 
   const maxVisibleItems = 5;
-  let startPage = Math.max(currentPage - Math.floor(maxVisibleItems / 2), 1);
-  let endPage = Math.min(startPage + maxVisibleItems - 1, totalPages);
-  const dispatch = useDispatch();
+  const startPage = Math.max(currentPage - Math.floor(maxVisibleItems / 2), 1);
+  const endPage = Math.min(startPage + maxVisibleItems - 1, totalPages);
 
   const handlePageChange = (page) => {
     dispatch(searchPackage(query, page, orderBy));
+  };
+
+  const generatePageTiles = () => {
+    return Array.from(
+      { length: endPage - startPage + 1 },
+      (_, i) => i + startPage
+    );
   };
 
   return (
@@ -28,10 +35,7 @@ const Pagination = ({ currentPage, totalPages }) => {
         >
           <MDBPaginationLink aria-disabled="true">Previous</MDBPaginationLink>
         </MDBPaginationItem>
-        {Array.from(
-          { length: endPage - startPage + 1 },
-          (_, i) => i + startPage
-        ).map((page) => (
+        {generatePageTiles().map((page) => (
           <MDBPaginationItem
             key={page}
             active={currentPage + 1 === page}

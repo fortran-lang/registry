@@ -8,6 +8,7 @@ import DropdownButton from "react-bootstrap/DropdownButton";
 import { searchPackage, setOrderBy } from "../store/actions/searchActions";
 
 const Search = () => {
+  const dispatch = useDispatch();
   const packages = useSelector((state) => state.search.packages);
   const error = useSelector((state) => state.search.error);
   const totalPages = useSelector((state) => state.search.totalPages);
@@ -17,53 +18,78 @@ const Search = () => {
 
   const dropdownOptions = ["None", "Date last updated"];
 
-  const dispatch = useDispatch();
+  const onDropDownSelect = (option) => {
+    dispatch(setOrderBy(option));
+    dispatch(searchPackage(query, 0, option));
+  };
 
-  return error !== null ? (
-    <div className="container">
-      <div id="result">{error}</div>
-    </div>
-  ) : packages !== null ? (
-    packages.length === 0 ? (
+  if (error !== null) {
+    return (
       <div className="container">
-        <div>No packages found.</div>
+        <div id="result">{error}</div>
       </div>
-    ) : (
-      <div className="container">
-        <br />
-        <div className="d-flex justify-content-end" id="dropdown-orderby">
-          <label>Order by</label>
-          <DropdownButton title={orderBy}>
-            {dropdownOptions.map((option) => (
-              <Dropdown.Item
-                key={option}
-                onClick={() => {
-                  dispatch(setOrderBy(option));
-                  dispatch(searchPackage(query, 0, option));
-                }}
-              >
-                {option}
-              </Dropdown.Item>
-            ))}
-          </DropdownButton>
+    );
+  }
+
+  if (packages !== null) {
+    if (packages.length === 0) {
+      return (
+        <div className="container">
+          <div>No packages found.</div>
         </div>
-        <MDBListGroup
-          style={{
-            alignItems: "center",
-          }}
-        >
-          {packages.map((packageEntity) => (
-            <PackageItem
-              key={packageEntity.name + packageEntity.namespace}
-              packageEntity={packageEntity}
-            />
-          ))}
+      );
+    } else {
+      return (
+        <div className="container">
           <br />
-          <Pagination currentPage={currentPage} totalPages={totalPages} />
-        </MDBListGroup>
-      </div>
-    )
-  ) : null;
+          <div className="d-flex justify-content-end" id="dropdown-orderby">
+            <label>Order by</label>
+            <DropdownSortBy
+              orderBy={orderBy}
+              dropdownOptions={dropdownOptions}
+              onDropDownSelect={onDropDownSelect}
+            />
+          </div>
+          <ListView
+            packages={packages}
+            currentPage={currentPage}
+            totalPages={totalPages}
+          />
+        </div>
+      );
+    }
+  }
 };
 
 export default Search;
+
+const ListView = ({ packages, currentPage, totalPages }) => {
+  return (
+    <MDBListGroup
+      style={{
+        alignItems: "center",
+      }}
+    >
+      {packages.map((packageEntity) => (
+        <PackageItem
+          key={packageEntity.name + packageEntity.namespace}
+          packageEntity={packageEntity}
+        />
+      ))}
+      <br />
+      <Pagination currentPage={currentPage} totalPages={totalPages} />
+    </MDBListGroup>
+  );
+};
+
+const DropdownSortBy = ({ orderBy, dropdownOptions, onDropDownSelect }) => {
+  return (
+    <DropdownButton title={orderBy}>
+      {dropdownOptions.map((option) => (
+        <Dropdown.Item key={option} onClick={() => onDropDownSelect(option)}>
+          {option}
+        </Dropdown.Item>
+      ))}
+    </DropdownButton>
+  );
+};
