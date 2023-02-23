@@ -61,7 +61,7 @@ def login():
                 "message": "Login successful",
                 "uuid": uuid,
                 "code": 200,
-                "name": user["name"],
+                "username": user["username"],
             }
         ),
         200,
@@ -76,12 +76,12 @@ def signup():
     if not uuid:
         uuid = generate_uuid()
 
-    name = request.form.get("name")
+    username = request.form.get("username")
     email = request.form.get("email")
     password = request.form.get("password")
 
-    if not name:
-        return jsonify({"message": "Name is required", "code": 400}), 400
+    if not username:
+        return jsonify({"message": "Username is required", "code": 400}), 400
 
     if not email:
         return jsonify({"message": "Email is required", "code": 400}), 400
@@ -91,10 +91,10 @@ def signup():
 
     password += salt
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
-    registry_user = db.users.find_one({"$or": [{"name": name}, {"email": email}]})
+    registry_user = db.users.find_one({"$or": [{"username": username}, {"email": email}]})
 
     user = {
-        "name": name,
+        "username": username,
         "email": email,
         "password": hashed_password,
         "lastLogin": datetime.utcnow(),
@@ -111,7 +111,7 @@ def signup():
                     "message": "Signup successful",
                     "uuid": uuid,
                     "code": 200,
-                    "name": user["name"],
+                    "username": user["username"],
                 }
             ),
             200,
@@ -135,9 +135,8 @@ def logout():
         return jsonify({"message": "User not found", "code": 404})
 
     user["loggedCount"] -= 1
-
-    if user["loggedCount"] == 0:
-        uuid = ""
+    
+    uuid = '' if user['loggedCount'] == 0 else uuid
 
     db.users.update_one(
         {"_id": user["_id"]},
