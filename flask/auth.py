@@ -42,8 +42,17 @@ def login():
     if not user:
         return jsonify({"message": "Invalid email or password", "code": 401}), 401
 
+    user["loggedCount"] += 1
+
     db.users.update_one(
-        {"_id": user["_id"]}, {"$set": {"loginAt": datetime.utcnow(), "uuid": uuid}}
+        {"_id": user["_id"]},
+        {
+            "$set": {
+                "loginAt": datetime.utcnow(),
+                "uuid": uuid,
+                "loggedCount": user["loggedCount"],
+            }
+        },
     )
 
     return (
@@ -91,10 +100,10 @@ def signup():
         "lastLogin": datetime.utcnow(),
         "createdAt": datetime.utcnow(),
         "uuid": uuid,
+        "loggedCount": 1,
     }
     if not registry_user:
         db.users.insert_one(user)
-        user_doc = db.users.find_one({"email": email})
 
         return (
             jsonify(
@@ -102,7 +111,7 @@ def signup():
                     "message": "Signup successful",
                     "uuid": uuid,
                     "code": 200,
-                    "name": user_doc["name"],
+                    "name": user["name"],
                 }
             ),
             200,
@@ -125,8 +134,20 @@ def logout():
     if not user:
         return jsonify({"message": "User not found", "code": 404})
 
+    user["loggedCount"] -= 1
+
+    if user["loggedCount"] == 0:
+        uuid = ""
+
     db.users.update_one(
-        {"_id": user["_id"]}, {"$set": {"lastLogout": datetime.utcnow(), "uuid": ""}}
+        {"_id": user["_id"]},
+        {
+            "$set": {
+                "lastLogout": datetime.utcnow(),
+                "uuid": uuid,
+                "loggedCount": user["loggedCount"],
+            }
+        },
     )
 
     return jsonify({"message": "Logout successful", "code": 200}), 200
