@@ -17,7 +17,7 @@ except KeyError as err:
 @app.route("/users/<username>", methods=["GET"])
 @swag_from("documentation/user.yaml", methods=["GET"])
 def profile(username):
-    user = db.users.find_one({"name": username})
+    user = db.users.find_one({"username": username})
     if user:
         packages = db.packages.find(
             {"$or": [{"author": user["_id"]}, {"maintainers": user["_id"]}]},
@@ -44,7 +44,7 @@ def profile(username):
                     }
                 )
         user_account = {
-            "name": user["name"],
+            "username": user["username"],
             "email": user["email"],
             "createdAt": user["createdAt"],
             "packages": response_packages,
@@ -96,7 +96,7 @@ def account():
         return jsonify({"message": "User not found", "code": 404}), 404
 
     user_account = {
-        "name": user["name"],
+        "username": user["username"],
         "email": user["email"],
         "lastLogin": user["lastLogin"],
         "createdAt": user["createdAt"],
