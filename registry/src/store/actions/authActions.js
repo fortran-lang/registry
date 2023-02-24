@@ -27,7 +27,7 @@ export const login = (email, password) => async (dispatch) => {
         type: LOGIN_SUCCESS,
         payload: {
           uuid: result.data.uuid,
-          username: result.data.name,
+          username: result.data.username,
         },
       });
     } else {
@@ -92,10 +92,10 @@ export const logout = (uuid) => async (dispatch) => {
 export const SIGNUP_SUCCESS = "SIGNUP_SUCCESS";
 export const SIGNUP_FAILURE = "SIGNUP_FAILURE";
 
-export const signup = (name, email, password) => async (dispatch) => {
+export const signup = (username, email, password) => async (dispatch) => {
   let formData = new FormData();
 
-  formData.append("name", name);
+  formData.append("username", username);
   formData.append("email", email);
   formData.append("password", password);
 
@@ -115,7 +115,7 @@ export const signup = (name, email, password) => async (dispatch) => {
         type: SIGNUP_SUCCESS,
         payload: {
           uuid: result.data.uuid,
-          username: result.data.name,
+          username: result.data.username,
         },
       });
     } else {
