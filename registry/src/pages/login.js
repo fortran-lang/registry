@@ -4,6 +4,7 @@ import { useCookies } from "react-cookie";
 import { useDispatch, useSelector } from "react-redux";
 import { login, resetErrorMessage } from "../store/actions/authActions";
 import { Link } from "react-router-dom";
+import Container from "react-bootstrap/Container";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -53,6 +54,7 @@ const Login = () => {
   };
 
   return (
+    <Container style={{ paddingTop: 25 }}>
     <form id="login-form" onSubmit={handleSubmit}>
       <h1>Welcome to fpm Registry!</h1>
       <p>Please enter your email and password to log in.</p>
@@ -81,7 +83,7 @@ const Login = () => {
       <p>
         Don't have an account?<Link to="/account/register"> Sign up </Link>
       </p>
-    </form>
+    </form></Container>
   );
 };
 

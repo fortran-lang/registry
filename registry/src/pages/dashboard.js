@@ -32,8 +32,8 @@ const Dashboard = () => {
       <span className="visually-hidden">Loading...</span>
     </Spinner>
   ) : (
-    <Container>
-      <Container>Packages</Container>
+    <Container style={{ paddingTop: 25 }}>
+      <p style={{textAlign: "left", fontSize: 24 }}>Packages</p>
       <Row>
         {packages.map((element, index) => (
           <Col key={element.name + element.namespace_name} xs={6} md={4}>
@@ -44,6 +44,7 @@ const Dashboard = () => {
                   {element.namespace_name}
                 </Card.Subtitle>
                 <Card.Text id="card-text">{element.description}</Card.Text>
+                 <p style={{textAlign: "left", fontSize: 16 }}><a href={`/package/create`} style={{textDecoration:'none'}}>Create New Release</a></p>
               </Card.Body>
             </Card>
           </Col>

@@ -63,7 +63,7 @@ const Account = () => {
       <span className="visually-hidden">Loading...</span>
     </Spinner>
   ) : (
-    <Container fluid="md">
+    <Container fluid="md" style={{ paddingTop: 25 }}>
       <Table>
         <thead>
           <h3>Account Settings</h3>
@@ -113,7 +113,7 @@ const Account = () => {
           </tr>
         </tbody>
       </Table>
-      <Form onSubmit={handleSubmit}>
+      <Form onSubmit={handleSubmit} style={{ paddingTop: 15 }}>
         <Form.Group as={Row} className="mb-4">
           <Form.Label column sm="4">
             Old Password
@@ -152,7 +152,7 @@ const Account = () => {
         </Form.Text>
       </Form>
       <Container>
-        <Table>
+        <Table style={{ paddingTop: 15 }}>
           <thead>
             <h3>Delete account</h3>
           </thead>
