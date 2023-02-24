@@ -74,27 +74,27 @@ const Navbar = () => {
                   <MDBDropdownMenu>
                     <MDBDropdownItem
                       className="dropdown-item"
-                      onClick={() => navigate("/package/create")}
+                      onClick={() => {navigate("/package/create");window.location.reload();}}
                     >
                       Create Package
                     </MDBDropdownItem>
 
                     <MDBDropdownItem
                       className="dropdown-item"
-                      onClick={() => navigate("/manage/projects")}
+                      onClick={() => {navigate("/manage/projects");window.location.reload();}}
                     >
                       Packages
                     </MDBDropdownItem>
                     <MDBDropdownItem
                       className="dropdown-item"
-                      onClick={() => navigate("/search")}
+                      onClick={() => {navigate("/search");window.location.reload();}}
                     >
                       Search
                     </MDBDropdownItem>
 
                     <MDBDropdownItem
                       className="dropdown-item"
-                      onClick={() => navigate("/manage/account")}
+                      onClick={() => {navigate("/manage/account");window.location.reload();}}
                     >
                       Account
                     </MDBDropdownItem>

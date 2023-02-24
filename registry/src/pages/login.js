@@ -21,6 +21,7 @@ const Login = () => {
     if (isAuthenticated) {
       setCookie("uuid", uuid);
       navigate("/manage/projects");
+      window.location.reload();
     }
 
     if (errorMessage != null) {
