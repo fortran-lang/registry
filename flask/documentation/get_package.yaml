@@ -10,6 +10,13 @@ parameters:
     required: true
     type: string
 
+  - name: body
+    description: The list of versions in local registry. (Only for POST method)
+    required: true
+    type: array
+    items:
+      type: string
+
 responses:
   200:
     description: Package Found.
@@ -51,7 +58,7 @@ responses:
             description: response status code
 
   404:
-    description: package not found.
+    description: Package or Namespace not found.
     schema:
       type: array
       items:
@@ -59,7 +66,7 @@ responses:
         properties:
           message:
             type: string
-            description: package not found.
+            description: package or namespace not found.
           status:
             type: string
             description: response status code
