@@ -98,7 +98,6 @@ def account():
     user_account = {
         "username": user["username"],
         "email": user["email"],
-        "lastLogin": user["lastLogin"],
         "createdAt": user["createdAt"],
         "loginAt": user["loginAt"],
         "lastLogout": user["lastLogout"],

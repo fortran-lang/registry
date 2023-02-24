@@ -80,7 +80,7 @@ def search_packages():
             namespace = db.namespaces.find_one({"_id": i["namespace"]})
             author = db.users.find_one({"_id": i["author"]})
             i["namespace"] = namespace["namespace"]
-            i["author"] = author["name"]
+            i["author"] = author["username"]
             search_packages.append(i)
         return jsonify({"status": 200, "packages": search_packages, "total_pages": total_pages}), 200
     else:
