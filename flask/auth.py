@@ -35,7 +35,7 @@ def login():
         password += salt
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
         user = db.users.find_one({"email": email, "password": hashed_password})
-        uuid = generate_uuid()
+        uuid = generate_uuid() if user['loggedCount']==0 else user['uuid']
     else:
         user = db.users.find_one({"uuid": uuid})
 
