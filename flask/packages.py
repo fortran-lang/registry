@@ -390,6 +390,10 @@ def get_package_from_version(namespace_name, package_name, version):
     # Get namespace from namespace name.
     namespace = db.namespaces.find_one({"namespace": namespace_name})
 
+    # Check if namespace does not exists.
+    if not namespace:
+        return jsonify({"message": "Namespace not found", "code": 404})
+
     # Get package from a package_name, namespace's id and version.
     package = db.packages.find_one(
         {
@@ -537,6 +541,10 @@ def delete_package_version(namespace_name, package_name, version):
     # Get the namespace from the namespace name.
     namespace = db.namespaces.find_one({"namespace": namespace_name})
 
+    # Check if namespace does not exists.
+    if not namespace:
+        return jsonify({"message": "Namespace does not found", "code": 404})
+
     # Perform the pull operation.
     result = db.packages.update_one(
         {"name": package_name, "namespace": namespace["_id"]},
@@ -561,6 +569,10 @@ def get_packages():
 
         # Get the namespace document from namespace id.
         namespace = db.namespaces.find_one({"_id": namespace_id})
+
+        # Check if namespace does not exists.
+        if not namespace:
+            return jsonify({"message": "Namespace does not found", "code": 404})
 
         response_packages.append(
             {
