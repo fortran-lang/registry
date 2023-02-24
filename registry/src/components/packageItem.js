@@ -45,7 +45,14 @@ const PackageItem = ({ packageEntity }) => {
         </Col>
         <Col md={4}>
           <div>
-            <h5 id="list-item-package-name">{packageEntity.name}</h5>
+            <h5 id="list-item-package-name">
+              <a
+                href={`/packages/${packageEntity.namespace}/${packageEntity.name}`}
+                style={{ textDecoration: "none" }}
+              >
+                {packageEntity.name}
+              </a>
+            </h5>
           </div>
           <h6 className="mb-2 text-muted">
             Namespace {packageEntity.namespace}

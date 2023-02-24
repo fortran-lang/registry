@@ -33,18 +33,32 @@ const Dashboard = () => {
     </Spinner>
   ) : (
     <Container style={{ paddingTop: 25 }}>
-      <p style={{textAlign: "left", fontSize: 24 }}>Packages</p>
+      <p style={{ textAlign: "left", fontSize: 24 }}>Packages</p>
       <Row>
         {packages.map((element, index) => (
           <Col key={element.name + element.namespace_name} xs={6} md={4}>
             <Card>
               <Card.Body>
-                <Card.Title>{element.name}</Card.Title>
+                <Card.Title>
+                  <a
+                    href={`/packages/${element.namespace_name}/${element.name}`}
+                    style={{ textDecoration: "none", color: "black" }}
+                  >
+                    {element.name}
+                  </a>
+                </Card.Title>
                 <Card.Subtitle className="mb-2 text-muted">
                   {element.namespace_name}
                 </Card.Subtitle>
                 <Card.Text id="card-text">{element.description}</Card.Text>
-                 <p style={{textAlign: "left", fontSize: 16 }}><a href={`/package/create`} style={{textDecoration:'none'}}>Create New Release</a></p>
+                <p style={{ textAlign: "left", fontSize: 16 }}>
+                  <a
+                    href={`/package/create`}
+                    style={{ textDecoration: "none" }}
+                  >
+                    Create New Release
+                  </a>
+                </p>
               </Card.Body>
             </Card>
           </Col>
