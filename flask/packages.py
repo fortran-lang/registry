@@ -38,18 +38,17 @@ def search_packages():
     packages_per_page = 10
 
     mongo_db_query = {
-                "$and": [
-                    {
-                        "$or": [
-                            {"name": {"$regex": query}},
-                            {"tags": {"$in": [query]}},
-                            {"description": {"$regex": query}},
-                        ]
-                    },
-                    {"isDeprecated": False},
+        "$and": [
+            {
+                "$or": [
+                    {"name": {"$regex": query}},
+                    {"tags": {"$in": [query]}},
+                    {"description": {"$regex": query}},
                 ]
-            }
-
+            },
+            {"isDeprecated": False},
+        ]
+    }
 
     packages = (
         db.packages.find(
@@ -72,7 +71,7 @@ def search_packages():
     if packages:
         # Count the number of documents in the database related to query.
         total_documents = db.packages.count_documents(mongo_db_query)
-    
+
         total_pages = math.ceil(total_documents / packages_per_page)
 
         search_packages = []
@@ -82,10 +81,47 @@ def search_packages():
             i["namespace"] = namespace["namespace"]
             i["author"] = author["username"]
             search_packages.append(i)
-        return jsonify({"status": 200, "packages": search_packages, "total_pages": total_pages}), 200
+        return (
+            jsonify(
+                {"status": 200, "packages": search_packages, "total_pages": total_pages}
+            ),
+            200,
+        )
     else:
         return jsonify({"status": "error", "message": "packages not found"}), 404
 
+
+@app.route("/namespace/<namespace>", methods=["GET"])
+def namespace_packages(namespace):
+    namespace_packages = db.namespaces.find_one({"namespace": namespace})
+    packages = []
+    for i in namespace_packages["packages"]:
+        package = db.packages.find(
+            {"_id": i},
+            {
+                "_id": 0,
+                "name": 1,
+                "description": 1,
+                "author": 1,
+                "updatedAt": 1,
+            },
+        )
+        for p in package:
+            p["namespace"] = namespace
+            author = db.users.find_one({"_id": p["author"]})
+            p["author"] = author["username"]
+            packages.append(p)
+
+    return (
+        jsonify(
+            {
+                "status": 200,
+                "packages": packages,
+                "createdAt": namespace_packages["createdAt"],
+            }
+        ),
+        200,
+    )
 
 @app.route("/packages", methods=["POST"])
 def upload():

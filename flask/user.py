@@ -21,13 +21,6 @@ def profile(username):
     if user:
         packages = db.packages.find(
             {"$or": [{"author": user["_id"]}, {"maintainers": user["_id"]}]},
-            {
-                "name": 1,
-                "updatedAt": 1,
-                "namespace": 1,
-                "_id": 0,
-                "description": {"$substr": ["$description", 0, 80]},
-            },
         )
 
         response_packages = []
@@ -35,12 +28,15 @@ def profile(username):
             for package in packages:
                 # Get namespace from namespace id.
                 namespace = db.namespaces.find_one({"_id": package["namespace"]})
+                user = db.users.find_one({"_id": package["author"]})
+                namespace = db.namespaces.find_one({"_id": package["namespace"]})
                 response_packages.append(
                     {
                         "name": package["name"],
-                        "namespace_name": namespace["namespace"],
+                        "namespace": namespace["namespace"],
                         "description": package["description"],
                         "updatedAt": package["updatedAt"],
+                        "author": user["username"],
                     }
                 )
         user_account = {
@@ -50,7 +46,14 @@ def profile(username):
             "packages": response_packages,
         }
         return (
-            jsonify({"message": "User found", "user": user_account,"packages": response_packages, "code": 200}),
+            jsonify(
+                {
+                    "message": "User found",
+                    "user": user_account,
+                    "packages": response_packages,
+                    "code": 200,
+                }
+            ),
             200,
         )
     else:
@@ -103,5 +106,3 @@ def account():
         "lastLogout": user["lastLogout"],
     }
     return jsonify({"message": "User Found", "user": user_account, "code": 200}), 200
-
-
