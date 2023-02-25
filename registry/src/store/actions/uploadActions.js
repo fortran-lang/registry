@@ -17,20 +17,20 @@ export const uploadPackage = (data)  => async (dispatch) => {
       });
 
       if (result.data.code === 200) {
-        console.log(result.data.message);
         dispatch({
           type: UPLOAD_PACKAGE_SUCCESS,
           payload: {
-            message: result.message,
+            message: result.data.message,
+            statuscode: result.data.code,
           },
         });
       }
     } catch (error) {
-      console.log(error.response.data.message);
       dispatch({
         type: UPLOAD_PACKAGE_ERROR,
         payload: {
           message: error.response.data.message,
+          statuscode: error.response.data.code,
         },
       });
     }

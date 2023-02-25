@@ -12,6 +12,7 @@ const PackageForm = () => {
   const dispatch = useDispatch();
   const isLoading = useSelector((state) => state.upload.isLoading);
   const message = useSelector((state) => state.upload.message);
+  const statuscode = useSelector((state) => state.upload.statuscode);
 
   const [data, setData] = useState({
     name: "",
@@ -139,7 +140,11 @@ const PackageForm = () => {
             onChange={handleChange}
           />
           <br />
-          <Container class="error">{message}</Container>
+          {statuscode === 200 ? (
+            <Container className="success">{message}</Container>
+          ) : (
+            <Container className="error">{message}</Container>
+          )}
           <button type="submit">Add Package</button>
         </form>
       </div>
