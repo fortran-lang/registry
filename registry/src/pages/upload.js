@@ -1,11 +1,18 @@
 import React, { useState } from "react";
 import { useCookies } from "react-cookie";
 import { Navigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { uploadPackage } from "../store/actions/uploadActions";
+import Container from "react-bootstrap/Container";
+import Spinner from "react-bootstrap/Spinner";
 import "./upload.css";
 
 const PackageForm = () => {
   const [cookies, setCookie] = useCookies(["uuid"]);
-  const responseDiv = document.getElementById("error");
+  const dispatch = useDispatch();
+  const isLoading = useSelector((state) => state.upload.isLoading);
+  const message = useSelector((state) => state.upload.message);
+  document.getElementById("error").innerHTML = message;
 
   const [data, setData] = useState({
     name: "",
@@ -18,6 +25,7 @@ const PackageForm = () => {
     namespace_description: "",
     tags: "",
     dependencies: "",
+    uuid:cookies.uuid,
   });
 
   const handleChange = (event) => {
@@ -27,24 +35,15 @@ const PackageForm = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    fetch(`${process.env.REACT_APP_REGISTRY_API_URL}/packages`, {
-      method: "POST",
-      body: new FormData(event.target),
-    }).then((res) => {
-      if (res.ok) {
-        console.log("created");
-      } else {
-        console.error("Error while sending request");
-      }
-      console.log(res);
-
-      responseDiv.innerHTML = `${res.data}`;
-    });
+    dispatch(uploadPackage(event.target));
+    
   };
+
+
   if (!cookies.uuid) {
     return <Navigate to="/account/login" replace={true} />;
   } else {
-    return (
+  return !isLoading ? (
       <div className="container">
         <h2>Create a Package</h2>
         <form id="package-form" onSubmit={handleSubmit}>
@@ -147,7 +146,13 @@ const PackageForm = () => {
           <button type="submit">Add Package</button>
         </form>
       </div>
-    );
+   ) : (
+    <Container style={{ margin: "200px" }}>
+      <Spinner animation="border" role="status">
+        <span className="visually-hidden">Loading...</span>
+      </Spinner>
+    </Container>
+  );
   }
 };
 
