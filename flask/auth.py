@@ -28,16 +28,12 @@ def generate_uuid():
 @app.route("/auth/login", methods=["POST"])
 @swag_from("documentation/login.yaml", methods=["POST"])
 def login():
-    uuid = request.form.get("uuid")
-    if not uuid:
-        email = request.form.get("email")
-        password = request.form.get("password")
-        password += salt
-        hashed_password = hashlib.sha256(password.encode()).hexdigest()
-        user = db.users.find_one({"email": email, "password": hashed_password})
-        uuid = generate_uuid() if user['loggedCount']==0 else user['uuid']
-    else:
-        user = db.users.find_one({"uuid": uuid})
+    email = request.form.get("email")
+    password = request.form.get("password")
+    password += salt
+    hashed_password = hashlib.sha256(password.encode()).hexdigest()
+    user = db.users.find_one({"email": email, "password": hashed_password})
+    uuid = generate_uuid() if user['loggedCount']==0 else user['uuid']
 
     if not user:
         return jsonify({"message": "Invalid email or password", "code": 401}), 401

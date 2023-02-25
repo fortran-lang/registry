@@ -11,7 +11,8 @@ import Account from "./pages/account";
 import Search from "./pages/search";
 import NoPage from "./pages/404";
 import UserPage from "./pages/user";
-// import PackagePage from "./pages/package";
+import PackagePage from "./pages/package_tabs";
+import NamespacePage from "./pages/namespace";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import "bootstrap/dist/css/bootstrap.css";
@@ -30,7 +31,8 @@ function App() {
         <Route path="/manage/account" element={<Account />} />
         <Route path="/package/create" element={<PackageForm />} />
         <Route path="/users/:user" element={<UserPage />} />
-        {/* <Route path="/packages/:namespace_name/:package_name" element={<PackagePage />} /> */}
+        <Route path="/packages/:namespace_name/:package_name" element={<PackagePage />} />
+        <Route path="/namespaces/:namespace" element={<NamespacePage />} />
         <Route path="*" element={<NoPage />} />
       </Routes>
     </BrowserRouter>
