@@ -12,7 +12,6 @@ const PackageForm = () => {
   const dispatch = useDispatch();
   const isLoading = useSelector((state) => state.upload.isLoading);
   const message = useSelector((state) => state.upload.message);
-  document.getElementById("error").innerHTML = message;
 
   const [data, setData] = useState({
     name: "",
@@ -25,7 +24,7 @@ const PackageForm = () => {
     namespace_description: "",
     tags: "",
     dependencies: "",
-    uuid:cookies.uuid,
+    uuid: cookies.uuid,
   });
 
   const handleChange = (event) => {
@@ -36,14 +35,12 @@ const PackageForm = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
     dispatch(uploadPackage(event.target));
-    
   };
-
 
   if (!cookies.uuid) {
     return <Navigate to="/account/login" replace={true} />;
   } else {
-  return !isLoading ? (
+    return !isLoading ? (
       <div className="container">
         <h2>Create a Package</h2>
         <form id="package-form" onSubmit={handleSubmit}>
@@ -142,17 +139,17 @@ const PackageForm = () => {
             onChange={handleChange}
           />
           <br />
-          <p id="error" className="error"></p>
+          <Container class="error">{message}</Container>
           <button type="submit">Add Package</button>
         </form>
       </div>
-   ) : (
-    <Container style={{ margin: "200px" }}>
-      <Spinner animation="border" role="status">
-        <span className="visually-hidden">Loading...</span>
-      </Spinner>
-    </Container>
-  );
+    ) : (
+      <Container style={{ margin: "200px" }}>
+        <Spinner animation="border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </Spinner>
+      </Container>
+    );
   }
 };
 

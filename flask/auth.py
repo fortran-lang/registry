@@ -74,6 +74,7 @@ def signup():
 
     username = request.form.get("username")
     email = request.form.get("email")
+    email = email.lower()
     password = request.form.get("password")
 
     if not username:
