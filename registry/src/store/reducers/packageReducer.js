@@ -7,15 +7,9 @@ import {
 
 
 const initialState = {
-  author: '',
-  tags: [],
-  license: '',
-  createdAt: '',
-  versionData: {},
-  updatedAt: '',
-  description: '',
-  notFound: false,
-  isLoading: false
+statuscode:0,
+data:[],
+  isLoading: true,
 };
 
 const packageReducer = (state = initialState, action) => {
@@ -23,25 +17,21 @@ const packageReducer = (state = initialState, action) => {
     case FETCH_PACKAGE_DATA:
       return {
         ...state,
-        isLoading: true
+        isLoading: true,
       };
     case FETCH_PACKAGE_DATA_SUCCESS:
       return {
         ...state,
         isLoading: false,
-        author: action.payload.author,
-        tags: action.payload.tags,
-        license: action.payload.license,
-        createdAt: action.payload.createdAt,
-        versionData: action.payload.versionData,
-        updatedAt: action.payload.updatedAt,
-        description: action.payload.description
+        statuscode: action.payload.statuscode,
+        data: action.payload.data,
       };
     case FETCH_PACKAGE_DATA_ERROR:
       return {
         ...state,
         isLoading: false,
-        notFound: true
+        statuscode: action.payload.statuscode,
+        data: action.payload.data,
       };
     default:
       return state;

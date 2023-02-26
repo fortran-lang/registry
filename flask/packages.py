@@ -251,6 +251,7 @@ def upload():
             "version": version,
             "dependencies": dependencies,
             "isDeprecated": False,
+            "createdAt": datetime.utcnow(),
         }
 
         package_previously_uploaded["versions"].append(new_version)
@@ -323,7 +324,7 @@ def get_package(namespace_name, package_name):
             "name": package["name"],
             "namespace": namespace["namespace"],
             "latest_version_data": package["versions"][-1],
-            "author": package_author["name"],
+            "author": package_author["username"],
             "tags": package["tags"],
             "license": package["license"],
             "createdAt": package["createdAt"],
@@ -368,7 +369,7 @@ def get_package_from_version(namespace_name, package_name, version):
         package_response_data = {
             "name": package["name"],
             "namespace": namespace["namespace"],
-            "author": package_author["name"],
+            "author": package_author["username"],
             "tags": package["tags"],
             "license": package["license"],
             "createdAt": package["createdAt"],
