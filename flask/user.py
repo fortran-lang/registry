@@ -116,3 +116,21 @@ def account():
         "lastLogout": user["lastLogout"],
     }
     return jsonify({"message": "User Found", "user": user_account, "code": 200}), 200
+
+@app.route("/users/admin", methods=["POST"])
+@swag_from("documentation/admin.yaml", methods=["POST"])
+def admin():
+    uuid = request.form.get("uuid")
+    if not uuid:
+        return jsonify({"message": "Unauthorized", "code": 401}), 401
+    else:
+        user = db.users.find_one({"uuid": uuid})
+
+    if not user:
+        return jsonify({"message": "User not found", "code": 404}), 404
+    
+    if 'admin' not in user['roles']:
+        return jsonify({"message": "Unauthorized", "code": 401}), 401
+    else:
+        return jsonify({"message": "User is admin", "isAdmin":"true","code": 200}), 200
+

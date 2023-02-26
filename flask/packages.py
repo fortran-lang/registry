@@ -410,7 +410,7 @@ def delete_namespace(namespace_name):
     if not namespace:
         return jsonify({"message": "Namespace not found", "code": 404})
 
-    namespace_deleted = db.packages.delete_one({"namespace": namespace["_id"]})
+    namespace_deleted = db.namespaces.delete_one({"namespace": namespace["_id"]})
 
     if namespace_deleted.deleted_count > 0:
         return jsonify({"message": "Namespace deleted successfully"}), 200
