@@ -1,14 +1,12 @@
-import { 
+import {
   FETCH_PACKAGE_DATA,
   FETCH_PACKAGE_DATA_SUCCESS,
   FETCH_PACKAGE_DATA_ERROR,
-
-} from '../actions/packageActions'
-
+} from "../actions/packageActions";
 
 const initialState = {
-statuscode:0,
-data:[],
+  statuscode: 0,
+  data: [],
   isLoading: true,
 };
 

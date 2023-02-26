@@ -123,6 +123,7 @@ def namespace_packages(namespace):
         200,
     )
 
+
 @app.route("/packages", methods=["POST"])
 def upload():
     uuid = request.form.get("uuid")
@@ -381,6 +382,42 @@ def get_package_from_version(namespace_name, package_name, version):
         return jsonify({"data": package_response_data, "code": 200})
 
 
+@app.route("/packages/<namespace_name>/delete", methods=["POST"])
+def delete_namespace(namespace_name):
+    uuid = request.form.get("uuid")
+
+    if not uuid:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
+
+    user = db.users.find_one({"uuid": uuid})
+
+    # Check if the user is authorized to delete the package.
+    if not "admin" in user["roles"]:
+        return (
+            jsonify(
+                {
+                    "status": "error",
+                    "message": "User is not authorized to delete the namespace",
+                }
+            ),
+            401,
+        )
+
+    # Get the namespace from the namespace_name.
+    namespace = db.namespaces.find_one({"namespace": namespace_name})
+
+    # If namespace is not found. Return 404.
+    if not namespace:
+        return jsonify({"message": "Namespace not found", "code": 404})
+
+    namespace_deleted = db.packages.delete_one({"namespace": namespace["_id"]})
+
+    if namespace_deleted.deleted_count > 0:
+        return jsonify({"message": "Namespace deleted successfully"}), 200
+    else:
+        return jsonify({"message": "Internal Server Error", "code": 500})
+
+
 @app.route("/packages/<namespace_name>/<package_name>/delete", methods=["POST"])
 def delete_package(namespace_name, package_name):
     uuid = request.form.get("uuid")
@@ -404,6 +441,9 @@ def delete_package(namespace_name, package_name):
 
     # Get the namespace from the namespace name.
     namespace = db.namespaces.find_one({"namespace": namespace_name})
+
+    if not namespace:
+        return jsonify({"message": "Namespace not found", "code": 404})
 
     # Find package using package_name & namespace_name.
     package = db.packages.find_one(

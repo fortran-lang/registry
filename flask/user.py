@@ -65,6 +65,7 @@ def profile(username):
 def delete_user():
     uuid = request.form.get("uuid")
     password = request.form.get("password")
+    username = request.form.get("username")
 
     if not uuid:
         return jsonify({"message": "Unauthorized", "code": 401}), 401
@@ -82,8 +83,17 @@ def delete_user():
         else:
             db.users.delete_one({"uuid": uuid})
             return jsonify({"message": "User deleted", "code": 200}), 200
+        
+    elif username and 'admin' in user['roles']:
+        delete_user = db.users.find_one({"username": username})
+        if delete_user:
+            db.users.delete_one({"username": username})
+            return jsonify({"message": "User deleted", "code": 200}), 200
+        else:
+            return jsonify({"message": "User not found", "code": 404}), 404
+        
     else:
-        return jsonify({"message": "Invalid email or password", "code": 401}), 401
+        return jsonify({"message": "Unauthorized", "code": 401}), 401
 
 
 @app.route("/users/account", methods=["POST"])
