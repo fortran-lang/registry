@@ -177,8 +177,8 @@ def reset_password():
 
 @app.route("/auth/forgot-password", methods=["POST"])
 @swag_from("documentation/forgot_password.yaml", methods=["POST"])
-def forgot_password():
-    email = request.form.get("email")
+def forgot_password(*email):
+    email = request.form.get("email") if request.form.get("email") else email[0]
     user = db.users.find({"email": email})
     if not user:
         return jsonify({"message": "User not found", "code": 404})

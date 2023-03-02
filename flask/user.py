@@ -6,6 +6,7 @@ from mongo import db
 from flask import request, jsonify
 from app import swagger
 from flasgger.utils import swag_from
+from auth import forgot_password
 
 load_dotenv()
 
@@ -13,6 +14,7 @@ try:
     salt = os.getenv("SALT")
 except KeyError as err:
     print("Add SALT to .env file")
+
 
 @app.route("/users/<username>", methods=["GET"])
 @swag_from("documentation/user.yaml", methods=["GET"])
@@ -83,15 +85,15 @@ def delete_user():
         else:
             db.users.delete_one({"uuid": uuid})
             return jsonify({"message": "User deleted", "code": 200}), 200
-        
-    elif username and 'admin' in user['roles']:
+
+    elif username and "admin" in user["roles"]:
         delete_user = db.users.find_one({"username": username})
         if delete_user:
             db.users.delete_one({"username": username})
             return jsonify({"message": "User deleted", "code": 200}), 200
         else:
             return jsonify({"message": "User not found", "code": 404}), 404
-        
+
     else:
         return jsonify({"message": "Unauthorized", "code": 401}), 401
 
@@ -117,6 +119,7 @@ def account():
     }
     return jsonify({"message": "User Found", "user": user_account, "code": 200}), 200
 
+
 @app.route("/users/admin", methods=["POST"])
 @swag_from("documentation/admin.yaml", methods=["POST"])
 def admin():
@@ -129,8 +132,53 @@ def admin():
     if not user:
         return jsonify({"message": "User not found", "code": 404}), 404
     
-    if 'admin' not in user['roles']:
+    if "admin" not in user["roles"]:
         return jsonify({"message": "Unauthorized", "code": 401}), 401
     else:
-        return jsonify({"message": "User is admin", "isAdmin":"true","code": 200}), 200
+        return (
+            jsonify({"message": "User is admin", "isAdmin": "true", "code": 200}),
+            200,
+        )
 
+
+@app.route("/users/admin/transfer", methods=["POST"])
+@swag_from("documentation/admin.yaml", methods=["POST"])
+def transfer_account():
+    uuid = request.form.get("uuid")
+    if not uuid:
+        return jsonify({"message": "Unauthorized", "code": 401}), 401
+    else:
+        user = db.users.find_one({"uuid": uuid})
+
+    if not user:
+        return jsonify({"message": "User not found", "code": 404}), 404
+
+    if "admin" not in user["roles"]:
+        return jsonify({"message": "Unauthorized", "code": 401}), 401
+    else:
+        old_user = request.form.get("old_username")
+        new_user = request.form.get("new_username")
+        new_email = request.form.get("new_email")
+        db.users.update_one(
+            {"username": old_user},
+            {
+                "$set": {
+                    "email": new_email,
+                    "username": new_user,
+                    "uuid": "",
+                    "loggedCount": 0,
+                    "loginAt": None,
+                    "lastLogout": None,
+                }
+            },
+        )
+        forgot_password(new_email)
+        return (
+            jsonify(
+                {
+                    "message": "Account Transfer Successful and Password reset request sent.",
+                    "code": 200,
+                }
+            ),
+            200,
+        )
