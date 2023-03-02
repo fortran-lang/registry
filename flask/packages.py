@@ -1,6 +1,9 @@
 from app import app
 from mongo import db
-from flask import request, jsonify
+from mongo import file_storage
+from bson.objectid import ObjectId
+from flask import request, jsonify, abort, send_file
+from gridfs.errors import NoFile
 from datetime import datetime
 from auth import generate_uuid
 from app import swagger
@@ -181,9 +184,10 @@ def upload():
         {"name": name, "namespace": namespace["_id"]}
     )
 
-    # TODO: Replace this code with Storage Service.
     tarball_name = "{}-{}.tar.gz".format(name, version)
-    tarball.save(tarball_name)
+
+    # Upload the tarball to the Grid FS storage.
+    file_object_id = file_storage.put(tarball, content_type="application/gzip", filename=tarball_name)
 
     # If there are no previous versions of package.
     # This means user is trying to upload a new package.
@@ -208,6 +212,7 @@ def upload():
             "tarball": tarball_name,
             "dependencies": dependencies,
             "isDeprecated": False,
+            "download_url": f"/tarballs/{file_object_id}"
         }
 
         package["versions"] = []
@@ -253,6 +258,7 @@ def upload():
             "dependencies": dependencies,
             "isDeprecated": False,
             "createdAt": datetime.utcnow(),
+            "download_url": f"/tarballs/{file_object_id}"
         }
 
         package_previously_uploaded["versions"].append(new_version)
@@ -263,6 +269,16 @@ def upload():
         )
 
         return jsonify({"message": "Package Uploaded Successfully.", "code": 200})
+    
+@app.route('/tarballs/<oid>', methods=["GET"])
+def serve_gridfs_file(oid):
+    try:
+        file = file_storage.get(ObjectId(oid))
+
+        # Return the file data as a Flask response object
+        return send_file(file, download_name=file.filename, as_attachment=True, mimetype=file.content_type)
+    except NoFile:
+        abort(404)
 
 
 @app.route("/packages", methods=["PUT"])
