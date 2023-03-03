@@ -1,4 +1,4 @@
-description: Makes a GET request to retrieve a package from a specific version.
+description: Makes a GET request to retrieve a package using namespace and package name.
 parameters:
   - name: namespace_name
     description: namespace name of the package
@@ -21,8 +21,6 @@ responses:
   200:
     description: Package Found.
     schema:
-      type: array
-      items:
         type: object
         properties:
           data:
@@ -47,26 +45,33 @@ responses:
               createdAt:
                 type: string
                 description: createdAt of package
-              version_data:
+              latest_version_data:
                 type: object
-                description: version data of package
+                description: data of the latest version of the package
+              version_history:
+                type: object
+                description: version history of package
               updatedAt:
                 type: string
                 description: updatedAt of package
-          status:
+              description:
+                type: string
+                description: description of the package
+              license:
+                type: string
+                description: license of the package
+          code:
             type: string
             description: response status code
 
   404:
     description: Package or Namespace not found.
     schema:
-      type: array
-      items:
-        type: object
-        properties:
+      type: object
+      properties:
           message:
             type: string
             description: package or namespace not found.
-          status:
+          code:
             type: string
             description: response status code

@@ -19,8 +19,6 @@ responses:
   200:
     description: Package Found.
     schema:
-      type: array
-      items:
         type: object
         properties:
           data:
@@ -51,12 +49,12 @@ responses:
               updatedAt:
                 type: string
                 description: updatedAt of package
-          status:
+          code:
             type: string
             description: response status code
 
   404:
-    description: package not found.
+    description: package or not namespace not found.
     schema:
       type: array
       items:
@@ -64,7 +62,7 @@ responses:
         properties:
           message:
             type: string
-            description: package not found.
+            description: package or namespace not found.
           status:
             type: string
             description: response status code
