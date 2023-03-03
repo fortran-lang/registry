@@ -317,8 +317,8 @@ def check_version(current_version, new_version):
     return new_list > current_list
 
 
-@app.route("/packages/<namespace_name>/<package_name>", methods=["GET", "POST"])
-@swag_from("documentation/get_package.yaml", methods=["GET", "POST"])
+@app.route("/packages/<namespace_name>/<package_name>", methods=["GET"])
+@swag_from("documentation/get_package.yaml", methods=["GET"])
 def get_package(namespace_name, package_name):
     # Get namespace from namespace name.
     namespace = db.namespaces.find_one({"namespace": namespace_name})
