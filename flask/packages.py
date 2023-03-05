@@ -6,7 +6,6 @@ from auth import generate_uuid
 from app import swagger
 from flasgger.utils import swag_from
 from urllib.parse import unquote
-import json
 import math
 
 parameters = {
@@ -91,37 +90,7 @@ def search_packages():
         return jsonify({"status": "error", "message": "packages not found"}), 404
 
 
-@app.route("/namespace/<namespace>", methods=["GET"])
-def namespace_packages(namespace):
-    namespace_packages = db.namespaces.find_one({"namespace": namespace})
-    packages = []
-    for i in namespace_packages["packages"]:
-        package = db.packages.find(
-            {"_id": i},
-            {
-                "_id": 0,
-                "name": 1,
-                "description": 1,
-                "author": 1,
-                "updatedAt": 1,
-            },
-        )
-        for p in package:
-            p["namespace"] = namespace
-            author = db.users.find_one({"_id": p["author"]})
-            p["author"] = author["username"]
-            packages.append(p)
 
-    return (
-        jsonify(
-            {
-                "status": 200,
-                "packages": packages,
-                "createdAt": namespace_packages["createdAt"],
-            }
-        ),
-        200,
-    )
 
 
 @app.route("/packages", methods=["POST"])
@@ -380,42 +349,6 @@ def get_package_from_version(namespace_name, package_name, version):
         }
 
         return jsonify({"data": package_response_data, "code": 200})
-
-
-@app.route("/packages/<namespace_name>/delete", methods=["POST"])
-def delete_namespace(namespace_name):
-    uuid = request.form.get("uuid")
-
-    if not uuid:
-        return jsonify({"status": "error", "message": "Unauthorized"}), 401
-
-    user = db.users.find_one({"uuid": uuid})
-
-    # Check if the user is authorized to delete the package.
-    if not "admin" in user["roles"]:
-        return (
-            jsonify(
-                {
-                    "status": "error",
-                    "message": "User is not authorized to delete the namespace",
-                }
-            ),
-            401,
-        )
-
-    # Get the namespace from the namespace_name.
-    namespace = db.namespaces.find_one({"namespace": namespace_name})
-
-    # If namespace is not found. Return 404.
-    if not namespace:
-        return jsonify({"message": "Namespace not found", "code": 404})
-
-    namespace_deleted = db.namespaces.delete_one({"namespace": namespace["_id"]})
-
-    if namespace_deleted.deleted_count > 0:
-        return jsonify({"message": "Namespace deleted successfully"}), 200
-    else:
-        return jsonify({"message": "Internal Server Error", "code": 500})
 
 
 @app.route("/packages/<namespace_name>/<package_name>/delete", methods=["POST"])
