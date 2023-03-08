@@ -182,3 +182,52 @@ def transfer_account():
             ),
             200,
         )
+
+@app.route("/<username>/<namespace>/maintainer", methods=["POST"])
+def add_maintainers(namespace, username):
+    uuid = request.get_json()["uuid"]
+    username_to_be_added = request.get_json()["username"]
+    if not uuid:
+        return jsonify({"message": "Unauthorized", "code": 401}), 401
+
+    # Get the user from the database using uuid.
+    user = db.users.find_one({"uuid": uuid})
+
+    # Check if current user is authorized to access this API.
+    if not user or user["username"] != username:
+        return jsonify({"message": "Unauthorized", "code": 401}), 401
+    
+    # Get the namespace from the database.
+    package_namespace = db.namespaces.find_one({"namespace": namespace})
+
+    # Check if namespace does not exists.
+    if not package_namespace:
+        return jsonify({"message": "Namespace not found", "code": 404}), 404
+
+    # Check if the current user has authority to add maintainers.
+    if checkUserNotAdmin(user_id=user["_id"], namespace=package_namespace):
+        return jsonify({"message": "Unauthorized", "code": 401}), 401
+    
+
+    # Get the user to be added using the username received in the request body.
+    user_to_be_added = db.users.find_one({"username": username_to_be_added})
+
+    if not user_to_be_added:
+        return jsonify({"message": "Username to be added as a maintainer not found", "code": 404})
+
+     # Update the document only if the user_to_be_added["_id"] is not already in the admins list.
+    result =  db.namespaces.update_one(
+        {"namespace": namespace, 'maintainers': {'$ne': user_to_be_added["_id"]}}, 
+        {"$addToSet": {"maintainers": user_to_be_added["_id"]}}
+    )
+
+    if result.modified_count > 0:
+        return jsonify({"message": "Maintainer added successfully", "code": 200}), 200
+    else:
+        return jsonify({"message": "Maintainer already added", "code": 200}), 200
+
+def checkUserNotAdmin(user_id, namespace):
+    user_id_str = str(user_id)
+    admin_id_list = [str(obj_id) for obj_id in namespace["admins"]]
+
+    return user_id_str not in admin_id_list
