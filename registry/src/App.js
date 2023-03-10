@@ -13,6 +13,9 @@ import NoPage from "./pages/404";
 import UserPage from "./pages/user";
 import PackagePage from "./pages/package";
 import NamespacePage from "./pages/namespace";
+import Admin from "./pages/admin";
+import ForgotPassword from "./pages/forgotpassword";
+import ResetPassword from "./pages/resetpassword";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import "bootstrap/dist/css/bootstrap.css";
@@ -24,6 +27,8 @@ function App() {
       <Routes>
         <Route path="/" exact element={<Home />} />
         <Route path="/account/login" element={<Login />} />
+        <Route path="/account/forgot-password" element={<ForgotPassword />} />
+        <Route path="/account/reset-password/:uuid" element={<ResetPassword />} />
         <Route path="/account/register" element={<Register />} />
         <Route path="/help" element={<Help />} />
         <Route path="/search" element={<Search />} />
@@ -33,6 +38,7 @@ function App() {
         <Route path="/users/:user" element={<UserPage />} />
         <Route path="/packages/:namespace_name/:package_name" element={<PackagePage />} />
         <Route path="/namespaces/:namespace" element={<NamespacePage />} />
+        <Route path="/admin" element={<Admin />} />
         <Route path="*" element={<NoPage />} />
       </Routes>
     </BrowserRouter>

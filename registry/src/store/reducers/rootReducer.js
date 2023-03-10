@@ -6,6 +6,7 @@ import userReducer from "./userReducer";
 import searchReducer from "./searchReducer";
 import namespaceReducer from "./namespaceReducer";
 import uploadReducer from "./uploadReducer";
+import resetPasswordReducer from "./resetPasswordReducer";
 import { combineReducers } from "redux";
 
 const rootReducer = combineReducers({
@@ -17,6 +18,7 @@ const rootReducer = combineReducers({
   package:packageReducer,
   namespace:namespaceReducer,
   upload:uploadReducer,
+  resetpassword:resetPasswordReducer,
 });
 
 export default rootReducer;
