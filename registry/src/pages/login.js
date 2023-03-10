@@ -55,35 +55,39 @@ const Login = () => {
 
   return (
     <Container style={{ paddingTop: 25 }}>
-    <form id="login-form" onSubmit={handleSubmit}>
-      <h1>Welcome to fpm Registry!</h1>
-      <p>Please enter your email and password to log in.</p>
-      <input
-        type="email"
-        name="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      {fromValidationErrors.email && (
-        <p className="error">{fromValidationErrors.email}</p>
-      )}
-      <input
-        type="password"
-        name="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      {fromValidationErrors.password && (
-        <p className="error">{fromValidationErrors.password}</p>
-      )}
-      {errorMessage != null ? <p className="error">{errorMessage}</p> : null}
-      <input type="submit" value="Log In" />
-      <p>
-        Don't have an account?<Link to="/account/register"> Sign up </Link>
-      </p>
-    </form></Container>
+      <form id="login-form" onSubmit={handleSubmit}>
+        <h1>Welcome to fpm Registry!</h1>
+        <p>Please enter your email and password to log in.</p>
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        {fromValidationErrors.email && (
+          <p className="error">{fromValidationErrors.email}</p>
+        )}
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        {fromValidationErrors.password && (
+          <p className="error">{fromValidationErrors.password}</p>
+        )}
+        {errorMessage != null ? <p className="error">{errorMessage}</p> : null}
+        <input type="submit" value="Log In" />
+        <p>
+          Don't have an account?<Link to="/account/register"> Sign up </Link>
+        </p>
+        <p>
+          <Link to="/account/forgot-password"> Forgot password </Link>
+        </p>
+      </form>
+    </Container>
   );
 };
 

@@ -60,45 +60,49 @@ const Register = () => {
 
   return (
     <Container style={{ paddingTop: 25 }}>
-    <form id="login-form" onSubmit={handleSubmit}>
-      <h1>Welcome to fpm Registry!</h1>
-      <p>Please enter your details to Sign up.</p>
-      <input
-        type="text"
-        name="username"
-        placeholder="username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
-      {fromValidationErrors.email && (
-        <p className="error">{fromValidationErrors.username}</p>
-      )}
-      <input
-        type="email"
-        name="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      {fromValidationErrors.email && (
-        <p className="error">{fromValidationErrors.email}</p>
-      )}
-      <input
-        type="password"
-        name="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      {fromValidationErrors.email && (
-        <p className="error">{fromValidationErrors.password}</p>
-      )}
-      {errorMessage != null ? <p className="error">{errorMessage}</p> : null}
-      <input type="submit" value="Sign Up" />
-      <p>
-        Already have an account?<Link to="/account/login"> Log in </Link>
-      </p>
-    </form></Container>
+      <form id="login-form" onSubmit={handleSubmit}>
+        <h1>Welcome to fpm Registry!</h1>
+        <p>Please enter your details to Sign up.</p>
+        <input
+          type="text"
+          name="username"
+          placeholder="username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+        {fromValidationErrors.email && (
+          <p className="error">{fromValidationErrors.username}</p>
+        )}
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        {fromValidationErrors.email && (
+          <p className="error">{fromValidationErrors.email}</p>
+        )}
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        {fromValidationErrors.email && (
+          <p className="error">{fromValidationErrors.password}</p>
+        )}
+        {errorMessage != null ? <p className="error">{errorMessage}</p> : null}
+        <input type="submit" value="Sign Up" />
+        <p>
+          Already have an account?<Link to="/account/login"> Log in </Link>
+        </p>
+        <p>
+          <Link to="/account/forgot-password"> Forgot password </Link>
+        </p>
+      </form>
+    </Container>
   );
 };
 
