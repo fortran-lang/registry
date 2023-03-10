@@ -7,7 +7,6 @@ from flask import request, jsonify
 from app import swagger
 from flasgger.utils import swag_from
 from auth import forgot_password
-from packages import checkUserUnauthorized
 
 load_dotenv()
 
@@ -226,7 +225,7 @@ def add_maintainers(username):
         return jsonify({"message": "Package not found", "code": 404}), 404
 
     # Check if the current user has authority to add maintainers.
-    if checkUserUnauthorized(user_id=user["_id"], package_namespace=package_namespace):
+    if checkUserUnauthorized(user_id=user["_id"], package=curr_package):
         return jsonify({"message": "Unauthorized", "code": 401}), 401
     
     # Get the user to be added using the username received in the request body.
@@ -251,3 +250,9 @@ def add_maintainers(username):
         return jsonify({"message": "Maintainer added successfully", "code": 200}), 200
     else:
         return jsonify({"message": "Maintainer already added", "code": 200}), 200
+    
+# This function checks if user is a maintainer of a package.
+def checkUserUnauthorized(user_id, package):
+    maintainers_id_list = [str(obj_id) for obj_id in package["maintainers"]]
+    str_user_id = str(user_id)
+    return str_user_id not in maintainers_id_list
