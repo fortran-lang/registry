@@ -171,7 +171,7 @@ def reset_password():
     password += salt
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
     db.users.update_one(
-        {"uuid": uuid}, {"$set": {"password": hashed_password, "uuid": ""}}
+        {"uuid": uuid}, {"$set": {"password": hashed_password, "uuid": "", "loggedCount": 0}}
     )
     return jsonify({"message": "Password reset successful", "code": 200}), 200
 
@@ -179,13 +179,18 @@ def reset_password():
 @app.route("/auth/forgot-password", methods=["POST"])
 @swag_from("documentation/forgot_password.yaml", methods=["POST"])
 def forgot_password(*email):
-    email = request.form.get("email") if request.form.get("email") else email[0]
-    user = db.users.find({"email": email})
+    try:
+        email = request.form.get("email") if request.form.get("email") else email[0]
+    except:
+        return jsonify({"message": "Email is required", "code": 400}), 400
+    
+    user = db.users.find_one({"email": email})
+
     if not user:
-        return jsonify({"message": "User not found", "code": 404})
+        return jsonify({"message": "User not found", "code": 404}),404
 
     uuid = generate_uuid()
-    db.users.update_one({"email": email}, {"$set": {"uuid": uuid}})
+    db.users.update_one({"email": email}, {"$set": {"uuid": uuid, "loggedCount": 1}})
 
     # send the uuid link in the email
 
