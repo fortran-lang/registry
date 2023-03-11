@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useCookies } from "react-cookie";
 import { fetchPackages } from "../store/actions/dashboardActions";
@@ -8,9 +8,11 @@ import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import Spinner from "react-bootstrap/Spinner";
 import Container from "react-bootstrap/Container";
+import AddMaintainerFormDialog from "../pages/maintainerDialogForm";
 
 const Dashboard = () => {
   const [cookies, setCookie] = useCookies(["uuid"]);
+  const [showMaintainerDialog, setShowMaintainerDialog] = useState(false);
   const username = useSelector((state) => state.auth.username);
   const packages = useSelector((state) => state.dashboard.packages);
   const isLoading = useSelector((state) => state.dashboard.isLoading);
@@ -59,6 +61,18 @@ const Dashboard = () => {
                     Create New Release
                   </a>
                 </p>
+                <span
+                  style={{ textAlign: "left", fontSize: 16 }}
+                  onClick={() => setShowMaintainerDialog(true)}
+                >
+                  Add Maintainers
+                </span>
+                <AddMaintainerFormDialog
+                  package={element.name}
+                  namespace={element.namespace}
+                  show={showMaintainerDialog}
+                  onHide={() => setShowMaintainerDialog(false)}
+                />
               </Card.Body>
             </Card>
           </Col>

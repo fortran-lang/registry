@@ -1,46 +1,70 @@
 import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
-import Form from "react-bootstrap/Form";
+import {
+  addMaintainer,
+  resetMessages,
+} from "../store/actions/addMaintainerActions";
 
 const AddMaintainerFormDialog = (props) => {
   const [username, setUsername] = useState("");
   const [validationError, setValidationError] = useState("");
+  const currUsername = useSelector((state) => state.auth.username);
+  const uuid = useSelector((state) => state.auth.uuid);
+  const successMessage = useSelector(
+    (state) => state.addMaintainer.successMessage
+  );
+  const errorMessage = useSelector((state) => state.addMaintainer.errorMessage);
 
-  console.log(!validationError);
+  const dispatch = useDispatch();
 
-  useEffect(() => {
-    if (validationError.length !== 0 && username.length !== 0) {
-      validateForm(username);
-    }
-  }, []);
-
-  const checkValidity = (event) => {
+  const onSubmit = (event) => {
+    dispatch(resetMessages());
     event.preventDefault();
 
     // If the form input is not valid. Do not proceed.
-    if (!validateForm(username)) {
+    if (!validateForm()) {
       return;
     }
+
+    dispatch(
+      addMaintainer(
+        {
+          uuid: uuid,
+          namespace: props.namespace,
+          username_to_be_added: username,
+          package: props.package,
+        },
+        currUsername
+      )
+    );
   };
 
-  const validateForm = (username) => {
+  const resetData = () => {
+    setUsername("");
+    setValidationError("");
+    dispatch(resetMessages());
+  };
+
+  const validateForm = () => {
     if (!username) {
       setValidationError("Username is required");
-    } else {
-      setValidationError("");
+      return false;
     }
 
-    return validationError === "";
+    setValidationError("");
+    return true;
   };
 
   return (
-    <form id="add-matainer-form" onSubmit={checkValidity}>
+    <form id="add-matainer-form">
       <Modal
         {...props}
-        size="sm"
+        size="md"
         aria-labelledby="contained-modal-title-vcenter"
         centered
+        onExit={resetData}
       >
         <Modal.Header closeButton>
           <Modal.Title id="contained-modal-title-vcenter">
@@ -57,10 +81,16 @@ const AddMaintainerFormDialog = (props) => {
             id="add-maintainer-input"
             onChange={(e) => setUsername(e.target.value)}
           />
-          <p className="error">{validationError}</p>
+          {validationError && (
+            <p id="add-maintainer-error">{validationError}</p>
+          )}
+          {successMessage && (
+            <p id="add-maintainer-success">{successMessage}</p>
+          )}
+          {errorMessage && <p id="add-maintainer-error">{errorMessage}</p>}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="success" onClick={checkValidity}>
+          <Button variant="success" onClick={onSubmit}>
             Add
           </Button>
         </Modal.Footer>
