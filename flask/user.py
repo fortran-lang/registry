@@ -263,7 +263,7 @@ def remove_maintainers_from_package(username):
         return jsonify({"message": "Unauthorized", "code": 401}), 401
     
     if not username_to_be_removed:
-        return jsonify({"message": "Please enter the username to be added", "code": 400}), 400
+        return jsonify({"message": "Please enter the username to be removed", "code": 400}), 400
     
     if not package:
         return jsonify({"message": "Please enter the package name", "code": 400}), 400
@@ -303,16 +303,16 @@ def remove_maintainers_from_package(username):
     if not checkIsNamespaceAdmin(user_id=user["_id"], namespace=package_namespace) and not checkIsMaintainer(user_id=user["_id"], package=curr_package):
         return jsonify({"message": "Unauthorized", "code": 401}), 401
     
-    # Get the user to be added using the username received in the request body.
-    user_to_be_added = db.users.find_one({"username": username_to_be_removed})
+    # Get the user to be removed using the username received in the request body.
+    user_to_be_removed = db.users.find_one({"username": username_to_be_removed})
 
-    if not user_to_be_added:
-        return jsonify({"message": "Username to be added as a maintainer not found", "code": 404})
+    if not user_to_be_removed:
+        return jsonify({"message": "Username to be removed as a maintainer not found", "code": 404})
 
     # Update the document only if the user_to_be_added["_id"] is not already in the maintainers list.
     result = db.packages.update_one(
         {"name": package, "namespace": package_namespace["_id"]},
-        {"$pull": {"maintainers": user_to_be_added["_id"]}}
+        {"$pull": {"maintainers": user_to_be_removed["_id"]}}
     )
 
     # package_id gets added to the maintainerOf list in user document.
