@@ -87,10 +87,6 @@ def search_packages():
     else:
         return jsonify({"status": "error", "message": "packages not found", "code": 404}), 404
 
-
-
-
-
 @app.route("/packages", methods=["POST"])
 def upload():
     uuid = request.form.get("uuid")
@@ -125,11 +121,17 @@ def upload():
             "createdBy": user["_id"],
             "description": namespace_description,
             "tags": tags,
-            "authors": user["_id"],
-            "isDeprecated": False,
+            "author": user["_id"],
+            "maintainers": [user["_id"]],
+            "admins": [user["_id"]]
         }
 
         db.namespaces.insert_one(namespace_doc)
+    
+    else:
+    # Check if user is not authorized to upload the package.
+        if checkUserUnauthorized(user_id=user["_id"], package_namespace=package_namespace):
+            return jsonify({"status": "error", "message": "Unauthorized", "code": 401}), 401
 
     # Get the namespace document.
     namespace = db.namespaces.find_one({"namespace": namespace})
@@ -260,10 +262,15 @@ def update_package():
     version = request.form.get("version")
     namespace = request.form.get("namespace")
     isDeprecated = request.form.get("isDeprecated")
-    namespace = db.namespaces.find_one({"namespace": namespace})
+
+    # Get the package namespace.
+    package_namespace = db.namespaces.find_one({"namespace": namespace})
+
+    if checkUserUnauthorized(user_id=user["_id"], package_namespace=package_namespace):
+        return jsonify({"status": "error", "message": "Unauthorized", "code": 401}), 401
 
     package = db.packages.find_one(
-        {"name": name, "version": version, "namespace": namespace["_id"]}
+        {"name": name, "versions.version": version, "namespace": package_namespace["_id"]}
     )
     if package is None:
         return jsonify({"status": "error", "message": "Package doesn't exist", "code": 404}), 404
@@ -542,3 +549,9 @@ def sort_versions(versions):
     """
     return sorted(versions, key=lambda x: [int(i) for i in x.split(".")], reverse=True)
 
+# This function checks if user is authorized to upload/update a package in a namespace.
+def checkUserUnauthorized(user_id, package_namespace):
+    admins_id_list = [str(obj_id) for obj_id in package_namespace["admins"]]
+    maintainers_id_list = [str(obj_id) for obj_id in package_namespace["maintainers"]]
+    str_user_id = str(user_id)
+    return str_user_id not in admins_id_list and str_user_id not in maintainers_id_list
