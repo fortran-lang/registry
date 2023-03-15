@@ -3,19 +3,21 @@ import { useDispatch, useSelector } from "react-redux";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import {
-  addMaintainer,
+  removeMaintainer,
   resetMessages,
-} from "../store/actions/addMaintainerActions";
+} from "../store/actions/addRemoveMaintainerActions";
 
-const AddMaintainerFormDialog = (props) => {
+const RemoveMaintainerFormDialog = (props) => {
   const [username, setUsername] = useState("");
   const [validationError, setValidationError] = useState("");
   const currUsername = useSelector((state) => state.auth.username);
   const uuid = useSelector((state) => state.auth.uuid);
   const successMessage = useSelector(
-    (state) => state.addMaintainer.successMessage
+    (state) => state.addRemoveMaintainer.successMessage
   );
-  const errorMessage = useSelector((state) => state.addMaintainer.errorMessage);
+  const errorMessage = useSelector(
+    (state) => state.addRemoveMaintainer.errorMessage
+  );
 
   const dispatch = useDispatch();
 
@@ -29,11 +31,11 @@ const AddMaintainerFormDialog = (props) => {
     }
 
     dispatch(
-      addMaintainer(
+      removeMaintainer(
         {
           uuid: uuid,
           namespace: props.namespace,
-          username_to_be_added: username,
+          username_to_be_removed: username,
           package: props.package,
         },
         currUsername
@@ -58,7 +60,7 @@ const AddMaintainerFormDialog = (props) => {
   };
 
   return (
-    <form id="add-matainer-form">
+    <form id="add-maintainer-form">
       <Modal
         {...props}
         size="md"
@@ -68,7 +70,7 @@ const AddMaintainerFormDialog = (props) => {
       >
         <Modal.Header closeButton>
           <Modal.Title id="contained-modal-title-vcenter">
-            Add maintainers
+            Remove maintainer
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -90,8 +92,8 @@ const AddMaintainerFormDialog = (props) => {
           {errorMessage && <p id="add-maintainer-error">{errorMessage}</p>}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="success" onClick={onSubmit}>
-            Add
+          <Button variant="danger" onClick={onSubmit}>
+            Remove
           </Button>
         </Modal.Footer>
       </Modal>
@@ -99,4 +101,4 @@ const AddMaintainerFormDialog = (props) => {
   );
 };
 
-export default AddMaintainerFormDialog;
+export default RemoveMaintainerFormDialog;

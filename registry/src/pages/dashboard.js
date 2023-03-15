@@ -8,11 +8,14 @@ import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import Spinner from "react-bootstrap/Spinner";
 import Container from "react-bootstrap/Container";
-import AddMaintainerFormDialog from "../pages/maintainerDialogForm";
+import AddMaintainerFormDialog from "./addMaintainerDialogForm";
+import RemoveMaintainerFormDialog from "./removeMaintainerDialogForm";
 
 const Dashboard = () => {
   const [cookies, setCookie] = useCookies(["uuid"]);
-  const [showMaintainerDialog, setShowMaintainerDialog] = useState(false);
+  const [showAddMaintainerDialog, setShowAddMaintainerDialog] = useState(false);
+  const [showRemoveMaintainerDialog, setShowRemoveMaintainerDialog] =
+    useState(false);
   const username = useSelector((state) => state.auth.username);
   const packages = useSelector((state) => state.dashboard.packages);
   const isLoading = useSelector((state) => state.dashboard.isLoading);
@@ -63,15 +66,27 @@ const Dashboard = () => {
                 </p>
                 <span
                   style={{ textAlign: "left", fontSize: 16 }}
-                  onClick={() => setShowMaintainerDialog(true)}
+                  onClick={() => setShowAddMaintainerDialog(true)}
                 >
                   Add Maintainers
                 </span>
                 <AddMaintainerFormDialog
                   package={element.name}
                   namespace={element.namespace}
-                  show={showMaintainerDialog}
-                  onHide={() => setShowMaintainerDialog(false)}
+                  show={showAddMaintainerDialog}
+                  onHide={() => setShowAddMaintainerDialog(false)}
+                />
+                <span
+                  style={{ textAlign: "left", fontSize: 16 }}
+                  onClick={() => setShowRemoveMaintainerDialog(true)}
+                >
+                  Remove Maintainers
+                </span>
+                <RemoveMaintainerFormDialog
+                  package={element.name}
+                  namespace={element.namespace}
+                  show={showRemoveMaintainerDialog}
+                  onHide={() => setShowRemoveMaintainerDialog(false)}
                 />
               </Card.Body>
             </Card>
