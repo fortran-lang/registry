@@ -1,6 +1,6 @@
 import React from "react";
 import "./App.css";
-import Navbar from "./pages/Navbar";
+import Navbar from "./pages/navbar";
 import Login from "./pages/login";
 import Help from "./pages/help";
 import Register from "./pages/register";
@@ -13,22 +13,26 @@ import NoPage from "./pages/404";
 import UserPage from "./pages/user";
 import PackagePage from "./pages/package";
 import NamespacePage from "./pages/namespace";
-import Admin from "./pages/admin";
+// import Admin from "./pages/admin";
 import ForgotPassword from "./pages/forgotpassword";
 import ResetPassword from "./pages/resetpassword";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import "bootstrap/dist/css/bootstrap.css";
+import NavbarComponent from "./pages/navbar";
 
 function App() {
   return (
     <BrowserRouter>
-      <Navbar />
+      <NavbarComponent />
       <Routes>
         <Route path="/" exact element={<Home />} />
         <Route path="/account/login" element={<Login />} />
         <Route path="/account/forgot-password" element={<ForgotPassword />} />
-        <Route path="/account/reset-password/:uuid" element={<ResetPassword />} />
+        <Route
+          path="/account/reset-password/:uuid"
+          element={<ResetPassword />}
+        />
         <Route path="/account/register" element={<Register />} />
         <Route path="/help" element={<Help />} />
         <Route path="/search" element={<Search />} />
@@ -36,9 +40,12 @@ function App() {
         <Route path="/manage/account" element={<Account />} />
         <Route path="/package/create" element={<PackageForm />} />
         <Route path="/users/:user" element={<UserPage />} />
-        <Route path="/packages/:namespace_name/:package_name" element={<PackagePage />} />
+        <Route
+          path="/packages/:namespace_name/:package_name"
+          element={<PackagePage />}
+        />
         <Route path="/namespaces/:namespace" element={<NamespacePage />} />
-        <Route path="/admin" element={<Admin />} />
+        {/* <Route path="/admin" element={<Admin />} /> */}
         <Route path="*" element={<NoPage />} />
       </Routes>
     </BrowserRouter>
