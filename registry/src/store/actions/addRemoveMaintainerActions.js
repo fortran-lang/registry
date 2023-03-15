@@ -73,8 +73,6 @@ export const removeMaintainer = (data, username) => async (dispatch) => {
       data: formData,
     });
 
-    console.log(result.data);
-
     if (result.data.code === 200) {
       dispatch({
         type: REMOVE_MAINTAINER_SUCCESS,
