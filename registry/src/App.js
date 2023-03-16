@@ -1,6 +1,6 @@
 import React from "react";
 import "./App.css";
-import Navbar from "./pages/navbar";
+import NavbarComponent from "./pages/Navbar";
 import Login from "./pages/login";
 import Help from "./pages/help";
 import Register from "./pages/register";
@@ -19,7 +19,6 @@ import ResetPassword from "./pages/resetpassword";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import "bootstrap/dist/css/bootstrap.css";
-import NavbarComponent from "./pages/navbar";
 
 function App() {
   return (
