@@ -31,18 +31,16 @@ const AdminSection = () => {
     setchangePasswordModal(!changePasswordModal);
   const [packageName, setPackageName] = useState("");
   const [deprecatepackageName, setdeprecatepackageName] = useState("");
-  const [toggleSwitch, setToggleSwitch] = useState(false);
   const [namespaceName, setNamespaceName] = useState("");
   const [userName, setUserName] = useState("");
   const [releaseName, setReleaseName] = useState("");
   const [newPassword, setNewPassword] = useState("");
-//   const [isAdmin, setIsAdmin] = 
 
   useEffect(() => {
    
-    //   dispatch(resetErrorMessage());
+    //   dispatch(adminAuth());
   
-  }, [isAuthenticated]);
+  }, []);
 
 
   const handleDeprecatePackage = () => {
