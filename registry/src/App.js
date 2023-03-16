@@ -13,7 +13,7 @@ import NoPage from "./pages/404";
 import UserPage from "./pages/user";
 import PackagePage from "./pages/package";
 import NamespacePage from "./pages/namespace";
-// import Admin from "./pages/admin";
+import AdminSection from "./pages/admin";
 import ForgotPassword from "./pages/forgotpassword";
 import ResetPassword from "./pages/resetpassword";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -44,7 +44,7 @@ function App() {
           element={<PackagePage />}
         />
         <Route path="/namespaces/:namespace" element={<NamespacePage />} />
-        {/* <Route path="/admin" element={<Admin />} /> */}
+        <Route path="/admin" element={<AdminSection />} />
         <Route path="*" element={<NoPage />} />
       </Routes>
     </BrowserRouter>

@@ -9,7 +9,7 @@ def delete_namespace(namespace_name):
     uuid = request.form.get("uuid")
 
     if not uuid:
-        return jsonify({"status": "error", "message": "Unauthorized"}), 401
+        return jsonify({"code": 401, "message": "Unauthorized"}), 401
 
     user = db.users.find_one({"uuid": uuid})
 
@@ -18,7 +18,7 @@ def delete_namespace(namespace_name):
         return (
             jsonify(
                 {
-                    "status": "error",
+                    "code": 401,
                     "message": "User is not authorized to delete the namespace",
                 }
             ),
@@ -35,9 +35,9 @@ def delete_namespace(namespace_name):
     namespace_deleted = db.namespaces.delete_one({"namespace": namespace["_id"]})
 
     if namespace_deleted.deleted_count > 0:
-        return jsonify({"message": "Namespace deleted successfully"}), 200
+        return jsonify({"message": "Namespace deleted successfully","code":200}), 200
     else:
-        return jsonify({"message": "Internal Server Error", "code": 500})
+        return jsonify({"message": "Internal Server Error", "code": 500}),200
     
 
 @app.route("/namespace/<namespace>", methods=["GET"])
