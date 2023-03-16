@@ -118,3 +118,11 @@ body {
 #add-maintainer-success {
   color: green;
 }
+
+#search-bar {
+  width: 50%;
+}
+
+#navbar-container {
+  width: 80%;
+}

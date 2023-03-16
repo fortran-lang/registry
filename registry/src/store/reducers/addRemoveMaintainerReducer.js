@@ -1,7 +1,9 @@
 import {
   ADD_MAINTAINER_SUCCESS,
   ADD_MAINTAINER_FAILURE,
-} from "../actions/addMaintainerActions";
+  REMOVE_MAINTAINER_SUCCESS,
+  REMOVE_MAINTAINER_FAILURE,
+} from "../actions/addRemoveMaintainerActions";
 import { RESET_ERROR_MESSAGE } from "../actions/authActions";
 
 const initialState = {
@@ -9,7 +11,7 @@ const initialState = {
   errorMessage: null,
 };
 
-const addMaintainerReducer = (state = initialState, action) => {
+const addRemoveMaintainerReducer = (state = initialState, action) => {
   switch (action.type) {
     case ADD_MAINTAINER_SUCCESS:
       return {
@@ -27,9 +29,19 @@ const addMaintainerReducer = (state = initialState, action) => {
         successMessage: null,
         errorMessage: null,
       };
+    case REMOVE_MAINTAINER_SUCCESS:
+      return {
+        ...state,
+        successMessage: action.payload.message,
+      };
+    case REMOVE_MAINTAINER_FAILURE:
+      return {
+        ...state,
+        errorMessage: action.payload.message,
+      };
     default:
       return state;
   }
 };
 
-export default addMaintainerReducer;
+export default addRemoveMaintainerReducer;

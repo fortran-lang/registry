@@ -1,29 +1,17 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  MDBContainer,
-  MDBNavbar,
-  MDBNavbarBrand,
-  MDBNavbarToggler,
-  MDBNavbarNav,
-  MDBNavbarItem,
-  MDBNavbarLink,
-  MDBDropdown,
-  MDBDropdownToggle,
-  MDBDropdownMenu,
-  MDBDropdownItem,
-  MDBIcon,
-  MDBCollapse,
-} from "mdb-react-ui-kit";
 import { useDispatch, useSelector } from "react-redux";
 import Image from "react-bootstrap/Image";
+import Container from "react-bootstrap/Container";
+import Nav from "react-bootstrap/Nav";
+import Navbar from "react-bootstrap/Navbar";
+import NavDropdown from "react-bootstrap/NavDropdown";
 import { logout } from "../store/actions/authActions";
 import { searchPackage, setQuery } from "../store/actions/searchActions";
 
-const Navbar = () => {
+const NavbarComponent = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [showNavSecond, setShowNavSecond] = useState(false);
 
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const username = useSelector((state) => state.auth.username);
@@ -34,90 +22,83 @@ const Navbar = () => {
   };
 
   return (
-    <MDBNavbar expand="lg" light bgColor="light">
-      <MDBContainer>
-        <MDBNavbarBrand href="#">
+    <Navbar bg="light" expand="md">
+      <Container id="navbar-container">
+        <Navbar.Brand onClick={() => navigate("/")}>
           <Image
             src="https://fortran-lang.org/en/_static/fortran-logo-256x256.png"
             fluid
             width={60}
             height={60}
           />
-        </MDBNavbarBrand>
-
-        <MDBNavbarToggler
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-          onClick={() => setShowNavSecond(!showNavSecond)}
-        >
-          <MDBIcon icon="bars" fas />
-        </MDBNavbarToggler>
-        <MDBCollapse navbar show={showNavSecond}>
-          <MDBNavbarNav className="mr-auto mb-2 mb-lg-0">
+        </Navbar.Brand>
+        <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+        <Navbar.Collapse>
+          <div id="search-bar">
+            <SearchBar />
+          </div>
+          <Nav className="ml-auto">
             {!isAuthenticated && (
-              <MDBNavbarLink onClick={() => navigate("/account/login")}>
+              <Nav.Link onClick={() => navigate("/account/login")}>
                 Login
-              </MDBNavbarLink>
+              </Nav.Link>
             )}
             {!isAuthenticated && (
-              <MDBNavbarLink onClick={() => navigate("/account/register")}>
+              <Nav.Link onClick={() => navigate("/account/register")}>
                 Register
-              </MDBNavbarLink>
+              </Nav.Link>
             )}
-            {isAuthenticated && (
-              <MDBNavbarItem>
-                <MDBDropdown>
-                  <MDBDropdownToggle tag="a" className="nav-link" role="button">
-                    {username}
-                  </MDBDropdownToggle>
+          </Nav>
 
-                  <MDBDropdownMenu>
-                    <MDBDropdownItem
-                      className="dropdown-item"
-                      onClick={() => {navigate("/package/create");window.location.reload();}}
-                    >
-                      Create Package
-                    </MDBDropdownItem>
+          {isAuthenticated && (
+            <Nav className="ml-auto">
+              <NavDropdown title={username} className="d-flex">
+                <NavDropdown.Item
+                  onClick={() => {
+                    navigate("/package/create");
+                    window.location.reload();
+                  }}
+                >
+                  Create Package
+                </NavDropdown.Item>
 
-                    <MDBDropdownItem
-                      className="dropdown-item"
-                      onClick={() => {navigate("/manage/projects");window.location.reload();}}
-                    >
-                      Packages
-                    </MDBDropdownItem>
-                    <MDBDropdownItem
-                      className="dropdown-item"
-                      onClick={() => {navigate("/search");window.location.reload();}}
-                    >
-                      Search
-                    </MDBDropdownItem>
+                <NavDropdown.Item
+                  onClick={() => {
+                    navigate("/manage/projects");
+                    window.location.reload();
+                  }}
+                >
+                  Packages
+                </NavDropdown.Item>
 
-                    <MDBDropdownItem
-                      className="dropdown-item"
-                      onClick={() => {navigate("/manage/account");window.location.reload();}}
-                    >
-                      Account
-                    </MDBDropdownItem>
+                <NavDropdown.Item
+                  onClick={() => {
+                    navigate("/search");
+                    window.location.reload();
+                  }}
+                >
+                  Search
+                </NavDropdown.Item>
 
-                    <MDBDropdownItem
-                      className="dropdown-item"
-                      onClick={signOut}
-                    >
-                      Logout
-                    </MDBDropdownItem>
-                  </MDBDropdownMenu>
-                </MDBDropdown>
-              </MDBNavbarItem>
-            )}
-          </MDBNavbarNav>
-          <SearchBar />
-        </MDBCollapse>
-      </MDBContainer>
-    </MDBNavbar>
+                <NavDropdown.Item
+                  onClick={() => {
+                    navigate("/manage/account");
+                    window.location.reload();
+                  }}
+                >
+                  Account
+                </NavDropdown.Item>
+                <NavDropdown.Item onClick={signOut}>Logout</NavDropdown.Item>
+              </NavDropdown>
+            </Nav>
+          )}
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
   );
 };
 
-export default Navbar;
+export default NavbarComponent;
 
 const SearchBar = () => {
   const query = useSelector((state) => state.search.query);

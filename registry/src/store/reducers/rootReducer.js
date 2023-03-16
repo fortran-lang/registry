@@ -8,7 +8,7 @@ import namespaceReducer from "./namespaceReducer";
 import uploadReducer from "./uploadReducer";
 import resetPasswordReducer from "./resetPasswordReducer";
 import { combineReducers } from "redux";
-import addMaintainerReducer from "./addMaintainerReducer";
+import addRemoveMaintainerReducer from "./addRemoveMaintainerReducer";
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -20,7 +20,7 @@ const rootReducer = combineReducers({
   namespace: namespaceReducer,
   upload: uploadReducer,
   resetpassword: resetPasswordReducer,
-  addMaintainer: addMaintainerReducer,
+  addRemoveMaintainer: addRemoveMaintainerReducer,
 });
 
 export default rootReducer;
