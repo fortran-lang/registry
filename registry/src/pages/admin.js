@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import {
   MDBBtn,
   MDBModal,
@@ -18,6 +20,12 @@ const isEmpty = (...values) => {
 
 const AdminSection = () => {
   const [deprecateModal, setdeprecateModal] = useState(false);
+  const uuid = useSelector((state) => state.auth.uuid);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const message = useSelector((state) => state.admin.message);
+  const statuscode = useSelector((state) => state.admin.statuscode);
+  const isAdmin = useSelector((state) => state.admin.isAdmin);
   const toggleShowDeprecateModal = () => {
     if (!isEmpty(deprecatePackageNamespaceName, deprecatepackageName)) {
       setdeprecateModal(!deprecateModal);
@@ -26,8 +34,9 @@ const AdminSection = () => {
     }
   };
   const [deprecatepackageName, setdeprecatepackageName] = useState("");
-  const [deprecatePackageNamespaceName, setdeprecatePackageNamespaceName] =
-    useState("");
+  const [deprecatepackageNameRelease, setdeprecatepackageNameRelease] = useState("");
+
+  const [deprecatePackageNamespaceName, setdeprecatePackageNamespaceName] = useState("");
 
   const [emptyModal, setemptyModal] = useState(false);
   const toggleShowemptyModal = () => setemptyModal(!emptyModal);
@@ -98,7 +107,10 @@ const AdminSection = () => {
   const [newPassword, setNewPassword] = useState("");
 
   useEffect(() => {
-    //   dispatch(adminAuth());
+    dispatch(adminAuth());
+    if (!isAdmin) {
+      navigate("/404");
+    }
   }, []);
 
   const handleDeprecatePackage = () => {
@@ -110,7 +122,6 @@ const AdminSection = () => {
 
   const handleDeleteNamespace = () => {
     // Delete namespace logic
-
     // dispatch(deleteNamespace(deletenamespaceName));
     setdeletenamespaceName("");
   };
@@ -170,7 +181,7 @@ const AdminSection = () => {
       </MDBModal>
       <h2 style={{ textAlign: "left" }}>Admin Settings</h2>
       <div>
-        <h4>Deprecate package</h4>
+        <h4>Deprecate package release</h4>  
         <p style={{ textAlign: "left" }}>
           <input
             type="text"
@@ -178,7 +189,7 @@ const AdminSection = () => {
             value={deprecatePackageNamespaceName}
             onChange={(e) => setdeprecatePackageNamespaceName(e.target.value)}
             style={{ width: 300 }}
-          />{" "}
+          />
           <input
             type="text"
             placeholder="Package Name"
@@ -433,7 +444,7 @@ const AdminSection = () => {
           </MDBModalDialog>
         </MDBModal>
       </div>
-      <div>
+      <div style={{display:"hidden"}}>
         <h4>Change password</h4>
         <p style={{ textAlign: "left" }}>
           <input
