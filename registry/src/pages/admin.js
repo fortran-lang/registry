@@ -12,51 +12,88 @@ import {
   MDBIcon,
 } from "mdb-react-ui-kit";
 
-const isEmpty = (v1,v2,v3) => {
-  if (v1 === '' || v2 === '' || v3 === '') {
-      return true;
-  }
-  return false;
+const isEmpty = (...values) => {
+  return values.some((value) => value === "");
 };
 
 const AdminSection = () => {
   const [deprecateModal, setdeprecateModal] = useState(false);
-  const toggleShowDeprecateModal = () => setdeprecateModal(!deprecateModal);
+  const toggleShowDeprecateModal = () => {
+    if (!isEmpty(deprecatePackageNamespaceName, deprecatepackageName)) {
+      setdeprecateModal(!deprecateModal);
+    } else {
+      toggleShowemptyModal();
+    }
+  };
   const [deprecatepackageName, setdeprecatepackageName] = useState("");
   const [deprecatePackageNamespaceName, setdeprecatePackageNamespaceName] =
     useState("");
- 
-    const [emptyModal, setemptyModal] = useState(false); 
-    const toggleShowemptyModal = () =>
-    setemptyModal(!emptyModal);
+
+  const [emptyModal, setemptyModal] = useState(false);
+  const toggleShowemptyModal = () => setemptyModal(!emptyModal);
 
   const [deleteNamespaceModal, setdeleteNamespaceModal] = useState(false);
-  const toggleShowDeleteNamespaceModal = () =>
-    setdeleteNamespaceModal(!deleteNamespaceModal);
+  const toggleShowDeleteNamespaceModal = () => {
+    if (!isEmpty(deletenamespaceName)) {
+      setdeleteNamespaceModal(!deleteNamespaceModal);
+    } else {
+      toggleShowemptyModal();
+    }
+  };
+
   const [deletenamespaceName, setdeletenamespaceName] = useState("");
 
   const [deletePackageModal, setdeletePackageModal] = useState(false);
-  const toggleShowDeletePackageModal = () =>
-    setdeletePackageModal(!deletePackageModal);
+  const toggleShowDeletePackageModal = () => {
+    if (!isEmpty(deletepackagenamespaceName, deletepackageName)) {
+      setdeletePackageModal(!deletePackageModal);
+    } else {
+      toggleShowemptyModal();
+    }
+  };
   const [deletepackageName, setdeletepackageName] = useState("");
   const [deletepackagenamespaceName, setdeletepackagenamespaceName] =
     useState("");
 
   const [deleteUserModal, setdeleteUserModal] = useState(false);
-  const toggleShowDeleteUserModal = () => setdeleteUserModal(!deleteUserModal);
+  const toggleShowDeleteUserModal = () => {
+    if (!isEmpty(deleteuserName)) {
+      setdeleteUserModal(!deleteUserModal);
+    } else {
+      toggleShowemptyModal();
+    }
+  };
+
   const [deleteuserName, setdeleteuserName] = useState("");
 
   const [deleteReleaseModal, setdeleteReleaseModal] = useState(false);
-  const toggleShowDeleteReleaseModal = () =>
-    setdeleteReleaseModal(!deleteReleaseModal);
+  const toggleShowDeleteReleaseModal = () => {
+    if (
+      !isEmpty(
+        deletereleasenamespaceName,
+        deletereleasepackageName,
+        deletereleaseName
+      )
+    ) {
+      setdeleteReleaseModal(!deleteReleaseModal);
+    } else {
+      toggleShowemptyModal();
+    }
+  };
   const [deletereleasepackageName, setdeletereleasepackageName] = useState("");
   const [deletereleasenamespaceName, setdeletereleasenamespaceName] =
     useState("");
   const [deletereleaseName, setdeletereleaseName] = useState("");
 
   const [changePasswordModal, setchangePasswordModal] = useState(false);
-  const toggleShowChangePasswordModal = () =>
-    setchangePasswordModal(!changePasswordModal);
+  const toggleShowChangePasswordModal = () => {
+    if (!isEmpty(userName, newPassword)) {
+      setchangePasswordModal(!changePasswordModal);
+    } else {
+      toggleShowemptyModal();
+    }
+  };
+
   const [userName, setUserName] = useState("");
   const [newPassword, setNewPassword] = useState("");
 
@@ -66,86 +103,71 @@ const AdminSection = () => {
 
   const handleDeprecatePackage = () => {
     // Deprecate package logic
-      if(!isEmpty(deprecatePackageNamespaceName, deprecatepackageName)){
-        // dispatch(deprecatePackage(deprecatePackageNamespaceName, deprecatepackageName));
-        setdeprecatePackageNamespaceName('');
-        setdeprecatepackageName('');
-      }
+    // dispatch(deprecatePackage(deprecatePackageNamespaceName, deprecatepackageName));
+    setdeprecatePackageNamespaceName("");
+    setdeprecatepackageName("");
   };
 
   const handleDeleteNamespace = () => {
     // Delete namespace logic
-      if(!isEmpty(deletenamespaceName)){
-        // dispatch(deleteNamespace(deletenamespaceName));
-        setdeletenamespaceName('');
-      }
 
+    // dispatch(deleteNamespace(deletenamespaceName));
+    setdeletenamespaceName("");
   };
 
   const handleDeletePackage = () => {
     // Delete package logic
-      if(!isEmpty(deletepackagenamespaceName, deletepackageName)){
-        // dispatch(deletePackage(deletepackagenamespaceName, deletepackageName));
-        setdeletepackagenamespaceName('');
-        setdeletepackageName('');
-      }
+    // dispatch(deletePackage(deletepackagenamespaceName, deletepackageName));
+    setdeletepackagenamespaceName("");
+    setdeletepackageName("");
   };
 
   const handleDeleteUser = () => {
     // Delete user logic
-      if(!isEmpty(deleteuserName)){
-        // dispatch(deleteUser(deleteuserName));
-        setdeleteuserName('');
-      }
+    // dispatch(deleteUser(deleteuserName));
+    setdeleteuserName("");
   };
 
   const handleDeleteRelease = () => {
     // Delete release logic
-      if(!isEmpty(deletereleasenamespaceName, deletereleasepackageName, deletereleaseName)){
-        // dispatch(deleteRelease(deletereleasenamespaceName, deletereleasepackageName, deletereleaseName));
-        setdeletereleasenamespaceName('');
-        setdeletereleasepackageName('');
-        setdeletereleaseName('');
-      }
+    // dispatch(deleteRelease(deletereleasenamespaceName, deletereleasepackageName, deletereleaseName));
+    setdeletereleasenamespaceName("");
+    setdeletereleasepackageName("");
+    setdeletereleaseName("");
   };
 
   const handleChangePassword = () => {
     // Change password logic
-      if(!isEmpty(userName, newPassword)){
-        // dispatch(changePassword(userName, newPassword));
-        setUserName('');
-        setNewPassword('');
-      }
+    // dispatch(changePassword(userName, newPassword));
+    setUserName("");
+    setNewPassword("");
   };
 
   return (
     <Container className="mt-5">
-      <MDBModal
-          show={emptyModal}
-          setShow={setemptyModal}
-          tabIndex="-1"
-        >
-          <MDBModalDialog>
-            <MDBModalContent>
-              <MDBModalHeader>
-                <MDBModalTitle>Empty Inputs</MDBModalTitle>
-                <MDBBtn
-                  className="btn-close"
-                  color="none"
-                  onClick={toggleShowemptyModal}
-                ></MDBBtn>
-              </MDBModalHeader>
-              <MDBModalBody>
-                <MDBIcon fas icon="exclamation-triangle" /> You must fill all the fields.
-              </MDBModalBody>
-              <MDBModalFooter>
-                <MDBBtn color="secondary" onClick={toggleShowDeprecateModal}>
-                  Close
-                </MDBBtn>
-              </MDBModalFooter>
-            </MDBModalContent>
-          </MDBModalDialog>
-        </MDBModal>
+      <MDBModal show={emptyModal} setShow={setemptyModal} tabIndex="-1">
+        <MDBModalDialog>
+          <MDBModalContent>
+            <MDBModalHeader>
+              <MDBModalTitle>Empty Inputs</MDBModalTitle>
+              <MDBBtn
+                className="btn-close"
+                color="none"
+                onClick={toggleShowemptyModal}
+              ></MDBBtn>
+            </MDBModalHeader>
+            <MDBModalBody>
+              <MDBIcon fas icon="exclamation-triangle" /> You must fill all the
+              fields.
+            </MDBModalBody>
+            <MDBModalFooter>
+              <MDBBtn color="secondary" onClick={toggleShowDeprecateModal}>
+                Close
+              </MDBBtn>
+            </MDBModalFooter>
+          </MDBModalContent>
+        </MDBModalDialog>
+      </MDBModal>
       <h2 style={{ textAlign: "left" }}>Admin Settings</h2>
       <div>
         <h4>Deprecate package</h4>
@@ -185,7 +207,8 @@ const AdminSection = () => {
               </MDBModalHeader>
               <MDBModalBody>
                 <MDBIcon fas icon="exclamation-triangle" /> You will not be able
-                to recover {deprecatePackageNamespaceName}/{deprecatepackageName} package after you deprecate it.
+                to recover {deprecatePackageNamespaceName}/
+                {deprecatepackageName} package after you deprecate it.
               </MDBModalBody>
               <MDBModalFooter>
                 <MDBBtn color="secondary" onClick={toggleShowDeprecateModal}>
@@ -261,12 +284,12 @@ const AdminSection = () => {
             style={{ width: 300 }}
           />
           <input
-          type="text"
-          placeholder="Package Name"
-          value={deletepackageName}
-          onChange={(e) => setdeletepackageName(e.target.value)} 
-          style={{ width: 300 }}
-        />
+            type="text"
+            placeholder="Package Name"
+            value={deletepackageName}
+            onChange={(e) => setdeletepackageName(e.target.value)}
+            style={{ width: 300 }}
+          />
         </p>
         <MDBBtn onClick={toggleShowDeletePackageModal} style={{ fontSize: 16 }}>
           Deprecate Package
@@ -288,7 +311,8 @@ const AdminSection = () => {
               </MDBModalHeader>
               <MDBModalBody>
                 <MDBIcon fas icon="exclamation-triangle" /> You will not be able
-                to recover {deletepackagenamespaceName}/{deletepackageName} package after you delete it.
+                to recover {deletepackagenamespaceName}/{deletepackageName}{" "}
+                package after you delete it.
               </MDBModalBody>
               <MDBModalFooter>
                 <MDBBtn
@@ -392,7 +416,9 @@ const AdminSection = () => {
               </MDBModalHeader>
               <MDBModalBody>
                 <MDBIcon fas icon="exclamation-triangle" /> You will not be able
-                to recover {deletereleasenamespaceName}/{deletereleasepackageName}/{deletereleaseName} release after you delete it.
+                to recover {deletereleasenamespaceName}/
+                {deletereleasepackageName}/{deletereleaseName} release after you
+                delete it.
               </MDBModalBody>
               <MDBModalFooter>
                 <MDBBtn
