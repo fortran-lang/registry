@@ -105,17 +105,17 @@ const AdminSection = () => {
     useState("");
   const [deletereleaseName, setdeletereleaseName] = useState("");
 
-  const [changePasswordModal, setchangePasswordModal] = useState(false);
-  const toggleShowChangePasswordModal = () => {
-    if (!isEmpty(userName, newPassword)) {
-      setchangePasswordModal(!changePasswordModal);
-    } else {
-      toggleShowemptyModal();
-    }
-  };
+  // const [changePasswordModal, setchangePasswordModal] = useState(false);
+  // const toggleShowChangePasswordModal = () => {
+  //   if (!isEmpty(userName, newPassword)) {
+  //     setchangePasswordModal(!changePasswordModal);
+  //   } else {
+  //     toggleShowemptyModal();
+  //   }
+  // };
 
-  const [userName, setUserName] = useState("");
-  const [newPassword, setNewPassword] = useState("");
+  // const [userName, setUserName] = useState("");
+  // const [newPassword, setNewPassword] = useState("");
 
   useEffect(() => {
     dispatch(adminAuth());
@@ -124,7 +124,9 @@ const AdminSection = () => {
     }
   }, [isAdmin]);
 
-  useEffect(() => {}, [message]);
+  useEffect(() => {
+      toggleShowmessageModal();
+  }, [message]);
 
   const handleDeprecatePackage = () => {
     dispatch(
@@ -489,7 +491,7 @@ const AdminSection = () => {
           </MDBModalDialog>
         </MDBModal>
       </div>
-      <div style={{ display: "hidden" }}>
+      {/* <div style={{ display: "hidden" }}>
         <h4>Change password</h4>
         <p style={{ textAlign: "left" }}>
           <input
@@ -546,7 +548,7 @@ const AdminSection = () => {
             </MDBModalContent>
           </MDBModalDialog>
         </MDBModal>
-      </div>
+      </div> */}
     </Container>
   );
 };
