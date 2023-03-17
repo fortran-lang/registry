@@ -3,6 +3,14 @@ import { Container } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
+  adminAuth,
+  deleteUser,
+  deleteNamespace,
+  deletePackage,
+  deleteRelease,
+  deprecatePackage,
+} from "../store/actions/adminActions";
+import {
   MDBBtn,
   MDBModal,
   MDBModalDialog,
@@ -34,9 +42,11 @@ const AdminSection = () => {
     }
   };
   const [deprecatepackageName, setdeprecatepackageName] = useState("");
-  const [deprecatepackageNameRelease, setdeprecatepackageNameRelease] = useState("");
+  const [deprecatepackageNameRelease, setdeprecatepackageNameRelease] =
+    useState("");
 
-  const [deprecatePackageNamespaceName, setdeprecatePackageNamespaceName] = useState("");
+  const [deprecatePackageNamespaceName, setdeprecatePackageNamespaceName] =
+    useState("");
 
   const [emptyModal, setemptyModal] = useState(false);
   const toggleShowemptyModal = () => setemptyModal(!emptyModal);
@@ -111,47 +121,43 @@ const AdminSection = () => {
     if (!isAdmin) {
       navigate("/404");
     }
-  }, []);
+  }, [isAdmin]);
 
   const handleDeprecatePackage = () => {
-    // Deprecate package logic
-    // dispatch(deprecatePackage(deprecatePackageNamespaceName, deprecatepackageName));
+    dispatch(
+      deprecatePackage(deprecatePackageNamespaceName, deprecatepackageName,uuid)
+    );
     setdeprecatePackageNamespaceName("");
     setdeprecatepackageName("");
   };
 
   const handleDeleteNamespace = () => {
-    // Delete namespace logic
-    // dispatch(deleteNamespace(deletenamespaceName));
+    dispatch(deleteNamespace(deletenamespaceName,uuid));
     setdeletenamespaceName("");
   };
 
   const handleDeletePackage = () => {
-    // Delete package logic
-    // dispatch(deletePackage(deletepackagenamespaceName, deletepackageName));
+    dispatch(deletePackage(deletepackagenamespaceName, deletepackageName,uuid));
     setdeletepackagenamespaceName("");
     setdeletepackageName("");
   };
 
   const handleDeleteUser = () => {
-    // Delete user logic
-    // dispatch(deleteUser(deleteuserName));
+    dispatch(deleteUser(deleteuserName,uuid));
     setdeleteuserName("");
   };
 
   const handleDeleteRelease = () => {
-    // Delete release logic
-    // dispatch(deleteRelease(deletereleasenamespaceName, deletereleasepackageName, deletereleaseName));
+    dispatch(deleteRelease(deletereleasenamespaceName, deletereleasepackageName, deletereleaseName,uuid));
     setdeletereleasenamespaceName("");
     setdeletereleasepackageName("");
     setdeletereleaseName("");
   };
 
   const handleChangePassword = () => {
-    // Change password logic
-    // dispatch(changePassword(userName, newPassword));
-    setUserName("");
-    setNewPassword("");
+    // dispatch(adminAuth(userName, newPassword));
+    // setUserName("");
+    // setNewPassword("");
   };
 
   return (
@@ -181,7 +187,7 @@ const AdminSection = () => {
       </MDBModal>
       <h2 style={{ textAlign: "left" }}>Admin Settings</h2>
       <div>
-        <h4>Deprecate package release</h4>  
+        <h4>Deprecate package release</h4>
         <p style={{ textAlign: "left" }}>
           <input
             type="text"
@@ -444,7 +450,7 @@ const AdminSection = () => {
           </MDBModalDialog>
         </MDBModal>
       </div>
-      <div style={{display:"hidden"}}>
+      <div style={{ display: "hidden" }}>
         <h4>Change password</h4>
         <p style={{ textAlign: "left" }}>
           <input

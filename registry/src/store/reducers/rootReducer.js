@@ -7,6 +7,7 @@ import searchReducer from "./searchReducer";
 import namespaceReducer from "./namespaceReducer";
 import uploadReducer from "./uploadReducer";
 import resetPasswordReducer from "./resetPasswordReducer";
+import adminReducer from "./adminReducer";
 import { combineReducers } from "redux";
 import addRemoveMaintainerReducer from "./addRemoveMaintainerReducer";
 
@@ -21,6 +22,7 @@ const rootReducer = combineReducers({
   upload: uploadReducer,
   resetpassword: resetPasswordReducer,
   addRemoveMaintainer: addRemoveMaintainerReducer,
+  admin: adminReducer,
 });
 
 export default rootReducer;
