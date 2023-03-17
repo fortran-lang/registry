@@ -1,18 +1,23 @@
 import {
-  MARK_PACKAGE_DEPRECATED,
-  MARK_PACKAGE_DEPRECATED_SUCCESS,
-  MARK_PACKAGE_DEPRECATED_ERROR,
-  CREATE_NEW_RELEASE,
-  CREATE_NEW_RELEASE_SUCCESS,
-  CREATE_NEW_RELEASE_ERROR,
+  DEPRECATE_PACKAGE_SUCCESS,
+  DEPRECATE_PACKAGE_ERROR,
+  DELETE_USER_SUCCESS,
+  DELETE_USER_ERROR,
+  DELETE_NAMESPACE_SUCCESS,
+  DELETE_NAMESPACE_ERROR,
+  DELETE_RELEASE_SUCCESS,
+  DELETE_RELEASE_ERROR,
   ADMIN_AUTH_ERROR,
   ADMIN_AUTH_SUCCESS,
+  DELETE_PACKAGE_SUCCESS,
+  DELETE_PACKAGE_ERROR,
 } from "../actions/adminActions";
 
 const initialState = {
-  packages: [],
   error: null,
   isAdmin: false,
+  message: "",
+  statuscode: null,
 };
 
 const adminReducer = (state = initialState, action) => {
@@ -21,24 +26,66 @@ const adminReducer = (state = initialState, action) => {
       return { ...state, isAdmin: true };
     case ADMIN_AUTH_ERROR:
       return { ...state, isAdmin: false };
-    case FETCH_PACKAGES:
-      return { ...state, packages: [] };
-    case FETCH_PACKAGES_SUCCESS:
-      return { ...state, packages: action.payload };
-    case FETCH_PACKAGES_ERROR:
-      return { ...state, error: action.payload };
-    case MARK_PACKAGE_DEPRECATED:
-      return { ...state, packages: [] };
-    case MARK_PACKAGE_DEPRECATED_SUCCESS:
-      return { ...state, packages: action.payload };
-    case MARK_PACKAGE_DEPRECATED_ERROR:
-      return { ...state, error: action.payload };
-    case CREATE_NEW_RELEASE:
-      return { ...state, packages: [] };
-    case CREATE_NEW_RELEASE_SUCCESS:
-      return { ...state, packages: action.payload };
-    case CREATE_NEW_RELEASE_ERROR:
-      return { ...state, error: action.payload };
+    case DELETE_USER_SUCCESS:
+      return {
+        ...state,
+        message: action.payload.message,
+        statuscode: action.payload.statuscode,
+      };
+    case DELETE_USER_ERROR:
+      return {
+        ...state,
+        error: action.payload.message,
+        statuscode: action.payload.statuscode,
+      };
+    case DELETE_NAMESPACE_SUCCESS:
+      return {
+        ...state,
+        message: action.payload.message,
+        statuscode: action.payload.statuscode,
+      };
+    case DELETE_NAMESPACE_ERROR:
+      return {
+        ...state,
+        error: action.payload.message,
+        statuscode: action.payload.statuscode,
+      };
+    case DELETE_PACKAGE_SUCCESS:
+      return {
+        ...state,
+        message: action.payload.message,
+        statuscode: action.payload.statuscode,
+      };
+    case DELETE_PACKAGE_ERROR:
+      return {
+        ...state,
+        error: action.payload.message,
+        statuscode: action.payload.statuscode,
+      };
+    case DELETE_RELEASE_SUCCESS:
+      return {
+        ...state,
+        message: action.payload.message,
+        statuscode: action.payload.statuscode,
+      };
+    case DELETE_RELEASE_ERROR:
+      return {
+        ...state,
+        error: action.payload.message,
+        statuscode: action.payload.statuscode,
+      };
+    case DEPRECATE_PACKAGE_SUCCESS:
+      return {
+        ...state,
+        message: action.payload.message,
+        statuscode: action.payload.statuscode,
+      };
+    case DEPRECATE_PACKAGE_ERROR:
+      return {
+        ...state,
+        error: action.payload.message,
+        statuscode: action.payload.statuscode,
+      };
     default:
       return state;
   }
