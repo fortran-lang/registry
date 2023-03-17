@@ -42,8 +42,6 @@ const AdminSection = () => {
     }
   };
   const [deprecatepackageName, setdeprecatepackageName] = useState("");
-  const [deprecatepackageNameRelease, setdeprecatepackageNameRelease] =
-    useState("");
 
   const [deprecatePackageNamespaceName, setdeprecatePackageNamespaceName] =
     useState("");
@@ -126,36 +124,47 @@ const AdminSection = () => {
     }
   }, [isAdmin]);
 
-  useEffect(() => {
-    
-  }, [message]);
+  useEffect(() => {}, [message]);
 
   const handleDeprecatePackage = () => {
     dispatch(
-      deprecatePackage(deprecatePackageNamespaceName, deprecatepackageName,uuid)
+      deprecatePackage(
+        deprecatePackageNamespaceName,
+        deprecatepackageName,
+        uuid
+      )
     );
     setdeprecatePackageNamespaceName("");
     setdeprecatepackageName("");
   };
 
   const handleDeleteNamespace = () => {
-    dispatch(deleteNamespace(deletenamespaceName,uuid));
+    dispatch(deleteNamespace(deletenamespaceName, uuid));
     setdeletenamespaceName("");
   };
 
   const handleDeletePackage = () => {
-    dispatch(deletePackage(deletepackagenamespaceName, deletepackageName,uuid));
+    dispatch(
+      deletePackage(deletepackagenamespaceName, deletepackageName, uuid)
+    );
     setdeletepackagenamespaceName("");
     setdeletepackageName("");
   };
 
   const handleDeleteUser = () => {
-    dispatch(deleteUser(deleteuserName,uuid));
+    dispatch(deleteUser(deleteuserName, uuid));
     setdeleteuserName("");
   };
 
   const handleDeleteRelease = () => {
-    dispatch(deleteRelease(deletereleasenamespaceName, deletereleasepackageName, deletereleaseName,uuid));
+    dispatch(
+      deleteRelease(
+        deletereleasenamespaceName,
+        deletereleasepackageName,
+        deletereleaseName,
+        uuid
+      )
+    );
     setdeletereleasenamespaceName("");
     setdeletereleasepackageName("");
     setdeletereleaseName("");
@@ -192,7 +201,7 @@ const AdminSection = () => {
           </MDBModalContent>
         </MDBModalDialog>
       </MDBModal>
-      <MDBModal show={messageModal} setShow={setmessageModall} tabIndex="-1">
+      <MDBModal show={messageModal} setShow={setmessageModal} tabIndex="-1">
         <MDBModalDialog>
           <MDBModalContent>
             <MDBModalHeader>
@@ -204,7 +213,8 @@ const AdminSection = () => {
               ></MDBBtn>
             </MDBModalHeader>
             <MDBModalBody>
-              <MDBIcon fas icon="exclamation-triangle" />{message}
+              <MDBIcon fas icon="exclamation-triangle" />
+              {message}
             </MDBModalBody>
             <MDBModalFooter>
               <MDBBtn color="secondary" onClick={toggleShowmessageModal}>
