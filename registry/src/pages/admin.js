@@ -14,27 +14,38 @@ import {
 
 const AdminSection = () => {
   const [deprecateModal, setdeprecateModal] = useState(false);
-  const [deleteNamespaceModal, setdeleteNamespaceModal] = useState(false);
-  const [deletePackageModal, setdeletePackageModal] = useState(false);
-  const [deleteUserModal, setdeleteUserModal] = useState(false);
-  const [deleteReleaseModal, setdeleteReleaseModal] = useState(false);
-  const [changePasswordModal, setchangePasswordModal] = useState(false);
   const toggleShowDeprecateModal = () => setdeprecateModal(!deprecateModal);
-  const toggleShowDeleteUserModal = () => setdeleteUserModal(!deleteUserModal);
+  const [deprecatepackageName, setdeprecatepackageName] = useState("");
+  const [deprecatePackageNamespaceName, setdeprecatePackageNamespaceName] = useState("");
+
+  const [deleteNamespaceModal, setdeleteNamespaceModal] = useState(false);
   const toggleShowDeleteNamespaceModal = () =>
-    setdeleteNamespaceModal(!deleteNamespaceModal);
+  setdeleteNamespaceModal(!deleteNamespaceModal);
+  const [deletenamespaceName, setdeletenamespaceName] = useState("");
+
+  const [deletePackageModal, setdeletePackageModal] = useState(false);
   const toggleShowDeletePackageModal = () =>
-    setdeletePackageModal(!deletePackageModal);
+  setdeletePackageModal(!deletePackageModal);
+  const [deletepackageName, setdeletepackageName] = useState("");
+  const [deletepackagenamespaceName, setdeletepackagenamespaceName] = useState("");
+
+  const [deleteUserModal, setdeleteUserModal] = useState(false);
+  const toggleShowDeleteUserModal = () => setdeleteUserModal(!deleteUserModal);
+  const [deleteuserName, setdeleteuserName] = useState("");
+
+  const [deleteReleaseModal, setdeleteReleaseModal] = useState(false);
   const toggleShowDeleteReleaseModal = () =>
-    setdeleteReleaseModal(!deleteReleaseModal);
+  setdeleteReleaseModal(!deleteReleaseModal);
+  const [deletereleasepackageName, setdeletereleasepackageName] = useState("");
+  const [deletereleasenamespaceName, setdeletereleasenamespaceName] = useState("");
+  const [deletereleaseName, setdeletereleaseName] = useState("");
+
+  const [changePasswordModal, setchangePasswordModal] = useState(false);
   const toggleShowChangePasswordModal = () =>
     setchangePasswordModal(!changePasswordModal);
-  const [packageName, setPackageName] = useState("");
-  const [deprecatepackageName, setdeprecatepackageName] = useState("");
-  const [namespaceName, setNamespaceName] = useState("");
   const [userName, setUserName] = useState("");
-  const [releaseName, setReleaseName] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  
 
   useEffect(() => {
    
@@ -69,16 +80,22 @@ const AdminSection = () => {
 
   return (
     <Container className="mt-5">
-      <div>
-        <h2>Admin Settings</h2>
+        <h2 style ={{textAlign:"left"}}>Admin Settings</h2>
         <div>
-          <h3>Deprecate package</h3>
+          <h4>Deprecate package</h4>
           <p style={{ textAlign: "left" }}>
-            <input
+          <input
+              type="text"
+              placeholder="Namespace Name"
+              value={deprecatePackageNamespaceName}
+              onChange={(e) => setdeprecatePackageNamespaceName(e.target.value)}
+              style={{ width: 300 }}
+            />  <input
               type="text"
               placeholder="Package Name"
               value={deprecatepackageName}
               onChange={(e) => setdeprecatepackageName(e.target.value)}
+              style={{ width: 300 }}
             />
           </p>
           <MDBBtn onClick={toggleShowDeprecateModal} style={{ fontSize: 16 }}>
@@ -117,13 +134,14 @@ const AdminSection = () => {
           </MDBModal>
         </div>
         <div>
-          <h3>Delete namespace</h3>
+          <h4>Delete namespace</h4>
           <p style={{ textAlign: "left" }}>
             <input
               type="text"
               placeholder="Namespace Name"
-              value={namespaceName}
-              onChange={(e) => setNamespaceName(e.target.value)}
+              value={deletenamespaceName}
+              onChange={(e) => setdeletenamespaceName(e.target.value)}
+              style={{ width: 300 }}
             />
           </p>
           <MDBBtn
@@ -149,7 +167,7 @@ const AdminSection = () => {
                 </MDBModalHeader>
                 <MDBModalBody>
                   <MDBIcon fas icon="exclamation-triangle" /> You will not be
-                  able to recover {namespaceName} Namespace after you delete it.
+                  able to recover {} Namespace after you delete it.
                 </MDBModalBody>
                 <MDBModalFooter>
                   <MDBBtn
@@ -167,14 +185,21 @@ const AdminSection = () => {
           </MDBModal>
         </div>
         <div>
-          <h3>Delete package</h3>
+          <h4>Delete package</h4>
           <p style={{ textAlign: "left" }}>
-            <input
+          <input
               type="text"
-              placeholder="Package Name"
-              value={packageName}
-              onChange={(e) => setPackageName(e.target.value)}
-            />
+              placeholder="Namespace Name"
+              value={deletepackageName}
+              onChange={(e) => setdeletepackageName(e.target.value)}
+              style={{ width: 300 }}
+            /> <input
+            type="text"
+            placeholder="Package Name"
+            value={deletepackagenamespaceName}
+            onChange={(e) => setdeletepackagenamespaceName(e.target.value)}
+            style={{ width: 300 }}
+          />
           </p>
           <MDBBtn
             onClick={toggleShowDeletePackageModal}
@@ -199,7 +224,7 @@ const AdminSection = () => {
                 </MDBModalHeader>
                 <MDBModalBody>
                   <MDBIcon fas icon="exclamation-triangle" /> You will not be
-                  able to recover {packageName} package after you delete it.
+                  able to recover {} package after you delete it.
                 </MDBModalBody>
                 <MDBModalFooter>
                   <MDBBtn
@@ -215,17 +240,16 @@ const AdminSection = () => {
           </MDBModal>
         </div>
         <div>
-          <h3>Delete user</h3>
+          <h4>Delete user</h4>
           <p style={{ textAlign: "left" }}>
             <input
               type="text"
               placeholder="User Name"
-              value={userName}
-              onChange={(e) => setUserName(e.target.value)}
+              value={deleteuserName}
+              onChange={(e) => setdeleteuserName(e.target.value)}
+              style={{ width: 300 }}
             />
           </p>
-          {/* <button onClick={handleDeleteUser}>Confirm</button>
-           */}
           <MDBBtn onClick={toggleShowDeleteUserModal} style={{ fontSize: 16 }}>
             Delete User
           </MDBBtn>
@@ -259,13 +283,30 @@ const AdminSection = () => {
           </MDBModal>
         </div>
         <div>
-          <h3>Delete release</h3>
+          <h4>Delete release</h4>
           <p style={{ textAlign: "left" }}>
+            
+          <input
+              type="text"
+              placeholder="Namespace Name"
+              value={deletereleasepackageName}
+              onChange={(e) => setdeletereleasepackageName(e.target.value)}
+              style={{ width: 300 }}
+            />
+            <input
+              type="text"
+              placeholder="package Name"
+              value={deletereleasenamespaceName}
+              onChange={(e) => setdeletereleasenamespaceName(e.target.value)}
+              style={{ width: 300 }}
+
+            />
             <input
               type="text"
               placeholder="Release Name"
-              value={releaseName}
-              onChange={(e) => setReleaseName(e.target.value)}
+              value={deletereleaseName}
+              onChange={(e) => setdeletereleaseName(e.target.value)}
+              style={{ width: 300 }}
             />
           </p>
 
@@ -292,7 +333,7 @@ const AdminSection = () => {
                 </MDBModalHeader>
                 <MDBModalBody>
                   <MDBIcon fas icon="exclamation-triangle" /> You will not be
-                  able to recover {releaseName} release after you delete it.
+                  able to recover {} release after you delete it.
                 </MDBModalBody>
                 <MDBModalFooter>
                   <MDBBtn
@@ -308,13 +349,14 @@ const AdminSection = () => {
           </MDBModal>
         </div>
         <div>
-          <h3>Change password</h3>
+          <h4>Change password</h4>
           <p style={{ textAlign: "left" }}>
             <input
               type="text"
               placeholder="User Name"
               value={userName}
               onChange={(e) => setUserName(e.target.value)}
+              style={{ width: 300 }}
             />
           </p>
           <p style={{ textAlign: "left" }}>
@@ -323,6 +365,7 @@ const AdminSection = () => {
               placeholder="New Password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
+              style={{ width: 300 }}
             />
           </p>
           <MDBBtn
@@ -366,7 +409,6 @@ const AdminSection = () => {
             </MDBModalDialog>
           </MDBModal>
         </div>
-      </div>
     </Container>
   );
 };
