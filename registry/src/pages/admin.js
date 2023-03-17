@@ -49,6 +49,9 @@ const AdminSection = () => {
     useState("");
 
   const [emptyModal, setemptyModal] = useState(false);
+
+  const [messageModal, setmessageModal] = useState(false);
+  const toggleShowmessageModal = () => setmessageModal(!messageModal);
   const toggleShowemptyModal = () => setemptyModal(!emptyModal);
 
   const [deleteNamespaceModal, setdeleteNamespaceModal] = useState(false);
@@ -123,6 +126,10 @@ const AdminSection = () => {
     }
   }, [isAdmin]);
 
+  useEffect(() => {
+    
+  }, [message]);
+
   const handleDeprecatePackage = () => {
     dispatch(
       deprecatePackage(deprecatePackageNamespaceName, deprecatepackageName,uuid)
@@ -178,7 +185,29 @@ const AdminSection = () => {
               fields.
             </MDBModalBody>
             <MDBModalFooter>
-              <MDBBtn color="secondary" onClick={toggleShowDeprecateModal}>
+              <MDBBtn color="secondary" onClick={toggleShowemptyModal}>
+                Close
+              </MDBBtn>
+            </MDBModalFooter>
+          </MDBModalContent>
+        </MDBModalDialog>
+      </MDBModal>
+      <MDBModal show={messageModal} setShow={setmessageModall} tabIndex="-1">
+        <MDBModalDialog>
+          <MDBModalContent>
+            <MDBModalHeader>
+              <MDBModalTitle>{statuscode} status</MDBModalTitle>
+              <MDBBtn
+                className="btn-close"
+                color="none"
+                onClick={toggleShowmessageModal}
+              ></MDBBtn>
+            </MDBModalHeader>
+            <MDBModalBody>
+              <MDBIcon fas icon="exclamation-triangle" />{message}
+            </MDBModalBody>
+            <MDBModalFooter>
+              <MDBBtn color="secondary" onClick={toggleShowmessageModal}>
                 Close
               </MDBBtn>
             </MDBModalFooter>
