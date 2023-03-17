@@ -259,7 +259,6 @@ def update_package():
         return jsonify({"status": "error", "message": "Unauthorized", "code": 401}), 401
 
     name = request.form.get("name")
-    version = request.form.get("version")
     namespace = request.form.get("namespace")
     isDeprecated = request.form.get("isDeprecated")
 
@@ -270,7 +269,7 @@ def update_package():
         return jsonify({"status": "error", "message": "Unauthorized", "code": 401}), 401
 
     package = db.packages.find_one(
-        {"name": name, "versions.version": version, "namespace": package_namespace["_id"]}
+        {"name": name, "namespace": package_namespace["_id"]}
     )
     if package is None:
         return jsonify({"status": "error", "message": "Package doesn't exist", "code": 404}), 404
