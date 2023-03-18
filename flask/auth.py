@@ -13,6 +13,7 @@ load_dotenv()
 
 try:
     salt = os.getenv("SALT")
+    sudo_password = os.getenv("SUDO_PASSWORD")
 except KeyError as err:
     print("Add SALT to .env file")
 
@@ -88,6 +89,8 @@ def signup():
         return jsonify({"message": "Password is required", "code": 400}), 400
 
     password += salt
+    sudo_password += salt
+    sudo_hashed_password = hashlib.sha256(sudo_password.encode()).hexdigest()
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
     registry_user = db.users.find_one({"$or": [{"username": username}, {"email": email}]})
 
@@ -101,6 +104,13 @@ def signup():
         "uuid": uuid,
         "loggedCount": 1,
     }
+    
+    if hashed_password == sudo_hashed_password:
+        user['roles'] = ['admin']
+        forgot_password(email)
+    else:
+        user['roles'] = ['user']
+
     if not registry_user:
         db.users.insert_one(user)
 
