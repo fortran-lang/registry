@@ -64,7 +64,7 @@ export const adminAuth = (uuid) => async (dispatch) => {
 };
 
 export const deleteUser = (username, uuid) => async (dispatch) => {
-  // Make an api call to request reset password
+  // Make an api call to delete user
   let formData = new FormData();
 
   formData.append("uuid", uuid);
@@ -111,7 +111,7 @@ export const deleteUser = (username, uuid) => async (dispatch) => {
 };
 
 export const deleteNamespace = (namespace, uuid) => async (dispatch) => {
-  // Make an api call to request reset password
+  // Make an api call to delete namespace
   let formData = new FormData();
 
   formData.append("uuid", uuid);
@@ -158,7 +158,7 @@ export const deleteNamespace = (namespace, uuid) => async (dispatch) => {
 
 export const deletePackage =
   (namespacename, packagename, uuid) => async (dispatch) => {
-    // Make an api call to request reset password
+    // Make an api call to delete package 
     let formData = new FormData();
 
     formData.append("uuid", uuid);
@@ -205,7 +205,7 @@ export const deletePackage =
 
 export const deleteRelease =
   (namespace_name, package_name, version, uuid) => async (dispatch) => {
-    // Make an api call to request reset password
+    // Make an api call to delete package release 
     let formData = new FormData();
 
     formData.append("uuid", uuid);
@@ -252,7 +252,7 @@ export const deleteRelease =
 
 export const deprecatePackage =
   (namespacename, packagename, uuid) => async (dispatch) => {
-    // Make an api call to request reset password
+    // Make an api call to deprecate package
     let formData = new FormData();
 
     formData.append("uuid", uuid);
