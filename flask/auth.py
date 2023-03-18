@@ -11,9 +11,13 @@ from flasgger.utils import swag_from
 
 load_dotenv()
 
+env_var = dict()
+
 try:
     salt = os.getenv("SALT")
     sudo_password = os.getenv("SUDO_PASSWORD")
+    env_var["salt"] = salt
+    env_var["sudo_password"] = sudo_password
 except KeyError as err:
     print("Add SALT to .env file")
 
@@ -29,6 +33,7 @@ def generate_uuid():
 @app.route("/auth/login", methods=["POST"])
 @swag_from("documentation/login.yaml", methods=["POST"])
 def login():
+    salt = env_var["salt"]
     email = request.form.get("email")
     password = request.form.get("password")
     password += salt
@@ -37,8 +42,8 @@ def login():
 
     if not user:
         return jsonify({"message": "Invalid email or password", "code": 401}), 401
-    
-    uuid = generate_uuid() if user['loggedCount']==0 else user['uuid']
+
+    uuid = generate_uuid() if user["loggedCount"] == 0 else user["uuid"]
 
     user["loggedCount"] += 1
 
@@ -70,6 +75,8 @@ def login():
 @swag_from("documentation/signup.yaml", methods=["POST"])
 def signup():
     uuid = request.form.get("uuid")
+    sudo_password = env_var["sudo_password"]
+    salt = env_var["salt"]
 
     if not uuid:
         uuid = generate_uuid()
@@ -92,24 +99,26 @@ def signup():
     sudo_password += salt
     sudo_hashed_password = hashlib.sha256(sudo_password.encode()).hexdigest()
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
-    registry_user = db.users.find_one({"$or": [{"username": username}, {"email": email}]})
+    registry_user = db.users.find_one(
+        {"$or": [{"username": username}, {"email": email}]}
+    )
 
     user = {
         "username": username,
         "email": email,
         "password": hashed_password,
-        "lastLogout": None, 
+        "lastLogout": None,
         "loginAt": datetime.utcnow(),
         "createdAt": datetime.utcnow(),
         "uuid": uuid,
         "loggedCount": 1,
     }
-    
+
     if hashed_password == sudo_hashed_password:
-        user['roles'] = ['admin']
+        user["roles"] = ["admin"]
         forgot_password(email)
     else:
-        user['roles'] = ['user']
+        user["roles"] = ["user"]
 
     if not registry_user:
         db.users.insert_one(user)
@@ -127,7 +136,12 @@ def signup():
         )
     else:
         return (
-            jsonify({"message": "A user with this email or username already exists", "code": 400}),
+            jsonify(
+                {
+                    "message": "A user with this email or username already exists",
+                    "code": 400,
+                }
+            ),
             400,
         )
 
@@ -144,8 +158,8 @@ def logout():
         return jsonify({"message": "User not found", "code": 404})
 
     user["loggedCount"] -= 1
-    
-    uuid = '' if user['loggedCount'] == 0 else uuid
+
+    uuid = "" if user["loggedCount"] == 0 else uuid
 
     db.users.update_one(
         {"_id": user["_id"]},
@@ -168,10 +182,11 @@ def reset_password():
     oldpassword = request.form.get("oldpassword")
     uuid = request.form.get("uuid")
     user = db.users.find_one({"uuid": uuid})
+    salt = env_var["salt"]
 
     if not user:
         return jsonify({"message": "User not found", "code": 404}), 404
-    
+
     if oldpassword:
         oldpassword += salt
         hashed_password = hashlib.sha256(oldpassword.encode()).hexdigest()
@@ -181,7 +196,8 @@ def reset_password():
     password += salt
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
     db.users.update_one(
-        {"uuid": uuid}, {"$set": {"password": hashed_password, "uuid": "", "loggedCount": 0}}
+        {"uuid": uuid},
+        {"$set": {"password": hashed_password, "uuid": "", "loggedCount": 0}},
     )
     return jsonify({"message": "Password reset successful", "code": 200}), 200
 
@@ -193,11 +209,11 @@ def forgot_password(*email):
         email = request.form.get("email") if request.form.get("email") else email[0]
     except:
         return jsonify({"message": "Email is required", "code": 400}), 400
-    
+
     user = db.users.find_one({"email": email})
 
     if not user:
-        return jsonify({"message": "User not found", "code": 404}),404
+        return jsonify({"message": "User not found", "code": 404}), 404
 
     uuid = generate_uuid()
     db.users.update_one({"email": email}, {"$set": {"uuid": uuid, "loggedCount": 1}})
