@@ -300,8 +300,8 @@ def remove_maintainers_from_package(username):
         return jsonify({"message": "Package not found", "code": 404}), 404
 
     # Check if the current user has authority to remove maintainers.
-    if not checkIsNamespaceAdmin(user_id=user["_id"], namespace=package_namespace) and not checkIsMaintainer(user_id=user["_id"], package=curr_package):
-        return jsonify({"message": "Unauthorized", "code": 401}), 401
+    if not checkIsNamespaceAdmin(user_id=user["_id"], namespace=package_namespace):
+        return jsonify({"message": "User is not authorized to remove maintainers", "code": 401}), 401
     
     # Get the user to be removed using the username received in the request body.
     user_to_be_removed = db.users.find_one({"username": username_to_be_removed})
