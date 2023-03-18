@@ -278,13 +278,6 @@ def remove_maintainers_from_package(username):
     if not user or user["username"] != username:
         return jsonify({"message": "Unauthorized", "code": 401}), 401
     
-    # Get the user from the database using uuid.
-    user = db.users.find_one({"uuid": uuid})
-
-    # Check if current user is authorized to access this API.
-    if not user or user["username"] != username:
-        return jsonify({"message": "Unauthorized", "code": 401}), 401
-    
     # Get the namespace from the database.
     package_namespace = db.namespaces.find_one({"namespace": namespace})
 
@@ -353,9 +346,6 @@ def add_maintainers_to_namespace(username):
 
     # Get the namespace from the database.
     namespace_doc = db.namespaces.find_one({"namespace": namespace})
-
-    print(namespace_doc["maintainers"])
-    print(namespace_doc["admins"])
 
     # Check if namespace does not exists.
     if not namespace_doc:
