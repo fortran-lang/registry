@@ -42,9 +42,13 @@ def delete_namespace(namespace_name):
 
 @app.route("/namespace/<namespace>", methods=["GET"])
 def namespace_packages(namespace):
-    namespace_packages = db.namespaces.find_one({"namespace": namespace})
+    namespace_document = db.namespaces.find_one({"namespace": namespace})
+
+    if not namespace_document:
+        return jsonify({"code": 404, "message": "Namespace not found"}), 404
+
     packages = []
-    for i in namespace_packages["packages"]:
+    for i in namespace_document["packages"]:
         package = db.packages.find(
             {"_id": i},
             {
@@ -66,7 +70,7 @@ def namespace_packages(namespace):
             {
                 "status": 200,
                 "packages": packages,
-                "createdAt": namespace_packages["createdAt"],
+                "createdAt": namespace_document["createdAt"],
             }
         ),
         200,
