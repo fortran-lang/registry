@@ -324,8 +324,6 @@ def add_maintainers_to_namespace(username):
     uuid = request.form.get("uuid")
     username_to_be_added = request.form.get("username")
     namespace = request.form.get("namespace")
-    if not uuid:
-        return jsonify({"message": "Unauthorized", "code": 401}), 401
     
     # Validating the data coming with request.
     if not uuid:
