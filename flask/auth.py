@@ -7,6 +7,7 @@ from app import app
 from mongo import db
 import hashlib
 from app import swagger
+import smtplib
 from flasgger.utils import swag_from
 
 load_dotenv()
@@ -16,8 +17,16 @@ env_var = dict()
 try:
     salt = os.getenv("SALT")
     sudo_password = os.getenv("SUDO_PASSWORD")
+    fortran_email = os.getenv("RESET_EMAIL")
+    fortran_password = os.getenv("RESET_PASSWORD")
+    host = os.getenv("HOST")
+    env_var["host"] = host
     env_var["salt"] = salt
     env_var["sudo_password"] = sudo_password
+    smtp = smtplib.SMTP('smtp.gmail.com', 587)
+    smtp.starttls()
+    smtp.login(fortran_email, fortran_password)
+
 except KeyError as err:
     print("Add SALT to .env file")
 
@@ -218,7 +227,21 @@ def forgot_password(*email):
     uuid = generate_uuid()
     db.users.update_one({"email": email}, {"$set": {"uuid": uuid, "loggedCount": 1}})
 
-    # send the uuid link in the email
+    message = f"""\
+    Subject: Password reset link
+    To: {email}
+
+    Dear {user['username']},
+
+    We received a request to reset your password. To reset your password, please copy paste the link below in a new browser window:
+
+    {env_var['host']}/reset-password/{uuid}
+
+    Thank you,
+    The Fortran-lang Team"""
+
+    # sending the mail
+    smtp.sendmail(to_addrs=email, msg=message, from_addr=fortran_email)
 
     return (
         jsonify({"message": "Password reset link sent to your email", "code": 200}),
