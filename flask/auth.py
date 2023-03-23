@@ -227,19 +227,18 @@ def forgot_password(*email):
     uuid = generate_uuid()
     db.users.update_one({"email": email}, {"$set": {"uuid": uuid, "loggedCount": 1}})
 
-    message = f"""\
-    Subject: Password reset link
-    To: {email}
-
+    message = f"""\n
     Dear {user['username']},
 
     We received a request to reset your password. To reset your password, please copy paste the link below in a new browser window:
 
-    {env_var['host']}/reset-password/{uuid}
+    {env_var['host']}/account/reset-password/{uuid}
 
     Thank you,
     The Fortran-lang Team"""
 
+    message = f'Subject: Password reset link\nTo: {email}\n{message}'
+    
     # sending the mail
     smtp.sendmail(to_addrs=email, msg=message, from_addr=fortran_email)
 
