@@ -1,0 +1,16 @@
+services:
+  test:
+    build:
+      context: flask
+      target: builder
+    command: python -m unittest discover -s tests
+    volumes:
+      - ./tests:/src/tests
+      - ./flask:/src
+    depends_on:
+      - tests_db
+    environment:
+      - MONGO_DB_NAME=testregistry
+      - MONGO_URI=mongodb://mongo:27017/testregistry
+  tests_db:
+    image: mongo
