@@ -6,3 +6,6 @@
 /flask/static/
 /flask/.vercel
 /frontend/node_modules/
+tests/__pycache__/
+/.DS_Store
+/flask/.DS_Store
