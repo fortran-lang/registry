@@ -6,6 +6,7 @@ import auth
 import user
 import packages
 import namespaces
+import package_test
 
 @app.route("/")
 def index():
