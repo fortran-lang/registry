@@ -20,6 +20,16 @@ class TestPackages(BaseTestClass):
         "tags": "test_tags",
         "dependencies": "test_dependencies",
     }
+
+    @staticmethod
+    def generate_tarball():
+        # Create a file object to upload
+        file_contents = b'Test file contents'
+        tarball = io.BytesIO(file_contents)
+        tarball.name = 'test.tar.gz'
+
+        return tarball
+
    
     def test_successful_package_upload(self):
         """
@@ -41,13 +51,38 @@ class TestPackages(BaseTestClass):
         uuid = response.json["uuid"]
 
         TestPackages.test_package_data["uuid"] = uuid
-
-        # Create a file object to upload
-        file_contents = b'Test file contents'
-        tarball = io.BytesIO(file_contents)
-        tarball.name = 'test.tar.gz'
-
-        TestPackages.test_package_data["tarball"] = tarball
+        TestPackages.test_package_data["tarball"] = TestPackages.generate_tarball()
 
         response = self.client.post("/packages", data=TestPackages.test_package_data)
         self.assertEqual(200, response.json["code"])
+
+    def test_upload_existing_package(self):
+        """
+        Test case to verify the behaviour of the system when a user tries to upload already existing 
+        package in the registry.
+
+        Parameters:
+        None
+
+        Returns:
+        None
+
+        Raises:
+        AssertionError: If the response code received from the server is not as expected.
+        """
+
+        response = self.client.post("/auth/signup", data=TestPackages.test_user_data)
+        self.assertEqual(200, response.json["code"])
+
+        uuid = response.json["uuid"]
+        
+        TestPackages.test_package_data["uuid"] = uuid
+        TestPackages.test_package_data["tarball"] = TestPackages.generate_tarball()
+
+        response = self.client.post("/packages", data=TestPackages.test_package_data)
+        self.assertEqual(200, response.json["code"])
+
+        TestPackages.test_package_data["tarball"] = TestPackages.generate_tarball()
+
+        response = self.client.post("/packages", data=TestPackages.test_package_data)
+        self.assertEqual(400, response.json["code"])
