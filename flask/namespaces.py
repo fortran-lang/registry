@@ -4,6 +4,48 @@ from flask import request, jsonify
 from app import swagger
 from flasgger.utils import swag_from
 
+from datetime import datetime
+from auth import generate_uuid
+
+@app.route("/namespace", methods=["POST"])
+def create_namespace():
+    uuid = request.form.get("uuid")
+
+    if not uuid:
+        return jsonify({"code": 401, "message": "Unauthorized"}), 401
+    
+    namespace_name = request.form.get("namespace")
+
+    if not namespace_name:
+        return jsonify({"code": 400, "message": "Please enter namespace name"}), 400
+    
+    # Get the user document from the uuid.
+    user_doc = db.users.find_one({"uuid": uuid})
+
+    # Get the namespace document from the namespace name.
+    # To check if already a namespace exists by this name.
+    namespace_doc = db.namespaces.find_one({"namespace": namespace_name})
+
+    print(namespace_doc)
+
+    # Check if namespace already exists.
+    if namespace_doc:
+        return jsonify({"code": 400, "message": "Namespace already exists"}), 400
+
+    # Generate an access token for accessing the namespace.
+    access_token = generate_uuid()
+
+    namespace_obj = {
+        "namespace": namespace_name,
+        "createdAt": datetime.utcnow(),
+        "createdBy": user_doc["_id"],
+        "accessToken": access_token
+    }
+
+    db.namespaces.insert_one(namespace_obj)
+
+    return jsonify({"code": 200, "message": "Namespace created successfully", "accessToken": access_token}), 200
+
 @app.route("/packages/<namespace_name>/delete", methods=["POST"])
 def delete_namespace(namespace_name):
     uuid = request.form.get("uuid")
