@@ -7,7 +7,7 @@ from flasgger.utils import swag_from
 from datetime import datetime
 from auth import generate_uuid
 
-@app.route("/namespace", methods=["POST"])
+@app.route("/namespaces", methods=["POST"])
 def create_namespace():
     uuid = request.form.get("uuid")
 
@@ -25,8 +25,6 @@ def create_namespace():
     # Get the namespace document from the namespace name.
     # To check if already a namespace exists by this name.
     namespace_doc = db.namespaces.find_one({"namespace": namespace_name})
-
-    print(namespace_doc)
 
     # Check if namespace already exists.
     if namespace_doc:
