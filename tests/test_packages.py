@@ -193,3 +193,9 @@ class TestPackages(BaseTestClass):
         })
 
         self.assertEqual(200, response.json["code"])
+
+        response = self.client.get("/packages", query_string={
+            "query": "somerandompackage"
+        })
+
+        self.assertEqual(200, response.json["code"])
