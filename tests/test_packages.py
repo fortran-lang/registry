@@ -121,3 +121,45 @@ class TestPackages(BaseTestClass):
         response = self.client.post("/packages", data=TestPackages.test_package_data)
 
         self.assertEqual(400, response.json["code"])
+
+    def test_unauthorized_upload(self):
+        """
+        Test case to verify the behaviour of the system if an unauthorized user tries to upload a version
+        of a package.
+
+        Parameters:
+        None
+
+        Returns:
+        None
+
+        Raises:
+        AssertionError: If the response received from the server is not as expected.
+        """
+        response = self.client.post("/auth/signup", data=TestPackages.test_user_data)
+        self.assertEqual(200, response.json["code"])
+
+        uuid = response.json["uuid"]
+        
+        TestPackages.test_package_data["uuid"] = uuid
+        TestPackages.test_package_data["tarball"] = TestPackages.generate_tarball()
+
+        response = self.client.post("/packages", data=TestPackages.test_package_data)
+        self.assertEqual(200, response.json["code"])
+        
+        # Sign up with different credentials.
+        response = self.client.post("/auth/signup", data={
+            "email": "test@gmail.com",
+            "password": "testpassword",
+            "username": "testusername"
+        })
+        self.assertEqual(200, response.json["code"])
+
+        uuid = response.json["uuid"]
+
+        TestPackages.test_package_data["uuid"] = uuid
+        TestPackages.test_package_data["tarball"] = TestPackages.generate_tarball()
+        TestPackages.test_package_data["version"] = "0.0.2"
+
+        response = self.client.post("/packages", data=TestPackages.test_package_data)
+        self.assertEqual(401, response.json["code"])
