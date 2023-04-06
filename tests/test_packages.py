@@ -136,6 +136,7 @@ class TestPackages(BaseTestClass):
         Raises:
         AssertionError: If the response received from the server is not as expected.
         """
+
         response = self.client.post("/auth/signup", data=TestPackages.test_user_data)
         self.assertEqual(200, response.json["code"])
 
@@ -177,6 +178,7 @@ class TestPackages(BaseTestClass):
         Raises:
         AssertionError: If the response received from the server is not as expected.
         """
+
         response = self.client.post("/auth/signup", data=TestPackages.test_user_data)
         self.assertEqual(200, response.json["code"])
 
@@ -199,3 +201,52 @@ class TestPackages(BaseTestClass):
         })
 
         self.assertEqual(200, response.json["code"])
+
+    def test_get_exisiting_package(self):
+        """
+        Test case to verify the behaviour of the system while trying to get a package.
+
+        Parameters:
+        None
+
+        Returns:
+        None
+
+        Raises:
+        AssertionError: If the response received from the server is not as expected.
+        """
+
+        response = self.client.post("/auth/signup", data=TestPackages.test_user_data)
+        self.assertEqual(200, response.json["code"])
+
+        uuid = response.json["uuid"]
+
+        TestPackages.test_package_data["uuid"] = uuid
+        TestPackages.test_package_data["tarball"] = TestPackages.generate_tarball()
+
+        response = self.client.post("/packages", data=TestPackages.test_package_data)
+        self.assertEqual(200, response.json["code"])      
+
+        response = self.client.get("/packages/test_namespace/test_package")
+
+        self.assertEqual(200, response.json["code"])
+
+    def test_get_nonexisting_package(self):
+        """
+        Test case to verify the behaviour of the system while trying to get non existing package.
+
+        Parameters:
+        None
+
+        Returns:
+        None
+
+        Raises:
+        AssertionError: If the response received from the server is not as expected.
+        """
+        
+        response = self.client.post("/auth/signup", data=TestPackages.test_user_data)
+        self.assertEqual(200, response.json["code"])
+
+        response = self.client.get("/packages/test_namespace/test_package")
+        self.assertEqual(404, response.json["code"])
