@@ -14,13 +14,16 @@ def create_namespace():
     if not uuid:
         return jsonify({"code": 401, "message": "Unauthorized"}), 401
     
+    # Get the user document from the uuid.
+    user_doc = db.users.find_one({"uuid": uuid})
+
+    if not user_doc:
+        return jsonify({"code":  401, "message": "Unauthorized"}), 401
+    
     namespace_name = request.form.get("namespace")
 
     if not namespace_name:
         return jsonify({"code": 400, "message": "Please enter namespace name"}), 400
-    
-    # Get the user document from the uuid.
-    user_doc = db.users.find_one({"uuid": uuid})
 
     # Get the namespace document from the namespace name.
     # To check if already a namespace exists by this name.
