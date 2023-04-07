@@ -1,3 +1,4 @@
+import re
 from app import app
 from mongo import db
 from flask import request, jsonify
@@ -24,6 +25,12 @@ def create_namespace():
 
     if not namespace_name:
         return jsonify({"code": 400, "message": "Please enter namespace name"}), 400
+    
+    pattern = r'^[a-zA-Z0-9_-]+$'
+
+    # Make sure namespace name only contains [a-z], [A-Z], [0-9], - and _ characters.
+    if not re.match(pattern, namespace_name):
+        return jsonify({"code": 400, "message": "Namespace name can only include (a-z), (A-Z), (0-9), - and _"}), 400
 
     # Get the namespace document from the namespace name.
     # To check if already a namespace exists by this name.
