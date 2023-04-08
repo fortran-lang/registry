@@ -24,9 +24,7 @@ def validate_package(tarball,packagename):
     container.exec_run('unzip package.zip')
     build_response = container.exec_run('sh -c "/home/registry/fpm build"')
     # execute_response = container.exec_run('sh -c "timeout 15s fpm run"',demux=True)
-    # print(build_response)
     if build_response.output[0] == None:
-        # output = jsonify({"executed": ""})
         if '<ERROR>' in build_response.output[1].decode():
             # package build failed 
             return False
