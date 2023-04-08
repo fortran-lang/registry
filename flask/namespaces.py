@@ -4,7 +4,7 @@ from flask import request, jsonify
 from app import swagger
 from flasgger.utils import swag_from
 
-@app.route("/packages/<namespace_name>/delete", methods=["POST"])
+@app.route("/namespace/<namespace_name>/delete", methods=["POST"])
 def delete_namespace(namespace_name):
     uuid = request.form.get("uuid")
 
