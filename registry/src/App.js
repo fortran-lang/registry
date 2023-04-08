@@ -6,12 +6,13 @@ import Help from "./pages/help";
 import Register from "./pages/register";
 import Home from "./pages/home";
 import Dashboard from "./pages/dashboard";
-import PackageForm from "./pages/upload";
+import PackageForm from "./pages/uploadPackage";
 import Account from "./pages/account";
 import Search from "./pages/search";
 import NoPage from "./pages/404";
 import UserPage from "./pages/user";
 import PackagePage from "./pages/package";
+import NamespaceForm from "./pages/createNamespace";
 import NamespacePage from "./pages/namespace";
 import AdminSection from "./pages/admin";
 import ForgotPassword from "./pages/forgotpassword";
@@ -38,6 +39,7 @@ function App() {
         <Route path="/manage/projects" element={<Dashboard />} />
         <Route path="/manage/account" element={<Account />} />
         <Route path="/package/create" element={<PackageForm />} />
+        <Route path="/namespace/create" element={<NamespaceForm />} />
         <Route path="/users/:user" element={<UserPage />} />
         <Route
           path="/packages/:namespace_name/:package_name"

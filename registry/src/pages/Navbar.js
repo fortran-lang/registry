@@ -61,6 +61,15 @@ const NavbarComponent = () => {
                 >
                   Create Package
                 </NavDropdown.Item>
+                
+                <NavDropdown.Item
+                  onClick={() => {
+                    navigate("/namespace/create");
+                    window.location.reload();
+                  }}
+                >
+                  Create Namespace
+                </NavDropdown.Item>
 
                 <NavDropdown.Item
                   onClick={() => {
