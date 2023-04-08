@@ -75,7 +75,7 @@ def create_upload_token(namespace_name):
     if checkUserUnauthorized(user_id=user_doc["_id"], package_namespace=namespace_doc):
         return jsonify({"code": 401, "message": "Unauthorized"}), 401
     
-    # Generate an access token for accessing the namespace.
+    # Generate an upload token for upload packages to the namespace.
     upload_token = generate_uuid()
     
     upload_token_obj = {
