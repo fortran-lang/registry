@@ -3,6 +3,7 @@ services:
     build:
       context: flask
       target: builder
+      dockerfile: backend.Dockerfile
     command: python -m unittest discover -s tests
     volumes:
       - ./tests:/src/tests

@@ -16,8 +16,7 @@ USER registry
 WORKDIR /home/registry
 
 # Set up fpm
-RUN wget https://github.com/fortran-lang/fpm/releases/download/v0.6.0/fpm-0.6.0-linux-x86_64 -4 -O fpm && \
+RUN wget https://github.com/fortran-lang/fpm/releases/download/v0.8.0/fpm-0.8.0-linux-x86_64 -4 -O fpm && \
     chmod u+x fpm
 
-RUN git checkout stdlib-fpm
 WORKDIR /home/registry
