@@ -42,7 +42,7 @@ const PackageForm = () => {
     return <Navigate to="/account/login" replace={true} />;
   } else {
     return !isLoading ? (
-      <div className="container">
+      <Container style={{ padding: 20 }}>
         <h2>Create a Package</h2>
         <form id="package-form" onSubmit={handleSubmit}>
           <label htmlFor="name">Name:</label>
@@ -51,15 +51,6 @@ const PackageForm = () => {
             id="name"
             name="name"
             value={data.name}
-            onChange={handleChange}
-          />
-          <br />
-          <label htmlFor="namespace">Namespace:</label>
-          <input
-            type="text"
-            id="namespace"
-            name="namespace"
-            value={data.namespace}
             onChange={handleChange}
           />
           <br />
@@ -107,14 +98,6 @@ const PackageForm = () => {
             onChange={handleChange}
           />
           <br />
-          <label htmlFor="namespace_description">Namespace Description:</label>
-          <textarea
-            id="namespace_description"
-            name="namespace_description"
-            value={data.namespace_description}
-            onChange={handleChange}
-          />
-          <br />
           <label htmlFor="tags">Tags (comma separated):</label>
           <input
             type="text"
@@ -147,7 +130,7 @@ const PackageForm = () => {
           )}
           <button type="submit">Add Package</button>
         </form>
-      </div>
+      </Container>
     ) : (
       <Container style={{ margin: "200px" }}>
         <Spinner animation="border" role="status">
