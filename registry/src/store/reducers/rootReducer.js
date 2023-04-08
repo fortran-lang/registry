@@ -11,6 +11,7 @@ import createNamespaceReducer from "./createNamespaceReducer";
 import adminReducer from "./adminReducer";
 import { combineReducers } from "redux";
 import addRemoveMaintainerReducer from "./addRemoveMaintainerReducer";
+import generateNamespaceTokenReducer from "./generateNamespaceTokenReducer";
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -23,6 +24,7 @@ const rootReducer = combineReducers({
   upload: uploadReducer,
   resetpassword: resetPasswordReducer,
   addRemoveMaintainer: addRemoveMaintainerReducer,
+  generateNamespaceToken: generateNamespaceTokenReducer,
   admin: adminReducer,
   createNamespace: createNamespaceReducer,
 });

@@ -12,7 +12,7 @@ export const createNamespace = (data)  => async (dispatch) => {
     try {
       let result = await axios({
         method: "post",
-        url: `${process.env.REACT_APP_REGISTRY_API_URL}/packages`,
+        url: `${process.env.REACT_APP_REGISTRY_API_URL}/namespaces`,
         data: new FormData(data),
       });
 
