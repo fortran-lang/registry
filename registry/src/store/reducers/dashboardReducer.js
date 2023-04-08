@@ -6,6 +6,7 @@ import {
 
 const initialState = {
     packages: null,
+    namespaces: null,
     isLoading: true, 
     error: null,
 }
@@ -24,6 +25,7 @@ const dashboardReducer = (state = initialState, action) => {
                 ...state, 
                 isLoading: false,
                 packages: action.payload.packages,
+                namespaces: action.payload.namespaces,
             }
 
         case REQUEST_PACKAGES_FAILURE:

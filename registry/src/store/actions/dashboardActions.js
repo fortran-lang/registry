@@ -20,6 +20,7 @@ export const fetchPackages = (username) => async (dispatch) => {
         type: REQUEST_PACKAGES_SUCCESS,
         payload: {
           packages: result.data.packages,
+          namespaces: result.data.namespaces,
         },
       });
     } else {
