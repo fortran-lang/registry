@@ -6,7 +6,7 @@ import auth
 import user
 import packages
 import namespaces
-import package_test
+import validate_package
 
 @app.route("/")
 def index():
