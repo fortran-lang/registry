@@ -43,6 +43,7 @@ def profile(username):
                 )
                 response_namespaces.append({
                         "name": namespace["namespace"],
+                        "description": namespace["description"],
                         "author": user["username"],
                     })
 

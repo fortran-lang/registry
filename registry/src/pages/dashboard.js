@@ -10,10 +10,12 @@ import Spinner from "react-bootstrap/Spinner";
 import Container from "react-bootstrap/Container";
 import AddMaintainerFormDialog from "./addMaintainerDialogForm";
 import RemoveMaintainerFormDialog from "./removeMaintainerDialogForm";
+import GenerateNamespaceTokenDialogForm from "./generateNamespaceTokenDialogForm";
 
 const Dashboard = () => {
   const [cookies, setCookie] = useCookies(["uuid"]);
   const [showAddMaintainerDialog, setShowAddMaintainerDialog] = useState(false);
+  const [showGenerateTokenDialog, setshowGenerateTokenDialog] = useState(false);
   const [showRemoveMaintainerDialog, setShowRemoveMaintainerDialog] =
     useState(false);
   const username = useSelector((state) => state.auth.username);
@@ -42,7 +44,7 @@ const Dashboard = () => {
       <p style={{textAlign: "left", fontSize: 24, padding:5}}>Namespaces</p>
       <Row>
         {namespaces.map((element, index) => (
-          <Col key={element.name + element.namespace} xs={6} md={4}>
+          <Col key={element.name} xs={6} md={4}>
             <Card>
               <Card.Body>
                 <Card.Title>
@@ -56,15 +58,14 @@ const Dashboard = () => {
                 <Card.Text id="card-text">{element.description}</Card.Text>
                 <span
                   style={{ textAlign: "left", fontSize: 16 }}
-                  onClick={() => setShowAddMaintainerDialog(true)}
+                  onClick={() => setshowGenerateTokenDialog(true)}
                 >
-                  Add Maintainers
+                  Generate Token
                 </span>
-                <AddMaintainerFormDialog
-                  package={element.name}
-                  namespace={element.namespace}
-                  show={showAddMaintainerDialog}
-                  onHide={() => setShowAddMaintainerDialog(false)}
+                <GenerateNamespaceTokenDialogForm
+                  namespace={element.name}
+                  show={showGenerateTokenDialog}
+                  onHide={() => setshowGenerateTokenDialog(false)}
                 />
               </Card.Body>
             </Card>
