@@ -10,6 +10,7 @@ from app import swagger
 from flasgger.utils import swag_from
 from urllib.parse import unquote
 import math
+from validate_package import validate_package
 
 parameters = {
     "name": "name",
@@ -133,6 +134,15 @@ def upload():
     tarball_name = "{}-{}.tar.gz".format(package_name, package_version)
     # Upload the tarball to the Grid FS storage.
     file_object_id = file_storage.put(tarball, content_type="application/gzip", filename=tarball_name)
+
+
+    # TODO: Uncomment this when the package validation is enabled
+
+    # validate the package
+    # valid_package = validate_package(tarball_name, tarball_name)
+    # if not valid_package:
+    #     return jsonify({"status": "error", "message": "Invalid package", "code": 400}), 400
+
 
     # No previous recorded versions of the package found.
     if not package_doc:
