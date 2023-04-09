@@ -9,9 +9,13 @@ from packages import checkUserUnauthorized
 from datetime import datetime
 from auth import generate_uuid
 
+# Regular expression pattern for namespace name validation.
+NAMESPACE_NAME_PATTERN = r'^[a-zA-Z0-9_-]+$'
+
 @app.route("/namespaces", methods=["POST"])
 def create_namespace():
     uuid = request.form.get("uuid")
+    
 
     if not uuid:
         return jsonify({"code": 401, "message": "Unauthorized"}), 401
@@ -23,14 +27,16 @@ def create_namespace():
         return jsonify({"code":  401, "message": "Unauthorized"}), 401
     
     namespace_name = request.form.get("namespace")
+    namespace_description = request.form.get("namespace_description")
 
     if not namespace_name:
         return jsonify({"code": 400, "message": "Please enter namespace name"}), 400
     
-    pattern = r'^[a-zA-Z0-9_-]+$'
+    if not namespace_description:
+        return jsonify({"code": 400, "message": "Please enter namespace description"}), 400
 
     # Make sure namespace name only contains [a-z], [A-Z], [0-9], - and _ characters.
-    if not re.match(pattern, namespace_name):
+    if not re.match(NAMESPACE_NAME_PATTERN, namespace_name):
         return jsonify({"code": 400, "message": "Namespace name can only include (a-z), (A-Z), (0-9), - and _"}), 400
 
     # Get the namespace document from the namespace name.
@@ -43,10 +49,11 @@ def create_namespace():
 
     namespace_obj = {
         "namespace": namespace_name,
+        "description": namespace_description,
         "createdAt": datetime.utcnow(),
         "author": user_doc["_id"],
         "maintainers": [user_doc["_id"]],
-        "admins": [user_doc["_id"]]
+        "admins": [user_doc["_id"]],
     }
 
     db.namespaces.insert_one(namespace_obj)
