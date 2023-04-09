@@ -25,6 +25,10 @@ def profile(username):
             {"$or": [{"author": user["_id"]}, {"maintainers": user["_id"]}]},
         )
 
+        namespaces = db.namespaces.find(
+            {"$or": [{"author": user["_id"]}, {"maintainers": user["_id"]}, {"admins": user["_id"]}]},
+        )
+
         response_packages = []
         response_namespaces = []
         if packages:
@@ -38,21 +42,19 @@ def profile(username):
                         "namespace": namespace["namespace"],
                         "description": package["description"],
                         "updatedAt": package["updatedAt"],
-                        "author": user["username"],
                     }
                 )
+                
+        if namespaces:
+            for namespace in namespaces:
                 response_namespaces.append({
-                        "name": namespace["namespace"],
-                        "description": namespace["description"],
-                        "author": user["username"],
-                    })
-
+                    "name": namespace["namespace"],
+                    "description": namespace["description"],
+                })
         user_account = {
             "username": user["username"],
             "email": user["email"],
             "createdAt": user["createdAt"],
-            "packages": response_packages,
-            "namespaces": response_namespaces,
         }
         return (
             jsonify(
