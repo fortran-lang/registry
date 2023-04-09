@@ -90,73 +90,52 @@ def search_packages():
 
 @app.route("/packages", methods=["POST"])
 def upload():
-    uuid = request.form.get("uuid")
-    if not uuid:
-        return jsonify({"status": "error", "message": "Unauthorized", "code": 401}), 401
+    upload_token = request.form.get("upload_token")
+    package_name = request.form.get("package_name")
+    package_version = request.form.get("package_version")
+    package_license = request.form.get("package_license")
+    tarball = request.files["tarball"]
 
-    user = db.users.find_one({"uuid": uuid})
+    if not upload_token:
+        return jsonify({"code": 400, "message": "Upload token missing"})
+    
+    if not package_name:
+        return jsonify({"code": 400, "message": "Package name is missing"})
+    
+    if not package_version:
+        return jsonify({"code": 400, "message": "Package version is missing"})
+    
+    if not package_license:
+        return jsonify({"code": 400, "message": "Package license is missing"})
+    
+    # Find the document that contains the upload token.
+    namespace_doc = db.namespaces.find_one({"upload_tokens": {"$elemMatch": {"token": upload_token}}})
+
+    # Check if there is a namespace connected to the given upload_token:
+    if not namespace_doc:
+        return jsonify({"code": 401, "message": "Namespace not found or invalid upload token"})
+    
+    # Get the matching subdocument from the upload_token array
+    upload_token_doc = next(item for item in namespace_doc['upload_tokens'] if item['token'] == upload_token)
+
+    # Get the user connected to the upload token.
+    user_id = upload_token_doc["createdBy"]
+    user = db.users.find_one({"_id": user_id})
 
     if not user:
-        return jsonify({"status": "error", "message": "Unauthorized", "code": 401}), 401
-
-    name = request.form.get("name")
-    namespace = request.form.get("namespace")
-    tarball = request.files["tarball"]
-    version = request.form.get("version")
-    license = request.form.get("license")
-    copyright = request.form.get("copyright")
-    description = request.form.get("description")
-    namespace_description = request.form.get("namespace_description")
-    tags = request.form.get("tags").strip().split(",")
-    dependencies = request.form.get("dependencies").strip().split(",")
-
-    # Check if namespace already exists.
-    package_namespace = db.namespaces.find_one({"namespace": namespace})
-
-    # If namespace does not exists. Then, create it.
-    if package_namespace is None:
-        namespace_doc = {
-            "namespace": namespace,
-            "createdAt": datetime.utcnow(),
-            "updatedAt": datetime.utcnow(),
-            "createdBy": user["_id"],
-            "description": namespace_description,
-            "tags": tags,
-            "author": user["_id"],
-            "maintainers": [user["_id"]],
-            "admins": [user["_id"]]
-        }
-
-        db.namespaces.insert_one(namespace_doc)
+        return jsonify({"code": 404, "message": "User not found"})
     
-    else:
-    # Check if user is not authorized to upload the package.
-        if checkUserUnauthorized(user_id=user["_id"], package_namespace=package_namespace):
-            return jsonify({"status": "error", "message": "Unauthorized", "code": 401}), 401
+    # User should be either namespace maintainer or namespace admin to upload a package.
+    if checkUserUnauthorized(user_id=user["_id"], package_namespace=namespace_doc):
+        return jsonify({"message": "Unauthorized", "code": 401}), 401
+    
+    package_doc = db.packages.find_one({"name": package_name, "namespace": namespace_doc["_id"]})
 
-    # Get the namespace document.
-    namespace = db.namespaces.find_one({"namespace": namespace})
-
-    # Try to get the package with exact same version to be uploaded.
-    package = db.packages.find_one(
-        {"name": name, "versions.version": version, "namespace": namespace["_id"]}
-    )
-
-    # Check if package with particular version number already exists.
-    if package is not None:
-        return jsonify({"status": "error", "message": "Package already exists", "code": 400}), 400
-
-    # Get the previous uploaded package.
-    package_previously_uploaded = db.packages.find_one(
-        {"name": name, "namespace": namespace["_id"]}
-    )
-
-    tarball_name = "{}-{}.tar.gz".format(name, version)
-
+    tarball_name = "{}-{}.tar.gz".format(package_name, package_version)
     # Upload the tarball to the Grid FS storage.
     file_object_id = file_storage.put(tarball, content_type="application/gzip", filename=tarball_name)
 
-    
+
     # TODO: Uncomment this when the package validation is enabled
 
     # validate the package
@@ -164,49 +143,47 @@ def upload():
     # if not valid_package:
     #     return jsonify({"status": "error", "message": "Invalid package", "code": 400}), 400
 
-    # If there are no previous versions of package.
-    # This means user is trying to upload a new package.
-    # There are no previous recorded versions of package present in registry.
-    if package_previously_uploaded is None:
-        package = {
-            "name": name,
-            "namespace": namespace["_id"],
-            "description": description,
-            "license": license,
+
+    # No previous recorded versions of the package found.
+    if not package_doc:
+        package_obj = {
+            "name": package_name,
+            "namespace": namespace_doc["_id"],
+            "description": "Sample Test description",
+            "license": package_license,
             "createdAt": datetime.utcnow(),
             "updatedAt": datetime.utcnow(),
             "author": user["_id"],
             "maintainers": [user["_id"]],
-            "copyright": copyright,
-            "tags": list(set(tags)),
+            "copyright": "Test copyright",
+            "tags": ["fortran", "fpm"],
             "isDeprecated": False,
         }
 
-        version_document = {
-            "version": version,
+        version_obj = {
+            "version": package_version,
             "tarball": tarball_name,
-            "dependencies": dependencies,
+            "dependencies": "Test dependencies",
             "isDeprecated": False,
             "download_url": f"/tarballs/{file_object_id}"
         }
 
-        package["versions"] = []
+        package_obj["versions"] = []
 
         # Append the first version document.
-        package["versions"].append(version_document)
-
-        db.packages.insert_one(package)
+        package_obj["versions"].append(version_obj)
+        db.packages.insert_one(package_obj)
 
         package = db.packages.find_one(
-            {"name": name, "versions.version": version, "namespace": namespace["_id"]}
+            {"name": package_name, "versions.version": package_version, "namespace": namespace_doc["_id"]}
         )
 
-        namespace["packages"] = []
+        namespace_doc["packages"] = []
 
         # Add the package id to the namespace.
-        namespace["packages"].append(package["_id"])
-        namespace["updatedAt"] = datetime.utcnow()
-        db.namespaces.update_one({"_id": namespace["_id"]}, {"$set": namespace})
+        namespace_doc["packages"].append(package["_id"])
+        namespace_doc["updatedAt"] = datetime.utcnow()
+        db.namespaces.update_one({"_id": namespace_doc["_id"]}, {"$set": namespace_doc})
 
         if "authorOf" not in user:
             user["authorOf"] = []
@@ -221,26 +198,26 @@ def upload():
         # This means user is uploading a new version of already existing package.
         # Check if the version to be uploaded is valid or not.
         is_valid = check_version(
-            package_previously_uploaded["versions"][-1]["version"], version
+            package_doc["versions"][-1]["version"], package_version
         )
 
         if not is_valid:
-            return jsonify({"status": "error", "message": "Incorrect version", "code": 400}), 400
+            return jsonify({"message": "Incorrect version", "code": 400}), 400
 
         new_version = {
             "tarball": tarball_name,
-            "version": version,
-            "dependencies": dependencies,
+            "version": package_version,
+            "dependencies": "Test dependencies",
             "isDeprecated": False,
             "createdAt": datetime.utcnow(),
             "download_url": f"/tarballs/{file_object_id}"
         }
 
-        package_previously_uploaded["versions"].append(new_version)
-        package_previously_uploaded["updatedAt"] = datetime.utcnow()
+        package_doc["versions"].append(new_version)
+        package_doc["updatedAt"] = datetime.utcnow()
         db.packages.update_one(
-            {"_id": package_previously_uploaded["_id"]},
-            {"$set": package_previously_uploaded},
+            {"_id": package_doc["_id"]},
+            {"$set": package_doc},
         )
 
         return jsonify({"message": "Package Uploaded Successfully.", "code": 200})
