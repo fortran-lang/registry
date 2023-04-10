@@ -9,6 +9,7 @@ class TestNamespaces(BaseTestClass):
 
     test_namespace_data = {
         "namespace": "test_namespace",
+        "namespace_description": "test namespace description"
     }
 
     def test_successful_namespace_creation(self):
