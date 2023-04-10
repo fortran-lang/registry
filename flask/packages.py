@@ -10,6 +10,7 @@ from app import swagger
 from flasgger.utils import swag_from
 from urllib.parse import unquote
 import math
+from license_expression import get_spdx_licensing
 from validate_package import validate_package
 
 parameters = {
@@ -20,6 +21,22 @@ parameters = {
     "downloads": "downloads",
 }
 
+def is_valid_license_identifier(license_str):
+    """
+    Function to check whether the license string is a valid identifier or not.
+
+    Parameters:
+    license_str (str): The SPDX license identifier string to be validated.
+
+    Returns:
+    bool: True if the string is a valid SPDX license identifier, False otherwise.
+    """
+    try:
+        licensing = get_spdx_licensing()
+        licensing.parse(license_str, validate=True)
+        return True
+    except:
+        return False
 
 @app.route("/packages", methods=["GET"])
 @swag_from("documentation/search_packages.yaml", methods=["GET"])
@@ -107,6 +124,10 @@ def upload():
     
     if not package_license:
         return jsonify({"code": 400, "message": "Package license is missing"})
+    
+    # Check whether license identifier is valid or not.
+    if not is_valid_license_identifier(license_str=package_license):
+        return jsonify({"code": 400, "message": "Invalid license identifier"})
     
     # Find the document that contains the upload token.
     namespace_doc = db.namespaces.find_one({"upload_tokens": {"$elemMatch": {"token": upload_token}}})
