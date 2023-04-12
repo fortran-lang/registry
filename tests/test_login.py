@@ -53,15 +53,38 @@ class TestLogin(BaseTestClass):
         AssertionError: If the response code received from the server is not as expected.
         """
         email = "testemail@gmail.com"
-        password="123456"
+        password = "123456"
+        username = "testuser"
 
-        data = {
+        signup_data = {
             "email": email,
+            "password": password,
+            "username": username
+        }
+
+        response_for_signup = self.client.post("/auth/signup", data=signup_data)
+        self.assertEqual(200, response_for_signup.json["code"])
+
+        login_data_incorrect_password = {
+            "email": email,
+            "password": password+'123',
+        }
+
+        login_data_incorrect_email = {
+            "email": "hello"+email,
             "password": password,
         }
 
-        response = self.client.post("/auth/login", data=data)
-        self.assertEqual(401, response.json["code"])
+        # Login with incorrect password for the same user.
+        response_for_login = self.client.post("/auth/login", data=login_data_incorrect_password)
+        self.assertEqual(401, response_for_login.json["code"])
+
+        # Login with incorrect email for the same user.
+        response_for_login = self.client.post("/auth/login", data=login_data_incorrect_email)
+        self.assertEqual(401, response_for_login.json["code"])
+
+        # response = self.client.post("/auth/login", data=data)
+        # self.assertEqual(401, response.json["code"])
 
     def test_successful_logout(self):
         """
