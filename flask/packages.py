@@ -185,6 +185,7 @@ def upload():
             "version": package_version,
             "tarball": tarball_name,
             "dependencies": "Test dependencies",
+            "createdAt": datetime.utcnow(),
             "isDeprecated": False,
             "download_url": f"/tarballs/{file_object_id}"
         }
@@ -215,15 +216,13 @@ def upload():
 
         return jsonify({"message": "Package Uploaded Successfully.", "code": 200})
     else:
-        # This block of code runs if there are previous recorded versions of a package present in registry.
-        # This means user is uploading a new version of already existing package.
-        # Check if the version to be uploaded is valid or not.
-        is_valid = check_version(
-            package_doc["versions"][-1]["version"], package_version
-        )
+        # Check if version of the package already exists in the backend.
+        package_version_doc = db.packages.find_one({
+            "name": package_name, "namespace": namespace_doc["_id"], "versions.version": package_version
+        })
 
-        if not is_valid:
-            return jsonify({"message": "Incorrect version", "code": 400}), 400
+        if package_version_doc:
+            return jsonify({"message": "Version already exists", "code": 400}), 400
 
         new_version = {
             "tarball": tarball_name,
@@ -235,6 +234,7 @@ def upload():
         }
 
         package_doc["versions"].append(new_version)
+        package_doc["versions"] = sorted(package_doc["versions"], key=lambda x: x['version'])
         package_doc["updatedAt"] = datetime.utcnow()
         db.packages.update_one(
             {"_id": package_doc["_id"]},
