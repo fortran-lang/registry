@@ -10,8 +10,9 @@ from app import swagger
 from flasgger.utils import swag_from
 from urllib.parse import unquote
 import math
+import semantic_version
 from license_expression import get_spdx_licensing
-from validate_package import validate_package
+# from validate_package import validate_package
 
 parameters = {
     "name": "name",
@@ -20,6 +21,23 @@ parameters = {
     "updatedat": "updatedAt",
     "downloads": "downloads",
 }
+
+def is_valid_version_str(version_str):
+    """
+    Function to verify whether the version string is valid or not.
+
+    Parameters:
+    version_str: The version string to be validated.
+
+    Returns:
+    bool: True if the version_str is valid.
+    """
+
+    try:
+        semantic_version.Version(version_str)
+        return True
+    except:
+        return False
 
 def is_valid_license_identifier(license_str):
     """
@@ -124,6 +142,10 @@ def upload():
     
     if not package_license:
         return jsonify({"code": 400, "message": "Package license is missing"})
+    
+    # Check whether version string is valid or not.
+    if not is_valid_version_str(package_version):
+        return jsonify({"code": 400, "message": "Version is not valid"})
     
     # Check whether license identifier is valid or not.
     if not is_valid_license_identifier(license_str=package_license):
