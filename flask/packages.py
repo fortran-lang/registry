@@ -144,7 +144,7 @@ def upload():
         return jsonify({"code": 400, "message": "Package license is missing"})
     
     # Check whether version string is valid or not.
-    if not is_valid_version_str(package_version):
+    if package_version == "0.0.0" or not is_valid_version_str(package_version):
         return jsonify({"code": 400, "message": "Version is not valid"})
     
     # Check whether license identifier is valid or not.
