@@ -6,3 +6,5 @@ bcrypt
 flask_cors
 flasgger
 license-expression
+semantic-version
+docker
