@@ -162,12 +162,9 @@ class TestPackages(BaseTestClass):
         self.assertEqual(200, response.json["code"])
 
         TestPackages.test_package_data["tarball"] = TestPackages.generate_tarball()
-
-        # Make the previous one previous to the correct one.
-        TestPackages.test_package_data["package_version"] = "0.0.0"
         
         # Upload the package again with version change.
-        response = self.client.post("/packages", data=TestPackages.test_package_data)
+        response = self.client.post("/packages", data={**TestPackages.test_package_data, "package_version": "somerandomstring"})
 
         self.assertEqual(400, response.json["code"])
 
