@@ -83,8 +83,6 @@ class TestLogin(BaseTestClass):
         response_for_login = self.client.post("/auth/login", data=login_data_incorrect_email)
         self.assertEqual(401, response_for_login.json["code"])
 
-        # response = self.client.post("/auth/login", data=data)
-        # self.assertEqual(401, response.json["code"])
 
     def test_successful_logout(self):
         """
