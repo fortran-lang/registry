@@ -36,43 +36,26 @@ const Dashboard = () => {
   }, [packages, username]);
 
   return isLoading ? (
-    <Spinner animation="border" role="status">
-      <span className="visually-hidden">Loading...</span>
-    </Spinner>
+    <div class="d-flex justify-content-center">
+      <Spinner className="spinner-border m-5" animation="border" role="status">
+        <span className="visually-hidden">Loading...</span>
+      </Spinner>
+    </div>
   ) : (
     <Container style={{ paddingTop: 25 }}>
-      <p style={{textAlign: "left", fontSize: 24, padding:5}}>Namespaces</p>
-      <Row>
-        {namespaces.map((element, index) => (
-          <Col key={element.name} xs={6} md={4}>
-            <Card>
-              <Card.Body>
-                <Card.Title>
-                  <a
-                    href={`/namespaces/${element.name}`}
-                    style={{ textDecoration: "none", color: "black" }}
-                  >
-                    {element.name}
-                  </a>
-                </Card.Title>
-                <Card.Text id="card-text">{element.description}</Card.Text>
-                <span
-                  style={{ textAlign: "left", fontSize: 16 }}
-                  onClick={() => setshowGenerateTokenDialog(true)}
-                >
-                  Generate Token
-                </span>
-                <GenerateNamespaceTokenDialogForm
-                  namespace={element.name}
-                  show={showGenerateTokenDialog}
-                  onHide={() => setshowGenerateTokenDialog(false)}
-                />
-              </Card.Body>
-            </Card>
-          </Col>
-        ))}
-      </Row>
-      <p style={{textAlign: "left", fontSize: 24, padding:5}}>Packages</p>
+      <p style={{ textAlign: "left", fontSize: 24, padding: 5 }}>Namespaces</p>
+      {Namespaces()}
+      <p style={{ textAlign: "left", fontSize: 24, padding: 5 }}>Packages</p>
+      {Packages()}
+    </Container>
+  );
+
+  function Packages() {
+    return packages.length === 0 ? (
+      <div class="alert alert-secondary" role="alert">
+        You are not a maintainer of any packages yet.
+      </div>
+    ) : (
       <Row>
         {packages.map((element, index) => (
           <Col key={element.name + element.namespace} xs={6} md={4}>
@@ -127,8 +110,47 @@ const Dashboard = () => {
           </Col>
         ))}
       </Row>
-    </Container>
-  );
+    );
+  }
+
+  function Namespaces() {
+    return namespaces.length === 0 ? (
+      <div class="alert alert-secondary" role="alert">
+        You are not a maintainer of any namespace yet.
+      </div>
+    ) : (
+      <Row>
+        {namespaces.map((element, index) => (
+          <Col key={element.name} xs={6} md={4}>
+            <Card>
+              <Card.Body>
+                <Card.Title>
+                  <a
+                    href={`/namespaces/${element.name}`}
+                    style={{ textDecoration: "none", color: "black" }}
+                  >
+                    {element.name}
+                  </a>
+                </Card.Title>
+                <Card.Text id="card-text">{element.description}</Card.Text>
+                <span
+                  style={{ textAlign: "left", fontSize: 16 }}
+                  onClick={() => setshowGenerateTokenDialog(true)}
+                >
+                  Generate Token
+                </span>
+                <GenerateNamespaceTokenDialogForm
+                  namespace={element.name}
+                  show={showGenerateTokenDialog}
+                  onHide={() => setshowGenerateTokenDialog(false)}
+                />
+              </Card.Body>
+            </Card>
+          </Col>
+        ))}
+      </Row>
+    );
+  }
 };
 
 export default Dashboard;
