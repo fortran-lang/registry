@@ -53,14 +53,6 @@ const NavbarComponent = () => {
           {isAuthenticated && (
             <Nav className="ml-auto">
               <NavDropdown title={username} className="d-flex">
-                <NavDropdown.Item
-                  onClick={() => {
-                    navigate("/package/create");
-                    window.location.reload();
-                  }}
-                >
-                  Create Package
-                </NavDropdown.Item>
 
                 <NavDropdown.Item
                   onClick={() => {
