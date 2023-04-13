@@ -61,7 +61,7 @@ const NavbarComponent = () => {
                 >
                   Create Package
                 </NavDropdown.Item>
-                
+
                 <NavDropdown.Item
                   onClick={() => {
                     navigate("/namespace/create");
@@ -77,16 +77,7 @@ const NavbarComponent = () => {
                     window.location.reload();
                   }}
                 >
-                  Packages
-                </NavDropdown.Item>
-
-                <NavDropdown.Item
-                  onClick={() => {
-                    navigate("/search");
-                    window.location.reload();
-                  }}
-                >
-                  Search
+                  Dashboard
                 </NavDropdown.Item>
 
                 <NavDropdown.Item
