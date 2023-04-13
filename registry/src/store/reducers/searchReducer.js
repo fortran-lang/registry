@@ -12,6 +12,7 @@ const initialState = {
   currentPage: 0,
   query: "",
   orderBy: "None",
+  isLoading: true,
 };
 
 const searchReducer = (state = initialState, action) => {
@@ -19,6 +20,7 @@ const searchReducer = (state = initialState, action) => {
     case SEARCH_SUCCESS:
       return {
         ...state,
+        isLoading: false,
         packages: action.payload.packages,
         totalPages: action.payload.totalPages,
         currentPage: action.payload.currentPage,
@@ -27,6 +29,7 @@ const searchReducer = (state = initialState, action) => {
     case SEARCH_FAILURE:
       return {
         ...state,
+        isLoading: false,
         packages: null,
         totalPages: action.payload.totalPages,
         error: action.payload.error,

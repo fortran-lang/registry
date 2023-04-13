@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect } from "react";
+import Spinner from "react-bootstrap/Spinner";
 import { useSelector, useDispatch } from "react-redux";
 import PackageItem from "../components/packageItem";
 import { MDBListGroup } from "mdbreact";
@@ -15,6 +16,7 @@ const Search = () => {
   const currentPage = useSelector((state) => state.search.currentPage);
   const orderBy = useSelector((state) => state.search.orderBy);
   const query = useSelector((state) => state.search.query);
+  const isLoading = useSelector((state) => state.search.isLoading);
 
   const dropdownOptions = ["None", "Date last updated"];
 
@@ -22,6 +24,20 @@ const Search = () => {
     dispatch(setOrderBy(option));
     dispatch(searchPackage(query, 0, option));
   };
+
+  if (isLoading) {
+    return (
+      <div class="d-flex justify-content-center">
+        <Spinner
+          className="spinner-border m-5"
+          animation="border"
+          role="status"
+        >
+          <span className="visually-hidden">Loading...</span>
+        </Spinner>
+      </div>
+    );
+  }
 
   if (error !== null) {
     return (
