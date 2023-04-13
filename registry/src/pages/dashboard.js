@@ -52,8 +52,8 @@ const Dashboard = () => {
 
   function Packages() {
     return packages.length === 0 ? (
-      <div class="alert alert-secondary" role="alert">
-        You are not a maintainer of any packages yet.
+      <div className="alert alert-secondary" role="alert">
+        You are not a maintainer of any package yet.
       </div>
     ) : (
       <Row>
@@ -115,7 +115,7 @@ const Dashboard = () => {
 
   function Namespaces() {
     return namespaces.length === 0 ? (
-      <div class="alert alert-secondary" role="alert">
+      <div className="alert alert-secondary" role="alert">
         You are not a maintainer of any namespace yet.
       </div>
     ) : (

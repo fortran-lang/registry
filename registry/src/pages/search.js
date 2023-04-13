@@ -34,8 +34,14 @@ const Search = () => {
   if (packages !== null) {
     if (packages.length === 0) {
       return (
-        <div className="container">
-          <div>No packages found.</div>
+        <div
+          className="container alert alert-secondary"
+          style={{
+            marginTop: "1em",
+          }}
+          role="alert"
+        >
+          No package found.
         </div>
       );
     } else {
