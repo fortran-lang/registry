@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Run Tests for Backend
 
 on:
   push:
@@ -15,6 +15,6 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image and run tests
-      run: docker compose -f "compose.test.yaml" up -d --build 
+      run: docker compose -f "compose.test.yaml" up -d --build --progress=plain --no-cache
       
       
