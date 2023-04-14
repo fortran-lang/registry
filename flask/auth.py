@@ -23,9 +23,9 @@ try:
     env_var["host"] = host
     env_var["salt"] = salt
     env_var["sudo_password"] = sudo_password
-    smtp = smtplib.SMTP('smtp.gmail.com', 587)
-    smtp.starttls()
-    smtp.login(fortran_email, fortran_password)
+    # smtp = smtplib.SMTP('smtp.gmail.com', 587)
+    # smtp.starttls()
+    # smtp.login(fortran_email, fortran_password)
 
 except KeyError as err:
     print("Add SALT to .env file")
@@ -190,17 +190,27 @@ def reset_password():
     password = request.form.get("password")
     oldpassword = request.form.get("oldpassword")
     uuid = request.form.get("uuid")
+
+    if not uuid:
+        return jsonify({"message": "Unauthorized", "code": 401}), 401
+    
+    if not password:
+        return jsonify({"message": "Please enter new password", "code": 400}), 400
+    
+    if not oldpassword:
+        return jsonify({"message": "Please enter old password", "code": 400}), 400
+
     user = db.users.find_one({"uuid": uuid})
     salt = env_var["salt"]
 
     if not user:
         return jsonify({"message": "User not found", "code": 404}), 404
 
-    if oldpassword:
-        oldpassword += salt
-        hashed_password = hashlib.sha256(oldpassword.encode()).hexdigest()
-        if hashed_password != user["password"]:
-            return jsonify({"message": "Invalid password", "code": 401}), 401
+
+    oldpassword += salt
+    hashed_password = hashlib.sha256(oldpassword.encode()).hexdigest()
+    if hashed_password != user["password"]:
+        return jsonify({"message": "Invalid password", "code": 401}), 401
 
     password += salt
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
