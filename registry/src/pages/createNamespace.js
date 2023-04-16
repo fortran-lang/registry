@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { createNamespace } from "../store/actions/createNamespaceActions";
 import Spinner from "react-bootstrap/Spinner";
 import Button from "react-bootstrap/Button";
@@ -9,10 +10,17 @@ import "./upload.css";
 
 const NamespaceForm = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const uuid = useSelector((state) => state.auth.uuid);
   const isLoading = useSelector((state) => state.createNamespace.isLoading);
   const message = useSelector((state) => state.createNamespace.message);
   const statuscode = useSelector((state) => state.createNamespace.statuscode);
+
+  useEffect(() => {
+    if (uuid === null) {
+      navigate("/");
+    }
+  }, [uuid]);
 
   const [data, setData] = useState({
     namespace: "",
