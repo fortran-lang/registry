@@ -126,3 +126,7 @@ body {
 #navbar-container {
   width: 80%;
 }
+
+#dashboard-card {
+  margin-bottom: 1em;
+}

@@ -11,6 +11,7 @@ import Container from "react-bootstrap/Container";
 import AddMaintainerFormDialog from "./addMaintainerDialogForm";
 import RemoveMaintainerFormDialog from "./removeMaintainerDialogForm";
 import GenerateNamespaceTokenDialogForm from "./generateNamespaceTokenDialogForm";
+import "../App.css";
 
 const Dashboard = () => {
   const [cookies, setCookie] = useCookies(["uuid"]);
@@ -59,7 +60,7 @@ const Dashboard = () => {
       <Row>
         {packages.map((element, index) => (
           <Col key={element.name + element.namespace} xs={6} md={4}>
-            <Card>
+            <Card id="dashboard-card">
               <Card.Body>
                 <Card.Title>
                   <a
@@ -122,7 +123,7 @@ const Dashboard = () => {
       <Row>
         {namespaces.map((element, index) => (
           <Col key={element.name} xs={6} md={4}>
-            <Card>
+            <Card id="dashboard-card">
               <Card.Body>
                 <Card.Title>
                   <a
