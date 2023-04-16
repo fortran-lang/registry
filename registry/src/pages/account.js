@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useCookies } from "react-cookie";
+// import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
 import {
   reset,
   getUserAccount,
-  deleteAccount,
+  // deleteAccount,
 } from "../store/actions/accountActions";
-import { fetchPackages } from "../store/actions/dashboardActions";
+// import { fetchPackages } from "../store/actions/dashboardActions";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import { MDBIcon } from "mdbreact";
-import { MDBBtn } from "mdb-react-ui-kit";
+// import { MDBIcon } from "mdbreact";
+// import { MDBBtn } from "mdb-react-ui-kit";
 import Image from "react-bootstrap/Image";
 import Table from "react-bootstrap/Table";
 import Spinner from "react-bootstrap/Spinner";
@@ -33,16 +33,14 @@ const Account = () => {
   const dateJoined = useSelector((state) => state.account.dateJoined);
   const username = useSelector((state) => state.auth.username);
   const uuid = useSelector((state) => state.auth.uuid);
-  const packages = useSelector((state) => state.dashboard.packages);
-  const isLoading = useSelector((state) => state.dashboard.isLoading);
+  const isLoading = useSelector((state) => state.account.isLoading);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (username === null) {
       navigate("/");
-    } else if (packages === null) {
-      dispatch(fetchPackages(username));
+    } else  {
       dispatch(getUserAccount(uuid));
     }
   });
@@ -51,11 +49,6 @@ const Account = () => {
     e.preventDefault();
     dispatch(reset(oldpassword, Newpassword, uuid));
     setShow(true);
-  };
-
-  const handleDelete = async (e) => {
-    e.preventDefault();
-    dispatch(deleteAccount(password, uuid));
   };
 
   return isLoading ? (
@@ -151,46 +144,6 @@ const Account = () => {
         {show && (error)}
         </Form.Text>
       </Form>
-      <Container>
-        <Table style={{ paddingTop: 15 }}>
-          <thead>
-            <h3>Delete account</h3>
-          </thead>
-          <tbody className="text-danger">
-            <tr>
-              <h5>Proceed with caution!</h5>
-            </tr>
-            <tr>
-              <h5>
-                <MDBIcon fas icon="exclamation-triangle" /> You will not be able
-                to recover your account after you delete it
-              </h5>
-            </tr>
-          </tbody>
-        </Table>
-        <Form onSubmit={handleDelete} className="text-danger">
-          <Form.Group as={Row} className="mb-4">
-            <Form.Label column sm="4">
-              Password
-            </Form.Label>
-            <Col sm="8">
-              <Form.Control
-                type="password"
-                placeholder="Enter Password"
-                name="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />{" "}
-            </Col>
-          </Form.Group>
-          <MDBBtn className="me-1" color="danger" type="submit">
-            Delete Account
-          </MDBBtn>
-          <Form.Text id="error" className="text-muted">
-            {!show && (error)}
-          </Form.Text>
-        </Form>
-      </Container>
     </Container>
   );
 };
