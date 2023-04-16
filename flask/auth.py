@@ -216,7 +216,7 @@ def reset_password():
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
     db.users.update_one(
         {"uuid": uuid},
-        {"$set": {"password": hashed_password, "uuid": "", "loggedCount": 0}},
+        {"$set": {"password": hashed_password}},
     )
     return jsonify({"message": "Password reset successful", "code": 200}), 200
 
