@@ -36,7 +36,7 @@ const Dashboard = () => {
   }, [packages, username]);
 
   return isLoading ? (
-    <div class="d-flex justify-content-center">
+    <div className="d-flex justify-content-center">
       <Spinner className="spinner-border m-5" animation="border" role="status">
         <span className="visually-hidden">Loading...</span>
       </Spinner>

@@ -35,3 +35,25 @@ body {
   .error {
     color: red;
   }
+
+  #create-namespace-card {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    max-width: 50%;
+    margin: 2em auto;
+    padding: 20px;
+    min-width: fit-content;
+  }
+  
+  #namespace-name-textfield {
+    width: 20em;
+  }
+
+  #namespace-description-textfield {
+    width: 30em;
+  }
+
+  #namespace-submit-btn {
+    width: 10em;
+  }

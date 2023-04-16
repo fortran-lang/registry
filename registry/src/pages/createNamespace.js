@@ -1,14 +1,15 @@
 import React, { useState } from "react";
-import { useCookies } from "react-cookie";
 import { useDispatch, useSelector } from "react-redux";
 import { createNamespace } from "../store/actions/createNamespaceActions";
-import Container from "react-bootstrap/Container";
 import Spinner from "react-bootstrap/Spinner";
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
+import { Card } from "react-bootstrap";
 import "./upload.css";
 
 const NamespaceForm = () => {
-  const [cookies, setCookie] = useCookies(["uuid"]);
   const dispatch = useDispatch();
+  const uuid = useSelector((state) => state.auth.uuid);
   const isLoading = useSelector((state) => state.createNamespace.isLoading);
   const message = useSelector((state) => state.createNamespace.message);
   const statuscode = useSelector((state) => state.createNamespace.statuscode);
@@ -16,7 +17,7 @@ const NamespaceForm = () => {
   const [data, setData] = useState({
     namespace: "",
     namespace_description: "",
-    uuid: cookies.uuid,
+    uuid: uuid,
   });
 
   const handleChange = (event) => {
@@ -26,54 +27,66 @@ const NamespaceForm = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    dispatch(createNamespace(event.target));
+    dispatch(createNamespace(data));
   };
 
   return !isLoading ? (
-    <Container style={{ padding: 20 }}>
-      <h2>Create a Namespace</h2>
-      <form id="package-form" onSubmit={handleSubmit}>
-        <label htmlFor="namespace">Namespace:</label>
-        <input
-          type="text"
-          id="namespace"
-          name="namespace"
-          value={data.namespace}
-          onChange={handleChange}
-        />
-        <br />
+    <Card id="create-namespace-card">
+      <h3>Create a namespace</h3>
+      <Form onSubmit={handleSubmit}>
+        <Form.Group
+          className="mb-3"
+          controlId="formNamespaceName"
+          id="namespace-name-textfield"
+        >
+          <Form.Label>Namespace:</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="Enter namespace"
+            value={data.namespace}
+            name="namespace"
+            onChange={handleChange}
+          />
+          <Form.Text className="text-muted">
+            Write a unique namespace name.
+          </Form.Text>
+        </Form.Group>
 
-        <label htmlFor="namespace_description">Namespace Description:</label>
-        <textarea
-          id="namespace_description"
-          name="namespace_description"
-          value={data.namespace_description}
-          onChange={handleChange}
-        />
-        <br />
+        <Form.Group
+          className="mb-3"
+          controlId="formNamespaceDescription"
+          id="namespace-description-textfield"
+        >
+          <Form.Label>Namespace description:</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="Enter namespace description"
+            as="textarea"
+            name="namespace_description"
+            value={data.namespace_description}
+            onChange={handleChange}
+          />
+          <Form.Text className="text-muted">
+            Write a brief namespace description.
+          </Form.Text>
+        </Form.Group>
 
-        <input
-          type="hidden"
-          id="uuid"
-          name="uuid"
-          value={cookies.uuid}
-          onChange={handleChange}
-        />
-        <br />
-        {statuscode === 200 ? (
-          <Container className="success">{message}</Container>
-        ) : (
-          <Container className="error">{message}</Container>
-        )}
-        <button type="submit">Create Namespace</button>
-      </form>
-    </Container>
+        <Button variant="primary" type="submit" id="namespace-submit-btn">
+          Submit
+        </Button>
+      </Form>
+      {statuscode === 200 ? (
+        <p className="success">{message}</p>
+      ) : (
+        <p className="error">{message}</p>
+      )}
+    </Card>
   ) : (
-    <Container style={{ margin: "200px" }}>
-      <Spinner animation="border" role="status">
+    <div className="d-flex justify-content-center">
+      <Spinner className="spinner-border m-5" animation="border" role="status">
         <span className="visually-hidden">Loading...</span>
       </Spinner>
-    </Container>
+    </div>
   );
 };
 
