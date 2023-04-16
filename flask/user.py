@@ -76,7 +76,6 @@ def profile(username):
 @swag_from("documentation/delete_user.yaml", methods=["POST"])
 def delete_user():
     uuid = request.form.get("uuid")
-    password = request.form.get("password")
     username = request.form.get("username")
 
     if not uuid:
@@ -87,16 +86,7 @@ def delete_user():
     if not user:
         return "Invalid email or password", 401
 
-    if password:
-        password += salt
-        hashed_password = hashlib.sha256(password.encode()).hexdigest()
-        if hashed_password != user["password"]:
-            return jsonify({"message": "Invalid email or password", "code": 401}), 401
-        else:
-            db.users.delete_one({"uuid": uuid})
-            return jsonify({"message": "User deleted", "code": 200}), 200
-
-    elif username and "admin" in user["roles"]:
+    if username and "admin" in user["roles"]:
         delete_user = db.users.find_one({"username": username})
         if delete_user:
             db.users.delete_one({"username": username})

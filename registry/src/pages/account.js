@@ -1,17 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-// import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
 import {
   reset,
   getUserAccount,
-  // deleteAccount,
 } from "../store/actions/accountActions";
-// import { fetchPackages } from "../store/actions/dashboardActions";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-// import { MDBIcon } from "mdbreact";
-// import { MDBBtn } from "mdb-react-ui-kit";
 import Image from "react-bootstrap/Image";
 import Table from "react-bootstrap/Table";
 import Spinner from "react-bootstrap/Spinner";
@@ -26,7 +21,6 @@ import "mdbreact/dist/css/mdb.css";
 const Account = () => {
   const email = useSelector((state) => state.account.email);
   const error = useSelector((state) => state.account.error);
-  const [password, setPassword] = useState("");
   const [oldpassword, setOldpassword] = useState("");
   const [Newpassword, setNewpassword] = useState("");
   const [show, setShow] = useState(false);
