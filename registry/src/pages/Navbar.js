@@ -14,6 +14,7 @@ const NavbarComponent = () => {
   const navigate = useNavigate();
 
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const isAdmin = useSelector((state) => state.admin.isAdmin);
   const username = useSelector((state) => state.auth.username);
   const uuid = useSelector((state) => state.auth.uuid);
 
@@ -53,7 +54,6 @@ const NavbarComponent = () => {
           {isAuthenticated && (
             <Nav className="ml-auto">
               <NavDropdown title={username} className="d-flex">
-
                 <NavDropdown.Item
                   onClick={() => {
                     navigate("/namespace/create");
@@ -80,6 +80,17 @@ const NavbarComponent = () => {
                 >
                   Account
                 </NavDropdown.Item>
+                {isAdmin && (
+                  <NavDropdown.Item
+                    onClick={() => {
+                      navigate("/admin");
+                      window.location.reload();
+                    }}
+                  >
+                    Admin
+                  </NavDropdown.Item>
+                )}
+
                 <NavDropdown.Item onClick={signOut}>Logout</NavDropdown.Item>
               </NavDropdown>
             </Nav>
