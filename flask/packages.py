@@ -227,8 +227,6 @@ def upload():
             {"name": package_name, "versions.version": package_version, "namespace": namespace_doc["_id"]}
         )
 
-        namespace_doc["packages"] = []
-
         # Add the package id to the namespace.
         namespace_doc["packages"].append(package["_id"])
         namespace_doc["updatedAt"] = datetime.utcnow()

@@ -54,6 +54,7 @@ def create_namespace():
         "author": user_doc["_id"],
         "maintainers": [user_doc["_id"]],
         "admins": [user_doc["_id"]],
+        "packages": []
     }
 
     db.namespaces.insert_one(namespace_obj)
