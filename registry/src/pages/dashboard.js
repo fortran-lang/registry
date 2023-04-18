@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useCookies } from "react-cookie";
 import { fetchPackages } from "../store/actions/dashboardActions";
 import { useNavigate } from "react-router-dom";
 import Card from "react-bootstrap/Card";
@@ -11,10 +10,9 @@ import Container from "react-bootstrap/Container";
 import AddMaintainerFormDialog from "./addMaintainerDialogForm";
 import RemoveMaintainerFormDialog from "./removeMaintainerDialogForm";
 import GenerateNamespaceTokenDialogForm from "./generateNamespaceTokenDialogForm";
-import "../App.css";
+
 
 const Dashboard = () => {
-  const [cookies, setCookie] = useCookies(["uuid"]);
   const [addMaintainerDialogState, setAddMaintainerDialogState] = useState({});
   const [showGenerateTokenDialog, setshowGenerateTokenDialog] = useState({});
   const [removeMaintainerDialogState, setRemoveMaintainerDialogState] =
