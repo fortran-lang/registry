@@ -6,7 +6,6 @@ import Spinner from "react-bootstrap/Spinner";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { Card } from "react-bootstrap";
-import "./upload.css";
 
 const NamespaceForm = () => {
   const dispatch = useDispatch();
