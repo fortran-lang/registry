@@ -1,5 +1,7 @@
 import io
 from base_case import BaseTestClass
+from packages import check_token_expiry
+from datetime import datetime
 
 class TestPackages(BaseTestClass):
 
@@ -457,3 +459,24 @@ class TestPackages(BaseTestClass):
         # Upload the package.
         response = self.client.post("/packages", data={**TestPackages.test_package_data, "package_license": "ABC"})
         self.assertEqual(400, response.json["code"])
+
+    def test_check_token_expiry(self):
+        """
+        Test case to unit test the behaviour of the function to check if token is expired or not.
+
+        Parameters:
+        None
+
+        Returns:
+        None
+
+        Raises:
+        AssertionError: If the response received is not as expected.
+        """
+        created_at = datetime(22, 1, 1)
+        response = check_token_expiry(created_at)
+        self.assertEqual(True, response)
+
+        created_at_now = datetime.now()
+        response = check_token_expiry(created_at_now)
+        self.assertEqual(False, response)
