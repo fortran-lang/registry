@@ -15,10 +15,10 @@ import "../App.css";
 
 const Dashboard = () => {
   const [cookies, setCookie] = useCookies(["uuid"]);
-  const [showAddMaintainerDialog, setShowAddMaintainerDialog] = useState(false);
+  const [addMaintainerDialogState, setAddMaintainerDialogState] = useState({});
   const [showGenerateTokenDialog, setshowGenerateTokenDialog] = useState(false);
-  const [showRemoveMaintainerDialog, setShowRemoveMaintainerDialog] =
-    useState(false);
+  const [removeMaintainerDialogState, setRemoveMaintainerDialogState] =
+    useState({});
   const username = useSelector((state) => state.auth.username);
   const packages = useSelector((state) => state.dashboard.packages);
   const namespaces = useSelector((state) => state.dashboard.namespaces);
@@ -35,6 +35,20 @@ const Dashboard = () => {
       navigate("/");
     }
   }, [packages, username]);
+
+  const handleAddMaintainerDialog = (itemId, value) => {
+    setAddMaintainerDialogState((prevState) => ({
+      ...prevState,
+      [itemId]: value,
+    }));
+  };
+
+  const handleRemoveMaintainerDialog = (itemId, value) => {
+    setRemoveMaintainerDialogState((prevState) => ({
+      ...prevState,
+      [itemId]: value,
+    }));
+  };
 
   return isLoading ? (
     <div className="d-flex justify-content-center">
@@ -59,7 +73,7 @@ const Dashboard = () => {
     ) : (
       <Row>
         {packages.map((element, index) => (
-          <Col key={element.name + element.namespace} xs={6} md={4}>
+          <Col key={element.id} xs={6} md={4}>
             <Card id="dashboard-card">
               <Card.Body>
                 <Card.Title>
@@ -84,27 +98,27 @@ const Dashboard = () => {
                 </p>
                 <span
                   style={{ textAlign: "left", fontSize: 16 }}
-                  onClick={() => setShowAddMaintainerDialog(true)}
+                  onClick={() => handleAddMaintainerDialog(element.id, true)}
                 >
                   Add Maintainers
                 </span>
                 <AddMaintainerFormDialog
                   package={element.name}
                   namespace={element.namespace}
-                  show={showAddMaintainerDialog}
-                  onHide={() => setShowAddMaintainerDialog(false)}
+                  show={addMaintainerDialogState[element.id]}
+                  onHide={() => handleAddMaintainerDialog(element.id, false)}
                 />
                 <span
                   style={{ textAlign: "left", fontSize: 16 }}
-                  onClick={() => setShowRemoveMaintainerDialog(true)}
+                  onClick={() => handleRemoveMaintainerDialog(element.id, true)}
                 >
                   Remove Maintainers
                 </span>
                 <RemoveMaintainerFormDialog
                   package={element.name}
                   namespace={element.namespace}
-                  show={showRemoveMaintainerDialog}
-                  onHide={() => setShowRemoveMaintainerDialog(false)}
+                  show={removeMaintainerDialogState[element.id]}
+                  onHide={() => handleRemoveMaintainerDialog(element.id, false)}
                 />
               </Card.Body>
             </Card>
