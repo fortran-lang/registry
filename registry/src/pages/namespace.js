@@ -9,6 +9,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Spinner from "react-bootstrap/Spinner";
 import PackageItem from "../components/packageItem";
+import "./upload.css";
 
 
 const NamespacePage = () => {

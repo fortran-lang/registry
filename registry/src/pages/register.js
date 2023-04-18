@@ -15,7 +15,6 @@ const Register = () => {
 
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const errorMessage = useSelector((state) => state.auth.error);
-  const uuid = useSelector((state) => state.auth.uuid);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
