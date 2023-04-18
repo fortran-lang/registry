@@ -37,7 +37,8 @@ def profile(username):
                 namespace = db.namespaces.find_one({"_id": package["namespace"]})
                 user = db.users.find_one({"_id": package["author"]})
                 response_packages.append(
-                    {
+                    {   
+                        "id": str(package["_id"]),
                         "name": package["name"],
                         "namespace": namespace["namespace"],
                         "description": package["description"],
@@ -48,6 +49,7 @@ def profile(username):
         if namespaces:
             for namespace in namespaces:
                 response_namespaces.append({
+                    "id": str(namespace["_id"]),
                     "name": namespace["namespace"],
                     "description": namespace["description"],
                 })
