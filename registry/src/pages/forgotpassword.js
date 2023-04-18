@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { forgot } from "../store/actions/resetPasswordActions";
 import { Link } from "react-router-dom";
@@ -8,7 +7,6 @@ import Container from "react-bootstrap/Container";
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [fromValidationErrors, setFormValidationError] = useState({});
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const message = useSelector((state) => state.resetpassword.message);
   const statuscode = useSelector((state) => state.resetpassword.statuscode);
