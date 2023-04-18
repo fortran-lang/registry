@@ -4,12 +4,10 @@ import { fetchUserData } from "../store/actions/userActions";
 import { MDBIcon } from "mdbreact";
 import { useNavigate, useParams } from "react-router-dom";
 import Container from "react-bootstrap/Container";
-import Card from "react-bootstrap/Card";
 import Figure from "react-bootstrap/Figure";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Spinner from "react-bootstrap/Spinner";
-import "./upload.css";
 import PackageItem from "../components/packageItem";
 
 const UserPage = () => {
