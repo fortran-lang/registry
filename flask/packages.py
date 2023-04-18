@@ -4,7 +4,7 @@ from mongo import file_storage
 from bson.objectid import ObjectId
 from flask import request, jsonify, abort, send_file
 from gridfs.errors import NoFile
-from datetime import datetime
+from datetime import datetime, timedelta
 from auth import generate_uuid
 from app import swagger
 from flasgger.utils import swag_from
@@ -156,10 +156,15 @@ def upload():
 
     # Check if there is a namespace connected to the given upload_token:
     if not namespace_doc:
-        return jsonify({"code": 401, "message": "Namespace not found or invalid upload token"})
+        return jsonify({"code": 401, "message": "Invalid upload token"})
     
     # Get the matching subdocument from the upload_token array
     upload_token_doc = next(item for item in namespace_doc['upload_tokens'] if item['token'] == upload_token)
+
+    # Check if the token is expired.
+    # Expire the token after one week of it's creation.
+    if check_token_expiry(upload_token_created_at=upload_token_doc['createdAt']):
+        return jsonify({"code": 401, "message": "Upload token has been expired. Please generate a new one"})
 
     # Get the user connected to the upload token.
     user_id = upload_token_doc["createdBy"]
@@ -264,6 +269,27 @@ def upload():
         )
 
         return jsonify({"message": "Package Uploaded Successfully.", "code": 200})
+
+def check_token_expiry(upload_token_created_at):
+    """
+    Function to verify whether the upload token is expired or not.
+
+    Parameters:
+    upload_token_created_at (datetime): The creation date of upload token.
+
+    Returns:
+    bool: True if token is expired (older than 1 week). False otherwise.
+    """
+    datetime_now = datetime.utcnow()
+
+    # Calculate the time difference between the current time and the `createdAt` time
+    time_diff = datetime_now - upload_token_created_at
+
+    # Check if the time difference is greater than 1 week
+    if time_diff > timedelta(weeks=1):
+        return True
+    
+    return False
     
 @app.route('/tarballs/<oid>', methods=["GET"])
 def serve_gridfs_file(oid):
