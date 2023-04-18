@@ -95,14 +95,6 @@ const Dashboard = () => {
                   {element.namespace}
                 </Card.Subtitle>
                 <Card.Text id="card-text">{element.description}</Card.Text>
-                <p style={{ textAlign: "left", fontSize: 16 }}>
-                  <a
-                    href={`/package/create`}
-                    style={{ textDecoration: "none" }}
-                  >
-                    Create New Release
-                  </a>
-                </p>
                 <span
                   style={{ textAlign: "left", fontSize: 16 }}
                   onClick={() => handleAddMaintainerDialog(element.id, true)}
