@@ -65,8 +65,6 @@ export const removeMaintainer = (data, username) => async (dispatch) => {
       type: REMOVE_MAINTAINER_REQUEST,
     });
 
-    console.log(data);
-
     const result = await axios({
       method: "post",
       url: `${process.env.REACT_APP_REGISTRY_API_URL}/${username}/maintainer/remove`,
