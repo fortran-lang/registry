@@ -16,7 +16,7 @@ import "../App.css";
 const Dashboard = () => {
   const [cookies, setCookie] = useCookies(["uuid"]);
   const [addMaintainerDialogState, setAddMaintainerDialogState] = useState({});
-  const [showGenerateTokenDialog, setshowGenerateTokenDialog] = useState(false);
+  const [showGenerateTokenDialog, setshowGenerateTokenDialog] = useState({});
   const [removeMaintainerDialogState, setRemoveMaintainerDialogState] =
     useState({});
   const username = useSelector((state) => state.auth.username);
@@ -45,6 +45,13 @@ const Dashboard = () => {
 
   const handleRemoveMaintainerDialog = (itemId, value) => {
     setRemoveMaintainerDialogState((prevState) => ({
+      ...prevState,
+      [itemId]: value,
+    }));
+  };
+
+  const handleGenerateTokenDialog = (itemId, value) => {
+    setshowGenerateTokenDialog((prevState) => ({
       ...prevState,
       [itemId]: value,
     }));
@@ -150,14 +157,14 @@ const Dashboard = () => {
                 <Card.Text id="card-text">{element.description}</Card.Text>
                 <span
                   style={{ textAlign: "left", fontSize: 16 }}
-                  onClick={() => setshowGenerateTokenDialog(true)}
+                  onClick={() => handleGenerateTokenDialog(element.id, true)}
                 >
                   Generate Token
                 </span>
                 <GenerateNamespaceTokenDialogForm
                   namespace={element.name}
-                  show={showGenerateTokenDialog}
-                  onHide={() => setshowGenerateTokenDialog(false)}
+                  show={showGenerateTokenDialog[element.id]}
+                  onHide={() => handleGenerateTokenDialog(element.id, false)}
                 />
               </Card.Body>
             </Card>
