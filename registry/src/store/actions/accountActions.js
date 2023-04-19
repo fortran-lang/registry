@@ -8,7 +8,7 @@ export const GET_USER_ACCOUNT_FAILURE = "GET_USER_ACCOUNT_FAILURE";
 // export const DELETE_ACCOUNT_ERROR = "DELETE_ACCOUNT_ERROR";
 export const RESET_PASSWORD = "RESET_PASSWORD";
 export const RESET_PASSWORD_ERROR = "RESET_PASSWORD_ERROR";
-
+export const RESET_MESSAGES = "RESET_MESSAGES";
 
 export const getUserAccount = (uuid) => async (dispatch) => {
   const formData = new FormData();
@@ -39,30 +39,34 @@ export const getUserAccount = (uuid) => async (dispatch) => {
     });
 };
 
-export const reset = (oldpassword, password, uuid) => {
-  return (dispatch) => {
-    let formData = new FormData();
-    formData.append("oldpassword", oldpassword);
-    formData.append("password", password);
-    formData.append("uuid", uuid);
+export const reset = (oldpassword, password, uuid) => async (dispatch) => {
+  let formData = new FormData();
+  formData.append("oldpassword", oldpassword);
+  formData.append("password", password);
+  formData.append("uuid", uuid);
 
-    axios({
+  try {
+    const result = await axios({
       method: "post",
       url: `${process.env.REACT_APP_REGISTRY_API_URL}/auth/reset-password`,
       data: formData,
       headers: {
         "Content-Type": "multipart/form-data",
       },
-    })
-      .then((result) => {
-        dispatch({ type: RESET_PASSWORD, payload: result.data.message });
-      })
-      .catch((error) => {
-        console.log(error);
-        dispatch({
-          type: RESET_PASSWORD_ERROR,
-          payload: error.response.data.message,
-        });
-      });
-  };
+    });
+    console.log(result);
+    dispatch({ type: RESET_PASSWORD, payload: result.data.message });
+  } catch (error) {
+    console.log(error.response.data.message);
+    dispatch({
+      type: RESET_PASSWORD_ERROR,
+      payload: error.response.data.message,
+    });
+  }
+};
+
+export const resetMessages = () => (dispatch) => {
+  dispatch({
+    type: RESET_MESSAGES,
+  });
 };

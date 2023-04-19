@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import {
   reset,
   getUserAccount,
+  resetMessages,
 } from "../store/actions/accountActions";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -21,9 +22,11 @@ import "mdbreact/dist/css/mdb.css";
 const Account = () => {
   const email = useSelector((state) => state.account.email);
   const error = useSelector((state) => state.account.error);
+  const successMsg = useSelector(
+    (state) => state.account.resetPasswordSuccessMsg
+  );
   const [oldpassword, setOldpassword] = useState("");
   const [Newpassword, setNewpassword] = useState("");
-  const [show, setShow] = useState(false);
   const dateJoined = useSelector((state) => state.account.dateJoined);
   const username = useSelector((state) => state.auth.username);
   const uuid = useSelector((state) => state.auth.uuid);
@@ -34,15 +37,19 @@ const Account = () => {
   useEffect(() => {
     if (username === null) {
       navigate("/");
-    } else  {
+    } else {
       dispatch(getUserAccount(uuid));
+    }
+
+    if (error !== null || successMsg !== null) {
+      resetMessages();
     }
   });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    dispatch(resetMessages());
     dispatch(reset(oldpassword, Newpassword, uuid));
-    setShow(true);
   };
 
   return isLoading ? (
@@ -68,8 +75,8 @@ const Account = () => {
               />
             </td>
             <td>
-              We use <a href="https://gravatar.com">gravatar.com</a> to generate your
-              profile picture based on your primary email address —
+              We use <a href="https://gravatar.com">gravatar.com</a> to generate
+              your profile picture based on your primary email address —
               <code className="break"> {email} </code>.
             </td>
           </tr>
@@ -112,7 +119,7 @@ const Account = () => {
               name="oldpassword"
               value={oldpassword}
               onChange={(e) => setOldpassword(e.target.value)}
-            />{" "}
+            />
           </Col>
         </Form.Group>
 
@@ -130,13 +137,11 @@ const Account = () => {
             />
           </Col>
         </Form.Group>
-
+        <p className="success"> {successMsg}</p>
+        <p className="error">{error}</p>
         <Button variant="primary" type="submit">
           Submit
         </Button>
-        <Form.Text id="error" className="text-muted">
-        {show && (error)}
-        </Form.Text>
       </Form>
     </Container>
   );
