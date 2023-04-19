@@ -39,6 +39,9 @@ const NavbarComponent = () => {
             <SearchBar />
           </div>
           <Nav className="ml-auto">
+          <Nav.Link onClick={() => navigate("/help")}>
+                Help
+              </Nav.Link>
             {!isAuthenticated && (
               <Nav.Link onClick={() => navigate("/account/login")}>
                 Login
