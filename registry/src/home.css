@@ -1,0 +1,20 @@
+.home-container {
+    margin: 2em;
+}
+
+.home-container h2 {
+    color: #734f96;
+}
+
+.heading-features {
+    text-align: left;
+}
+
+.home-container p {
+    font-size: 16px;
+    text-align: left;
+}
+
+.heading-features {
+    margin: 1em auto;
+}
