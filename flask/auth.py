@@ -194,11 +194,12 @@ def reset_password():
     if not uuid:
         return jsonify({"message": "Unauthorized", "code": 401}), 401
     
+    if not oldpassword:
+        return jsonify({"message": "Please enter old password", "code": 400}), 400
+    
     if not password:
         return jsonify({"message": "Please enter new password", "code": 400}), 400
     
-    if not oldpassword:
-        return jsonify({"message": "Please enter old password", "code": 400}), 400
 
     user = db.users.find_one({"uuid": uuid})
     salt = env_var["salt"]
