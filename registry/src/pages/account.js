@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import {
-  reset,
-  getUserAccount,
-} from "../store/actions/accountActions";
+import { reset, getUserAccount } from "../store/actions/accountActions";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Image from "react-bootstrap/Image";
@@ -23,6 +20,7 @@ const Account = () => {
   const error = useSelector((state) => state.account.error);
   const [oldpassword, setOldpassword] = useState("");
   const [Newpassword, setNewpassword] = useState("");
+  const [fromValidationErrors, setFormValidationError] = useState({});
   const [show, setShow] = useState(false);
   const dateJoined = useSelector((state) => state.account.dateJoined);
   const username = useSelector((state) => state.auth.username);
@@ -34,14 +32,30 @@ const Account = () => {
   useEffect(() => {
     if (username === null) {
       navigate("/");
-    } else  {
+    } else {
       dispatch(getUserAccount(uuid));
     }
   });
 
+  const validateForm = () => {
+    let errors = {};
+
+    if (!oldpassword) {
+      errors.password = "Old Password is required";
+    }
+    if (!Newpassword) {
+      errors.password = "Enter New password";
+    }
+
+    setFormValidationError(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    dispatch(reset(oldpassword, Newpassword, uuid));
+    if (validateForm()) {
+      dispatch(reset(oldpassword, Newpassword, uuid));
+    }
     setShow(true);
   };
 
@@ -68,8 +82,8 @@ const Account = () => {
               />
             </td>
             <td>
-              We use <a href="https://gravatar.com">gravatar.com</a> to generate your
-              profile picture based on your primary email address —
+              We use <a href="https://gravatar.com">gravatar.com</a> to generate
+              your profile picture based on your primary email address —
               <code className="break"> {email} </code>.
             </td>
           </tr>
@@ -130,12 +144,14 @@ const Account = () => {
             />
           </Col>
         </Form.Group>
-
+        {fromValidationErrors.password && (
+          <p className="error">{fromValidationErrors.password}</p>
+        )}
         <Button variant="primary" type="submit">
           Submit
         </Button>
         <Form.Text id="error" className="text-muted">
-        {show && (error)}
+          {show && error}
         </Form.Text>
       </Form>
     </Container>
