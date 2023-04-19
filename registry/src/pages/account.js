@@ -53,9 +53,11 @@ const Account = () => {
   };
 
   return isLoading ? (
-    <Spinner animation="border" role="status">
-      <span className="visually-hidden">Loading...</span>
-    </Spinner>
+    <div className="d-flex justify-content-center">
+      <Spinner className="spinner-border m-5" animation="border" role="status">
+        <span className="visually-hidden">Loading...</span>
+      </Spinner>
+    </div>
   ) : (
     <Container fluid="md" style={{ paddingTop: 25 }}>
       <Table>
