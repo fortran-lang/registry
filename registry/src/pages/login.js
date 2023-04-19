@@ -21,7 +21,7 @@ const Login = () => {
       window.location.reload();
     }
 
-    if (errorMessage != null) {
+    if (errorMessage !== null) {
       dispatch(resetErrorMessage());
     }
   }, [isAuthenticated]);

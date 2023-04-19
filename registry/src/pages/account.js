@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { reset, getUserAccount } from "../store/actions/accountActions";
+import {
+  reset,
+  getUserAccount,
+  resetMessages,
+} from "../store/actions/accountActions";
+
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Image from "react-bootstrap/Image";
@@ -18,6 +23,9 @@ import "mdbreact/dist/css/mdb.css";
 const Account = () => {
   const email = useSelector((state) => state.account.email);
   const error = useSelector((state) => state.account.error);
+  const successMsg = useSelector(
+    (state) => state.account.resetPasswordSuccessMsg
+  );
   const [oldpassword, setOldpassword] = useState("");
   const [Newpassword, setNewpassword] = useState("");
   const [fromValidationErrors, setFormValidationError] = useState({});
@@ -34,6 +42,10 @@ const Account = () => {
       navigate("/");
     } else {
       dispatch(getUserAccount(uuid));
+    }
+
+    if (error !== null || successMsg !== null) {
+      resetMessages();
     }
   });
 
@@ -53,16 +65,20 @@ const Account = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (validateForm()) {
+      dispatch(resetMessages());
       dispatch(reset(oldpassword, Newpassword, uuid));
     }
     setShow(true);
   };
 
   return isLoading ? (
-    <Spinner animation="border" role="status">
-      <span className="visually-hidden">Loading...</span>
-    </Spinner>
+    <div className="d-flex justify-content-center">
+      <Spinner className="spinner-border m-5" animation="border" role="status">
+        <span className="visually-hidden">Loading...</span>
+      </Spinner>
+    </div>
   ) : (
     <Container fluid="md" style={{ paddingTop: 25 }}>
       <Table>
@@ -126,7 +142,7 @@ const Account = () => {
               name="oldpassword"
               value={oldpassword}
               onChange={(e) => setOldpassword(e.target.value)}
-            />{" "}
+            />
           </Col>
         </Form.Group>
 
@@ -144,15 +160,19 @@ const Account = () => {
             />
           </Col>
         </Form.Group>
+
         {fromValidationErrors.password && (
           <p className="error">{fromValidationErrors.password}</p>
         )}
+        <p className="success"> {successMsg}</p>
+        <p className="error">{error}</p>
         <Button variant="primary" type="submit">
           Submit
         </Button>
         <Form.Text id="error" className="text-muted">
           {show && error}
         </Form.Text>
+
       </Form>
     </Container>
   );
