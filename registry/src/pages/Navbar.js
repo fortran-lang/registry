@@ -39,18 +39,16 @@ const NavbarComponent = () => {
             <SearchBar />
           </div>
           <Nav className="ml-auto">
-          <Nav.Link onClick={() => navigate("/help")}>
-                Help
-              </Nav.Link>
             {!isAuthenticated && (
-              <Nav.Link onClick={() => navigate("/account/login")}>
-                Login
-              </Nav.Link>
-            )}
-            {!isAuthenticated && (
-              <Nav.Link onClick={() => navigate("/account/register")}>
-                Register
-              </Nav.Link>
+              <>
+                <Nav.Link onClick={() => navigate("/help")}>Help</Nav.Link>
+                <Nav.Link onClick={() => navigate("/account/login")}>
+                  Login
+                </Nav.Link>
+                <Nav.Link onClick={() => navigate("/account/register")}>
+                  Register
+                </Nav.Link>
+              </>
             )}
           </Nav>
 
@@ -95,6 +93,7 @@ const NavbarComponent = () => {
                 )}
 
                 <NavDropdown.Item onClick={signOut}>Logout</NavDropdown.Item>
+                <NavDropdown.Item onClick={() => navigate("/help")}>Help</NavDropdown.Item>
               </NavDropdown>
             </Nav>
           )}
