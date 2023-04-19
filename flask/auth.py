@@ -197,28 +197,32 @@ def reset_password():
     if not password:
         return jsonify({"message": "Please enter new password", "code": 400}), 400
     
-    if not oldpassword:
-        return jsonify({"message": "Please enter old password", "code": 400}), 400
-
     user = db.users.find_one({"uuid": uuid})
     salt = env_var["salt"]
 
     if not user:
         return jsonify({"message": "User not found", "code": 404}), 404
-
-
+    
+    if not oldpassword:
+        password += salt
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
+        db.users.update_one(
+            {"uuid": uuid},
+            {"$set": {"password": hashed_password}},
+        )
+        return jsonify({"message": "Password reset successful", "code": 200}), 200
+    
     oldpassword += salt
     hashed_password = hashlib.sha256(oldpassword.encode()).hexdigest()
     if hashed_password != user["password"]:
         return jsonify({"message": "Invalid password", "code": 401}), 401
-
-    password += salt
-    hashed_password = hashlib.sha256(password.encode()).hexdigest()
     db.users.update_one(
-        {"uuid": uuid},
-        {"$set": {"password": hashed_password}},
-    )
+            {"uuid": uuid},
+            {"$set": {"password": hashed_password}},
+        )
     return jsonify({"message": "Password reset successful", "code": 200}), 200
+
+    
 
 
 @app.route("/auth/forgot-password", methods=["POST"])
