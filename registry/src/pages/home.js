@@ -36,7 +36,7 @@ const Home = () => {
           problem: imperative, procedural, array-oriented, object-oriented, or
           functional.
         </p>
-        <h3>Natively parallel</h3>
+        <h4>Natively parallel</h4>
         <p>
           Fortran is a natively parallel programming language with intuitive
           array-like syntax to communicate data between CPUs. You can run almost
