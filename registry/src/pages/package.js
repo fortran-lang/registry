@@ -46,12 +46,10 @@ const PackagePage = () => {
   return !isLoading ? (
     <Container style={{ paddingTop: 25 }}>
       <p style={{ textAlign: "left", fontSize: 24 }}>{data.name}</p>
-      <p style={{ textAlign: "left", fontSize: 16 }}>
-        <div>
-          v{data.latest_version_data.version} Published{" "}
-          {updatedDays(data.updatedAt)} days ago
-        </div>
-      </p>
+      <div style={{ textAlign: "left", fontSize: 16 }}>
+        v{data.latest_version_data.version} Published{" "}
+        {updatedDays(data.updatedAt)} days ago
+      </div>
       <MDBTabs className="mb-3">
         <MDBTabsItem>
           <MDBTabsLink
@@ -130,7 +128,7 @@ const PackagePage = () => {
                   </MDBTableHead>
                   <MDBTableBody>
                     {data.version_history.map((ver) => (
-                      <tr>
+                      <tr key={ver.version}>
                         <td colSpan={3}>
                           <a
                             href={`/packages/${namespace_name}/${package_name}`}

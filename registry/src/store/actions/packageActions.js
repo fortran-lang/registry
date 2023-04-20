@@ -22,7 +22,6 @@ export const fetchPackageData =
             data: result.data.data,
           },
         });
-        console.log(result.data.data);
       }
     } catch (error) {
       dispatch({
