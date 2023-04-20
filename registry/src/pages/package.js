@@ -100,23 +100,6 @@ const PackagePage = () => {
                 <p style={{ fontSize: 24, textAlign: "left" }}>Dependencies</p>
                 <hr></hr>
                 <br />
-
-                <p style={{ fontSize: 16, textAlign: "left" }}>
-                  {/* TODO: refactor Package Dependency API for namespace and name */}
-                  {data.version_history.map((dep) =>
-                    dep.dependencies.map(
-                      (vdep) =>
-                        vdep != "" && (
-                          <a
-                            href={`/packages/${vdep.namespace}/${vdep.name}`}
-                            style={{ textDecoration: "none" }}
-                          >
-                            {vdep},{" "}
-                          </a>
-                        )
-                    )
-                  )}
-                </p>
               </MDBCol>
 
               {sideBar(data)}
