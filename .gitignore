@@ -1,0 +1,11 @@
+/.vscode/
+/.docker/
+/flask/__pycache__/
+/flask/.env
+/flask/vercel.json
+/flask/static/
+/flask/.vercel
+/frontend/node_modules/
+tests/__pycache__/
+/.DS_Store
+/flask/.DS_Store

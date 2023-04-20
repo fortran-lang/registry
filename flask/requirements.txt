@@ -1,0 +1,10 @@
+pymongo
+flask
+python-dateutil
+python-dotenv
+bcrypt
+flask_cors
+flasgger
+license-expression
+semantic-version
+docker
