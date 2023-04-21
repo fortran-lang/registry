@@ -25,7 +25,12 @@ const NavbarComponent = () => {
   return (
     <Navbar bg="light" expand="md">
       <Container id="navbar-container">
-        <Navbar.Brand onClick={() => navigate("/")}>
+        <Navbar.Brand
+          onClick={() => navigate("/")}
+          style={{
+            cursor: "pointer",
+          }}
+        >
           <Image
             src="https://fortran-lang.org/en/_static/fortran-logo-256x256.png"
             fluid
@@ -93,7 +98,9 @@ const NavbarComponent = () => {
                 )}
 
                 <NavDropdown.Item onClick={signOut}>Logout</NavDropdown.Item>
-                <NavDropdown.Item onClick={() => navigate("/help")}>Help</NavDropdown.Item>
+                <NavDropdown.Item onClick={() => navigate("/help")}>
+                  Help
+                </NavDropdown.Item>
               </NavDropdown>
             </Nav>
           )}
