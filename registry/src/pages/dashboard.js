@@ -95,14 +95,6 @@ const Dashboard = () => {
 
                 <div
                   className="border border-success rounded-pill chip-action"
-                  style={{
-                    textAlign: "left",
-                    fontSize: 16,
-                    cursor: "pointer",
-                    padding: "8px",
-                    marginBottom: "4px",
-                    width: "fit-content",
-                  }}
                   onClick={() => handleAddMaintainerDialog(element.id, true)}
                 >
                   Add Maintainers
@@ -154,7 +146,7 @@ const Dashboard = () => {
                 </Card.Title>
                 <Card.Text id="card-text">{element.description}</Card.Text>
                 <div
-                  className="border border-danger rounded-pill chip-action"
+                  className="border border-success rounded-pill chip-action"
                   onClick={() => handleGenerateTokenDialog(element.id, true)}
                 >
                   Generate Token
