@@ -11,7 +11,6 @@ import AddMaintainerFormDialog from "./addMaintainerDialogForm";
 import RemoveMaintainerFormDialog from "./removeMaintainerDialogForm";
 import GenerateNamespaceTokenDialogForm from "./generateNamespaceTokenDialogForm";
 
-
 const Dashboard = () => {
   const [addMaintainerDialogState, setAddMaintainerDialogState] = useState({});
   const [showGenerateTokenDialog, setshowGenerateTokenDialog] = useState({});
@@ -93,24 +92,33 @@ const Dashboard = () => {
                   {element.namespace}
                 </Card.Subtitle>
                 <Card.Text id="card-text">{element.description}</Card.Text>
-                <span
-                  style={{ textAlign: "left", fontSize: 16 }}
+
+                <div
+                  className="border border-success rounded-pill chip-action"
+                  style={{
+                    textAlign: "left",
+                    fontSize: 16,
+                    cursor: "pointer",
+                    padding: "8px",
+                    marginBottom: "4px",
+                    width: "fit-content",
+                  }}
                   onClick={() => handleAddMaintainerDialog(element.id, true)}
                 >
                   Add Maintainers
-                </span>
+                </div>
                 <AddMaintainerFormDialog
                   package={element.name}
                   namespace={element.namespace}
                   show={addMaintainerDialogState[element.id]}
                   onHide={() => handleAddMaintainerDialog(element.id, false)}
                 />
-                <span
-                  style={{ textAlign: "left", fontSize: 16 }}
+                <div
+                  className="border border-danger rounded-pill chip-action"
                   onClick={() => handleRemoveMaintainerDialog(element.id, true)}
                 >
                   Remove Maintainers
-                </span>
+                </div>
                 <RemoveMaintainerFormDialog
                   package={element.name}
                   namespace={element.namespace}
@@ -145,12 +153,12 @@ const Dashboard = () => {
                   </a>
                 </Card.Title>
                 <Card.Text id="card-text">{element.description}</Card.Text>
-                <span
-                  style={{ textAlign: "left", fontSize: 16 }}
+                <div
+                  className="border border-danger rounded-pill chip-action"
                   onClick={() => handleGenerateTokenDialog(element.id, true)}
                 >
                   Generate Token
-                </span>
+                </div>
                 <GenerateNamespaceTokenDialogForm
                   namespace={element.name}
                   show={showGenerateTokenDialog[element.id]}
