@@ -130,3 +130,12 @@ body {
 #dashboard-card {
   margin-bottom: 1em;
 }
+
+.chip-action {
+    text-align: left;
+    font-size: 16;
+    cursor: pointer;
+    padding: 8px;
+    width: fit-content;
+    margin-bottom: 4px;
+}

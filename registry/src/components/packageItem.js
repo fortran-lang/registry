@@ -21,7 +21,7 @@ const PackageItem = ({ packageEntity }) => {
     } else {
       // Format date in "YYYY-MM-DD" format
       const year = date.getUTCFullYear();
-      const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+      const month = String(date.getUTCMonth()).padStart(2, "0");
       const monthName = new Date(Date.UTC(year, month, 1)).toLocaleString(
         "en-US",
         { month: "long" }
