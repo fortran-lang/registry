@@ -127,7 +127,13 @@ const PackagePage = () => {
                     </tr>
                   </MDBTableHead>
                   <MDBTableBody>
-                    {data.version_history.map((ver) => (
+                    {data.version_history.sort((a, b) => {
+                        if (updatedDays(a.createdAt) < updatedDays(b.createdAt)) {
+                          return -1;
+                        } else {
+                          return 1;
+                        } 
+                      }).map((ver) => (
                       <tr key={ver.version}>
                         <td colSpan={3}>
                           <a
