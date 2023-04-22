@@ -7,9 +7,11 @@ import Pagination from "../components/pagination";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import { searchPackage, setOrderBy } from "../store/actions/searchActions";
+import { useNavigate } from "react-router-dom";
 
 const Search = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const packages = useSelector((state) => state.search.packages);
   const error = useSelector((state) => state.search.error);
   const totalPages = useSelector((state) => state.search.totalPages);
@@ -25,9 +27,15 @@ const Search = () => {
     dispatch(searchPackage(query, 0, option));
   };
 
+  useEffect(() => {
+    if (query.length === 0) {
+      navigate("/manage/projects");
+    }
+  }, [isLoading]);
+
   if (isLoading) {
     return (
-      <div class="d-flex justify-content-center">
+      <div className="d-flex justify-content-center">
         <Spinner
           className="spinner-border m-5"
           animation="border"
