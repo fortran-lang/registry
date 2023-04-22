@@ -53,7 +53,7 @@ const Login = () => {
     <Container style={{ paddingTop: 25 }}>
       <form id="login-form" onSubmit={handleSubmit}>
         <h1>Welcome to fpm Registry!</h1>
-        <p>Please enter your email and password to log in.</p>
+        <p>Please enter your username/email and password to log in.</p>
         <input
           type="email"
           name="email"
