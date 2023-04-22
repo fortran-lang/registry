@@ -4,7 +4,7 @@ from pymongo import MongoClient
 from dotenv import load_dotenv
 from gridfs import GridFS
 from app import app
-from flask import jsonify, send_file
+from flask import send_file
 import subprocess
 
 load_dotenv()
@@ -53,11 +53,3 @@ def generate_latest_tarball():
     # Create the archive file
     command = f"tar -czvf {archive_path} static/"
     subprocess.call(command, shell=True)
-
-    # # Remove the backup directory
-    # command = f"rm -rf {backup_dir}"
-    # subprocess.call(command, shell=True)
-
-    print(f"Backup archive created: {archive_name}")
-
-generate_latest_tarball()
