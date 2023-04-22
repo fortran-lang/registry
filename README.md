@@ -37,6 +37,16 @@ Hello world, Mongo Flask
 
 set MONGO_URI=MONGO_DB_ATLAS_URL (in .env file in flask directory)
 The MONGO_URI must be set in the environment (or, alternatively, in the .env file in the flask directory) to the URL value of the MongoDB to use. For example,If deploying to production, MONGO_URI should be set to mongo container address.
+set the following env variables in the .env file in the flask folder: 
+   - SALT=MYSALT
+    - MONGO_URI
+  -  MONGO_DB_NAME
+   - SUDO_PASSWORD
+   - MONGO_USER_NAME
+   - MONGO_PASSWORD
+   - HOST
+   - RESET_EMAIL 
+   - RESET_PASSWOR
 
 Stop and remove the containers
 
