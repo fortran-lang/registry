@@ -130,8 +130,10 @@ const PackagePage = () => {
                     {data.version_history.sort((a, b) => {
                         if (updatedDays(a.createdAt) < updatedDays(b.createdAt)) {
                           return -1;
-                        } else {
+                        } else if (updatedDays(a.createdAt) > updatedDays(b.createdAt)) {
                           return 1;
+                        } else {
+                          return 0;
                         } 
                       }).map((ver) => (
                       <tr key={ver.version}>

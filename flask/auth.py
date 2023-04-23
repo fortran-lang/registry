@@ -43,11 +43,11 @@ def generate_uuid():
 @swag_from("documentation/login.yaml", methods=["POST"])
 def login():
     salt = env_var["salt"]
-    username = request.form.get("email")
+    user_identifier = request.form.get("user_identifier")
     password = request.form.get("password")
     password += salt
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
-    query = {"$and": [{"$or": [{"email": username}, {"username": username}]}, {"password": hashed_password}]}
+    query = {"$and": [{"$or": [{"email": user_identifier}, {"username": user_identifier}]}, {"password": hashed_password}]}
     
     # search for the user both by user name or email
     user = db.users.find_one(query)

@@ -46,7 +46,7 @@ set the following env variables in the .env file in the flask folder:
    - MONGO_PASSWORD
    - HOST
    - RESET_EMAIL 
-   - RESET_PASSWOR
+   - RESET_PASSWORD
 
 Stop and remove the containers
 
