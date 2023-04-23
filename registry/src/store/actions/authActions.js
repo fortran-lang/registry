@@ -5,11 +5,11 @@ export const RESET_ERROR_MESSAGE = "RESET_ERROR_MESSAGE";
 export const LOGIN_SUCCESS = "LOGIN_SUCCESS";
 export const LOGIN_FAILURE = "LOGIN_FAILURE";
 
-export const login = (email, password) => async (dispatch) => {
+export const login = (user_identifier, password) => async (dispatch) => {
   // Make an api call to login
   let formData = new FormData();
 
-  formData.append("email", email);
+  formData.append("user_identifier", user_identifier);
   formData.append("password", password);
 
   try {

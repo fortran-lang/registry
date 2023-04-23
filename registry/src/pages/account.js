@@ -26,8 +26,8 @@ const Account = () => {
   const successMsg = useSelector(
     (state) => state.account.resetPasswordSuccessMsg
   );
-  const [oldpassword, setOldpassword] = useState("");
-  const [Newpassword, setNewpassword] = useState("");
+  const [oldPassword, setoldPassword] = useState("");
+  const [newPassword, setnewPassword] = useState("");
   const [fromValidationErrors, setFormValidationError] = useState({});
   const [show, setShow] = useState(false);
   const dateJoined = useSelector((state) => state.account.dateJoined);
@@ -52,10 +52,10 @@ const Account = () => {
   const validateForm = () => {
     let errors = {};
 
-    if (!oldpassword) {
+    if (!oldPassword) {
       errors.password = "Old Password is required";
     }
-    if (!Newpassword) {
+    if (!newPassword) {
       errors.password = "Enter New password";
     }
 
@@ -68,7 +68,7 @@ const Account = () => {
 
     if (validateForm()) {
       dispatch(resetMessages());
-      dispatch(reset(oldpassword, Newpassword, uuid));
+      dispatch(reset(oldPassword, newPassword, uuid));
     }
     setShow(true);
   };
@@ -139,9 +139,9 @@ const Account = () => {
             <Form.Control
               type="password"
               placeholder="Enter Old Password"
-              name="oldpassword"
-              value={oldpassword}
-              onChange={(e) => setOldpassword(e.target.value)}
+              name="oldPassword"
+              value={oldPassword}
+              onChange={(e) => setoldPassword(e.target.value)}
             />
           </Col>
         </Form.Group>
@@ -155,8 +155,8 @@ const Account = () => {
               type="password"
               placeholder="Enter New Password"
               name="password"
-              value={Newpassword}
-              onChange={(e) => setNewpassword(e.target.value)}
+              value={newPassword}
+              onChange={(e) => setnewPassword(e.target.value)}
             />
           </Col>
         </Form.Group>

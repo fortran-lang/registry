@@ -124,8 +124,14 @@ const SearchBar = () => {
     }
   };
 
+  const handleKeyDown = event => { 
+    if (event.key === 'Enter') {
+      search();
+    }
+  };
+
   return (
-    <div className="d-flex">
+    <div className="d-flex" tabIndex={0} onKeyDown={handleKeyDown}>
       <input
         type="text"
         className="flex-fill form-control"
