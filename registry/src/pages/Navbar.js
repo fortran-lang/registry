@@ -132,6 +132,9 @@ const SearchBar = () => {
         placeholder="Search"
         value={query}
         onChange={(event) => dispatch(setQuery(event.target.value))}
+        style={{
+          borderRadius: "50px",
+        }}
       />
       <button className="btn btn-primary" onClick={search}>
         Search
