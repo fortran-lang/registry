@@ -128,9 +128,9 @@ const PackagePage = () => {
                   </MDBTableHead>
                   <MDBTableBody>
                     {data.version_history.sort((a, b) => {
-                        if (updatedDays(a.createdAt) < updatedDays(b.createdAt)) {
+                        if (updatedDays(a.createdAt) > updatedDays(b.createdAt)) {
                           return -1;
-                        } else if (updatedDays(a.createdAt) > updatedDays(b.createdAt)) {
+                        } else if (updatedDays(a.createdAt) < updatedDays(b.createdAt)) {
                           return 1;
                         } else {
                           return 0;
