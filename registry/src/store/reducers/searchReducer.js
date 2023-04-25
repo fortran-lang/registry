@@ -1,6 +1,7 @@
 import {
   SEARCH_SUCCESS,
   SEARCH_FAILURE,
+  SEARCH_PACKAGE,
   SET_QUERY,
   SET_ORDER_BY,
 } from "../actions/searchActions";
@@ -24,6 +25,13 @@ const searchReducer = (state = initialState, action) => {
         packages: action.payload.packages,
         totalPages: action.payload.totalPages,
         currentPage: action.payload.currentPage,
+      };
+
+      case SEARCH_PACKAGE:
+      return {
+        ...state,
+        isLoading: true,
+        packages: null,
       };
 
     case SEARCH_FAILURE:
