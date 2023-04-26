@@ -105,12 +105,16 @@ const Dashboard = () => {
                   show={addMaintainerDialogState[element.id]}
                   onHide={() => handleAddMaintainerDialog(element.id, false)}
                 />
-                <div
-                  className="border border-danger rounded-pill chip-action"
-                  onClick={() => handleRemoveMaintainerDialog(element.id, true)}
-                >
-                  Remove Maintainers
-                </div>
+                {element.isNamespaceMaintainer ? (
+                  <div
+                    className="border border-danger rounded-pill chip-action"
+                    onClick={() =>
+                      handleRemoveMaintainerDialog(element.id, true)
+                    }
+                  >
+                    Remove Maintainers
+                  </div>
+                ) : null}
                 <RemoveMaintainerFormDialog
                   package={element.name}
                   namespace={element.namespace}
