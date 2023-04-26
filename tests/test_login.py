@@ -31,7 +31,7 @@ class TestLogin(BaseTestClass):
         self.assertEqual(200, response_for_signup.json["code"])
 
         login_data = {
-            "email": email,
+            "user_identifier": email,
             "password": password
         }
 
@@ -66,12 +66,12 @@ class TestLogin(BaseTestClass):
         self.assertEqual(200, response_for_signup.json["code"])
 
         login_data_incorrect_password = {
-            "email": email,
+            "user_identifier": email,
             "password": password+'123',
         }
 
         login_data_incorrect_email = {
-            "email": "hello"+email,
+            "user_identifier": "hello"+email,
             "password": password,
         }
 
