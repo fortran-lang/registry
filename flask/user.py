@@ -279,9 +279,11 @@ def add_maintainers_to_package(username):
         return jsonify({"message": "Package not found", "code": 404}), 404
 
     # Check if the current user has authority to add maintainers.
+    # Package maintainer, Namespace maintainer or Namespace admin has the authority to add package maintainers.
     if not checkIsMaintainer(
         user_id=user["_id"], package=curr_package
-    ) and not checkIsNamespaceAdmin(user_id=user["_id"], namespace=package_namespace):
+    ) and not checkIsNamespaceAdmin(user_id=user["_id"], namespace=package_namespace
+        ) and not checkIfNamespaceMaintainer(user_id=user["_id"], namespace=package_namespace):
         return jsonify({"message": "Unauthorized", "code": 401}), 401
 
     # Get the user to be added using the username received in the request body.
@@ -359,7 +361,9 @@ def remove_maintainers_from_package(username):
         return jsonify({"message": "Package not found", "code": 404}), 404
 
     # Check if the current user has authority to remove maintainers.
-    if not checkIsNamespaceAdmin(user_id=user["_id"], namespace=package_namespace):
+    # Package maintainer, Namespace maintainer or Namespace admin has the authority to remove package maintainers.
+    if not checkIsNamespaceAdmin(user_id=user["_id"], namespace=package_namespace
+        ) and not checkIfNamespaceMaintainer(user_id=user["_id"], namespace=package_namespace):
         return (
             jsonify(
                 {"message": "User is not authorized to remove maintainers", "code": 401}
