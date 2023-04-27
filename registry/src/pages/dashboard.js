@@ -172,12 +172,17 @@ const Dashboard = () => {
                   show={addMaintainerDialogState[element.id]}
                   onHide={() => handleAddMaintainerDialog(element.id, false)}
                 />
-                <div
-                  className="border border-danger rounded-pill chip-action"
-                  onClick={() => handleRemoveMaintainerDialog(element.id, true)}
-                >
-                  Remove maintainers
-                </div>
+                {element.isNamespaceAdmin ? (
+                  <div
+                    className="border border-danger rounded-pill chip-action"
+                    onClick={() =>
+                      handleRemoveMaintainerDialog(element.id, true)
+                    }
+                  >
+                    Remove maintainers
+                  </div>
+                ) : null}
+
                 <RemoveNamespaceMaintainerFormDialog
                   namespace={element.name}
                   show={removeMaintainerDialogState[element.id]}
