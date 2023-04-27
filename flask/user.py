@@ -39,10 +39,17 @@ def profile(username):
         if namespaces:
             # Iterate over all the namespaces and add it to the response_namespace.
             for namespace in namespaces:
+                isNamespaceAdmin = False
+
+                # Check if the user is adming of the namespace.
+                if user_doc["_id"] in namespace["admins"]:
+                    isNamespaceAdmin = True
+
                 response_namespaces.append({
                     "id": str(namespace["_id"]),
                     "name": namespace["namespace"],
                     "description": namespace["description"],
+                    "isNamespaceAdmin": isNamespaceAdmin
                 })
 
                 # Iterate over all the packages in the namespace.
