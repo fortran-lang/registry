@@ -4,6 +4,7 @@ import {
   SEARCH_PACKAGE,
   SET_QUERY,
   SET_ORDER_BY,
+  SEARCH_LOADING,
 } from "../actions/searchActions";
 
 const initialState = {
@@ -18,6 +19,11 @@ const initialState = {
 
 const searchReducer = (state = initialState, action) => {
   switch (action.type) {
+    case SEARCH_LOADING:
+      return {
+        ...state,
+        isLoading: true,
+      };
     case SEARCH_SUCCESS:
       return {
         ...state,

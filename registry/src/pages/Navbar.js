@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Image from "react-bootstrap/Image";
 import Container from "react-bootstrap/Container";
@@ -13,6 +13,7 @@ const NavbarComponent = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const location = useLocation();
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const isAdmin = useSelector((state) => state.admin.isAdmin);
   const username = useSelector((state) => state.auth.username);
@@ -40,9 +41,11 @@ const NavbarComponent = () => {
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse>
-          <div id="search-bar">
-            <SearchBar />
-          </div>
+          {location.pathname !== "/" ? (
+            <div id="search-bar">
+              <SearchBar />
+            </div>
+          ) : null}
           <Nav className="ml-auto">
             {!isAuthenticated && (
               <>
@@ -138,6 +141,9 @@ const SearchBar = () => {
         placeholder="Search"
         value={query}
         onChange={(event) => dispatch(setQuery(event.target.value))}
+        style={{
+          borderRadius: "50px",
+        }}
       />
       <button className="btn btn-primary" onClick={search}>
         Search
