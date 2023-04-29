@@ -48,6 +48,9 @@ function HomeSearchField(props) {
         onKeyDown={handleKeyDown}
         onChange={(event) => dispatch(setQuery(event.target.value))}
       />
+      <span id="search-icon">
+        <i className="fas fa-search" />
+      </span>
     </InputGroup>
   );
 }
