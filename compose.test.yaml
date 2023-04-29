@@ -1,5 +1,5 @@
 services:
-  test:
+  test_ci:
     build:
       context: flask
       target: builder
