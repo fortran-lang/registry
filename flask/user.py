@@ -19,23 +19,81 @@ except KeyError as err:
 @app.route("/users/<username>", methods=["GET"])
 @swag_from("documentation/user.yaml", methods=["GET"])
 def profile(username):
-    user = db.users.find_one({"username": username})
-    if user:
+    user_doc = db.users.find_one({"username": username})
+    if user_doc:
+        # Get all the packages user is maintainer of.
         packages = db.packages.find(
-            {"$or": [{"author": user["_id"]}, {"maintainers": user["_id"]}]},
+            {"$or": [{"author": user_doc["_id"]}, {"maintainers": user_doc["_id"]}]},
         )
 
+        # Get all the namespaces user is maintainer/admin of.
+        # A namespace maintainer / admin will be maintainer of all the packages under that namespace.
         namespaces = db.namespaces.find(
-            {"$or": [{"author": user["_id"]}, {"maintainers": user["_id"]}, {"admins": user["_id"]}]},
+            {"$or": [{"author": user_doc["_id"]}, {"maintainers": user_doc["_id"]}, {"admins": user_doc["_id"]}]},
         )
 
         response_packages = []
         response_namespaces = []
+        
+        # Check if there are any namespaces user is maintainer of.
+        if namespaces:
+            # Iterate over all the namespaces and add it to the response_namespace.
+            for namespace in namespaces:
+                isNamespaceAdmin = False
+
+                # Check if the user is adming of the namespace.
+                if user_doc["_id"] in namespace["admins"]:
+                    isNamespaceAdmin = True
+
+                response_namespaces.append({
+                    "id": str(namespace["_id"]),
+                    "name": namespace["namespace"],
+                    "description": namespace["description"],
+                    "isNamespaceAdmin": isNamespaceAdmin
+                })
+
+                # Iterate over all the packages in the namespace.
+                # User is maintainer of all these packages.
+                # Add these packages to the response_packages.
+                for package_id in namespace["packages"]:
+                    package_doc = db.packages.find_one({"_id": package_id})
+
+                    response_packages.append({
+                        "id": str(package_doc["_id"]),
+                        "name": package_doc["name"],
+                        "namespace": namespace["namespace"],
+                        "description": package_doc["description"],
+                        "updatedAt": package_doc["updatedAt"],
+                        "isNamespaceMaintainer": True,
+                    })
+
+        # Check for the packages that user is maintainer of individually but not as namespace maintainer.
+        # If these packages are already not in the response then add it to the response_packages else skip the 
+        # duplicates.
         if packages:
             for package in packages:
+                isDuplicate = False
+
+                # Check if that package is already under a namespace.
+                # response_packages will contain a list of packages that user is maintainer of under a namespace.
+                for pkg in response_packages:
+                    
+                    if pkg["id"] == str(package["_id"]):
+                        isDuplicate = True
+                        break
+                
+                # Skip the duplicates.
+                if isDuplicate:
+                    continue
+                
                 # Get namespace from namespace id.
                 namespace = db.namespaces.find_one({"_id": package["namespace"]})
-                user = db.users.find_one({"_id": package["author"]})
+                
+                isNamespaceMaintainer = False
+
+                if user_doc["_id"] in namespace["maintainers"]:
+                    isNamespaceMaintainer = True
+
                 response_packages.append(
                     {   
                         "id": str(package["_id"]),
@@ -43,20 +101,15 @@ def profile(username):
                         "namespace": namespace["namespace"],
                         "description": package["description"],
                         "updatedAt": package["updatedAt"],
+                        "isNamespaceMaintainer": isNamespaceMaintainer
                     }
                 )
                 
-        if namespaces:
-            for namespace in namespaces:
-                response_namespaces.append({
-                    "id": str(namespace["_id"]),
-                    "name": namespace["namespace"],
-                    "description": namespace["description"],
-                })
+        
         user_account = {
-            "username": user["username"],
-            "email": user["email"],
-            "createdAt": user["createdAt"],
+            "username": user_doc["username"],
+            "email": user_doc["email"],
+            "createdAt": user_doc["createdAt"],
         }
         return (
             jsonify(
@@ -233,9 +286,11 @@ def add_maintainers_to_package(username):
         return jsonify({"message": "Package not found", "code": 404}), 404
 
     # Check if the current user has authority to add maintainers.
+    # Package maintainer, Namespace maintainer or Namespace admin has the authority to add package maintainers.
     if not checkIsMaintainer(
         user_id=user["_id"], package=curr_package
-    ) and not checkIsNamespaceAdmin(user_id=user["_id"], namespace=package_namespace):
+    ) and not checkIsNamespaceAdmin(user_id=user["_id"], namespace=package_namespace
+        ) and not checkIfNamespaceMaintainer(user_id=user["_id"], namespace=package_namespace):
         return jsonify({"message": "Unauthorized", "code": 401}), 401
 
     # Get the user to be added using the username received in the request body.
@@ -313,7 +368,9 @@ def remove_maintainers_from_package(username):
         return jsonify({"message": "Package not found", "code": 404}), 404
 
     # Check if the current user has authority to remove maintainers.
-    if not checkIsNamespaceAdmin(user_id=user["_id"], namespace=package_namespace):
+    # Package maintainer, Namespace maintainer or Namespace admin has the authority to remove package maintainers.
+    if not checkIsNamespaceAdmin(user_id=user["_id"], namespace=package_namespace
+        ) and not checkIfNamespaceMaintainer(user_id=user["_id"], namespace=package_namespace):
         return (
             jsonify(
                 {"message": "User is not authorized to remove maintainers", "code": 401}
