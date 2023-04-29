@@ -37,7 +37,7 @@ class TestLogin(BaseTestClass):
 
         # Login with the same user.
         response_for_login = self.client.post("/auth/login", data=login_data)
-        self.assertEqual(20, response_for_login.json["code"])
+        self.assertEqual(200, response_for_login.json["code"])
     
     def test_unsuccessful_login(self):
         """
