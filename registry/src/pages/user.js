@@ -29,7 +29,7 @@ const UserPage = () => {
   }
 
   return !isLoading ? (
-    <Container>
+    <Container style={{fontSize: 24}}>
       <Row>
         <Col sm={4}>
           <Row style={{ marginLeft: "10px", marginTop: "20px" }}>
@@ -61,9 +61,9 @@ const UserPage = () => {
           <Row style={{ fontSize: 24, marginTop: "20px" }}>
             {projects.length === 0
               ? "0 projects"
-              : projects.length + " projects"}
+              : projects.length + " projects"} 
           </Row>
-          {projects.map((packageEntity) => (
+           {projects.map((packageEntity) => (
         <PackageItem
           key={packageEntity.name + packageEntity.namespace}
           packageEntity={packageEntity}
