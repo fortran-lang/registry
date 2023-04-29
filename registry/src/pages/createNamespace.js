@@ -6,6 +6,8 @@ import Spinner from "react-bootstrap/Spinner";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { Card } from "react-bootstrap";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const NamespaceForm = () => {
   const dispatch = useDispatch();
@@ -14,6 +16,33 @@ const NamespaceForm = () => {
   const isLoading = useSelector((state) => state.createNamespace.isLoading);
   const message = useSelector((state) => state.createNamespace.message);
   const statuscode = useSelector((state) => state.createNamespace.statuscode);
+
+  useEffect(() => {
+    if (statuscode === 200) {
+      toast.success(message, {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+    }
+    if (statuscode !== 0 && statuscode !== 200) {
+      toast.error(message, {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+    }
+  }, [statuscode]);
 
   useEffect(() => {
     if (uuid === null) {
@@ -40,6 +69,17 @@ const NamespaceForm = () => {
   return !isLoading ? (
     <Card id="create-namespace-card">
       <h3>Create a namespace</h3>
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        pauseOnHover
+        theme="light"
+      />
       <Form onSubmit={handleSubmit}>
         <Form.Group
           className="mb-3"
@@ -82,11 +122,6 @@ const NamespaceForm = () => {
           Submit
         </Button>
       </Form>
-      {statuscode === 200 ? (
-        <p className="success">{message}</p>
-      ) : (
-        <p className="error">{message}</p>
-      )}
     </Card>
   ) : (
     <div className="d-flex justify-content-center">
