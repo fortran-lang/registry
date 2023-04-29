@@ -10,6 +10,8 @@ import Container from "react-bootstrap/Container";
 import AddMaintainerFormDialog from "./addMaintainerDialogForm";
 import RemoveMaintainerFormDialog from "./removeMaintainerDialogForm";
 import GenerateNamespaceTokenDialogForm from "./generateNamespaceTokenDialogForm";
+import AddNamespaceMaintainerFormDialog from "./addNamespaceMaintainerDialogForm";
+import RemoveNamespaceMaintainerFormDialog from "./removeNamespaceMaintainerDialogForm";
 
 const Dashboard = () => {
   const [addMaintainerDialogState, setAddMaintainerDialogState] = useState({});
@@ -92,7 +94,6 @@ const Dashboard = () => {
                   {element.namespace}
                 </Card.Subtitle>
                 <Card.Text id="card-text">{element.description}</Card.Text>
-
                 <div
                   className="border border-success rounded-pill chip-action"
                   onClick={() => handleAddMaintainerDialog(element.id, true)}
@@ -105,12 +106,16 @@ const Dashboard = () => {
                   show={addMaintainerDialogState[element.id]}
                   onHide={() => handleAddMaintainerDialog(element.id, false)}
                 />
-                <div
-                  className="border border-danger rounded-pill chip-action"
-                  onClick={() => handleRemoveMaintainerDialog(element.id, true)}
-                >
-                  Remove Maintainers
-                </div>
+                {element.isNamespaceMaintainer ? (
+                  <div
+                    className="border border-danger rounded-pill chip-action"
+                    onClick={() =>
+                      handleRemoveMaintainerDialog(element.id, true)
+                    }
+                  >
+                    Remove Maintainers
+                  </div>
+                ) : null}
                 <RemoveMaintainerFormDialog
                   package={element.name}
                   namespace={element.namespace}
@@ -155,6 +160,33 @@ const Dashboard = () => {
                   namespace={element.name}
                   show={showGenerateTokenDialog[element.id]}
                   onHide={() => handleGenerateTokenDialog(element.id, false)}
+                />
+                <div
+                  className="border border-success rounded-pill chip-action"
+                  onClick={() => handleAddMaintainerDialog(element.id, true)}
+                >
+                  Add maintainers
+                </div>
+                <AddNamespaceMaintainerFormDialog
+                  namespace={element.name}
+                  show={addMaintainerDialogState[element.id]}
+                  onHide={() => handleAddMaintainerDialog(element.id, false)}
+                />
+                {element.isNamespaceAdmin ? (
+                  <div
+                    className="border border-danger rounded-pill chip-action"
+                    onClick={() =>
+                      handleRemoveMaintainerDialog(element.id, true)
+                    }
+                  >
+                    Remove maintainers
+                  </div>
+                ) : null}
+
+                <RemoveNamespaceMaintainerFormDialog
+                  namespace={element.name}
+                  show={removeMaintainerDialogState[element.id]}
+                  onHide={() => handleRemoveMaintainerDialog(element.id, false)}
                 />
               </Card.Body>
             </Card>
