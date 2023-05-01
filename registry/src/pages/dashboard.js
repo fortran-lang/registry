@@ -12,11 +12,17 @@ import RemoveMaintainerFormDialog from "./removeMaintainerDialogForm";
 import GenerateNamespaceTokenDialogForm from "./generateNamespaceTokenDialogForm";
 import AddNamespaceMaintainerFormDialog from "./addNamespaceMaintainerDialogForm";
 import RemoveNamespaceMaintainerFormDialog from "./removeNamespaceMaintainerDialogForm";
+import AddNamespaceAdminFormDialog from "./addNamespaceAdminForm";
+import RemoveNamespaceAdminFormDialog from "./removeNamespaceAdminForm";
 
 const Dashboard = () => {
   const [addMaintainerDialogState, setAddMaintainerDialogState] = useState({});
   const [showGenerateTokenDialog, setshowGenerateTokenDialog] = useState({});
   const [removeMaintainerDialogState, setRemoveMaintainerDialogState] =
+    useState({});
+  const [addNamespaceAdminDialogState, setAddNamespaceAdminDialogState] =
+    useState({});
+  const [removeNamespaceAdminDialogState, setRemoveNamespaceAdminDialogState] =
     useState({});
   const username = useSelector((state) => state.auth.username);
   const packages = useSelector((state) => state.dashboard.packages);
@@ -51,6 +57,20 @@ const Dashboard = () => {
 
   const handleGenerateTokenDialog = (itemId, value) => {
     setshowGenerateTokenDialog((prevState) => ({
+      ...prevState,
+      [itemId]: value,
+    }));
+  };
+
+  const handleAddNamespaceAdminDialog = (itemId, value) => {
+    setAddNamespaceAdminDialogState((prevState) => ({
+      ...prevState,
+      [itemId]: value,
+    }));
+  };
+
+  const handleRemoveNamespaceAdminDialog = (itemId, value) => {
+    setRemoveNamespaceAdminDialogState((prevState) => ({
       ...prevState,
       [itemId]: value,
     }));
@@ -94,11 +114,23 @@ const Dashboard = () => {
                   {element.namespace}
                 </Card.Subtitle>
                 <Card.Text id="card-text">{element.description}</Card.Text>
-                <div
-                  className="border border-success rounded-pill chip-action"
-                  onClick={() => handleAddMaintainerDialog(element.id, true)}
-                >
-                  Add Maintainers
+                <div className="chip-container">
+                  <div
+                    className="border border-success rounded-pill chip-action"
+                    onClick={() => handleAddMaintainerDialog(element.id, true)}
+                  >
+                    Add Maintainers
+                  </div>
+                  {element.isNamespaceMaintainer ? (
+                    <div
+                      className="border border-danger rounded-pill chip-action"
+                      onClick={() =>
+                        handleRemoveMaintainerDialog(element.id, true)
+                      }
+                    >
+                      Remove Maintainers
+                    </div>
+                  ) : null}
                 </div>
                 <AddMaintainerFormDialog
                   package={element.name}
@@ -106,16 +138,6 @@ const Dashboard = () => {
                   show={addMaintainerDialogState[element.id]}
                   onHide={() => handleAddMaintainerDialog(element.id, false)}
                 />
-                {element.isNamespaceMaintainer ? (
-                  <div
-                    className="border border-danger rounded-pill chip-action"
-                    onClick={() =>
-                      handleRemoveMaintainerDialog(element.id, true)
-                    }
-                  >
-                    Remove Maintainers
-                  </div>
-                ) : null}
                 <RemoveMaintainerFormDialog
                   package={element.name}
                   namespace={element.namespace}
@@ -150,39 +172,74 @@ const Dashboard = () => {
                   </a>
                 </Card.Title>
                 <Card.Text id="card-text">{element.description}</Card.Text>
-                <div
-                  className="border border-success rounded-pill chip-action"
-                  onClick={() => handleGenerateTokenDialog(element.id, true)}
-                >
-                  Generate Token
+                <div className="chip-container">
+                  <div
+                    className="border border-success rounded-pill chip-action"
+                    onClick={() => handleGenerateTokenDialog(element.id, true)}
+                  >
+                    Generate Token
+                  </div>
+                  {element.isNamespaceAdmin ? (
+                    <div
+                      className="border border-success rounded-pill chip-action"
+                      onClick={() =>
+                        handleAddNamespaceAdminDialog(element.id, true)
+                      }
+                    >
+                      Add admins
+                    </div>
+                  ) : null}
+                  {element.isNamespaceAdmin ? (
+                    <div
+                      className="border border-success rounded-pill chip-action"
+                      onClick={() =>
+                        handleRemoveNamespaceAdminDialog(element.id, true)
+                      }
+                    >
+                      Remove admins
+                    </div>
+                  ) : null}
+                  <div
+                    className="border border-success rounded-pill chip-action"
+                    onClick={() => handleAddMaintainerDialog(element.id, true)}
+                  >
+                    Add maintainers
+                  </div>
+                  {element.isNamespaceAdmin ? (
+                    <div
+                      className="border border-danger rounded-pill chip-action"
+                      onClick={() =>
+                        handleRemoveMaintainerDialog(element.id, true)
+                      }
+                    >
+                      Remove maintainers
+                    </div>
+                  ) : null}
                 </div>
                 <GenerateNamespaceTokenDialogForm
                   namespace={element.name}
                   show={showGenerateTokenDialog[element.id]}
                   onHide={() => handleGenerateTokenDialog(element.id, false)}
                 />
-                <div
-                  className="border border-success rounded-pill chip-action"
-                  onClick={() => handleAddMaintainerDialog(element.id, true)}
-                >
-                  Add maintainers
-                </div>
+                <AddNamespaceAdminFormDialog
+                  namespace={element.name}
+                  show={addNamespaceAdminDialogState[element.id]}
+                  onHide={() =>
+                    handleAddNamespaceAdminDialog(element.id, false)
+                  }
+                />
+                <RemoveNamespaceAdminFormDialog
+                  namespace={element.name}
+                  show={removeNamespaceAdminDialogState[element.id]}
+                  onHide={() =>
+                    handleRemoveNamespaceAdminDialog(element.id, false)
+                  }
+                />
                 <AddNamespaceMaintainerFormDialog
                   namespace={element.name}
                   show={addMaintainerDialogState[element.id]}
                   onHide={() => handleAddMaintainerDialog(element.id, false)}
                 />
-                {element.isNamespaceAdmin ? (
-                  <div
-                    className="border border-danger rounded-pill chip-action"
-                    onClick={() =>
-                      handleRemoveMaintainerDialog(element.id, true)
-                    }
-                  >
-                    Remove maintainers
-                  </div>
-                ) : null}
-
                 <RemoveNamespaceMaintainerFormDialog
                   namespace={element.name}
                   show={removeMaintainerDialogState[element.id]}
