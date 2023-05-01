@@ -15,6 +15,7 @@ services:
       - MONGO_URI=mongodb://mongo:27017/testregistry
       - MONGO_USER_NAME=testuser
       - MONGO_PASSWORD=testpassword
+      - SALT=MYSALT
   tests_db:
     image: mongo
   
