@@ -13,6 +13,8 @@ services:
     environment:
       - MONGO_DB_NAME=testregistry
       - MONGO_URI=mongodb://mongo:27017/testregistry
+      - MONGO_USER_NAME=testuser
+      - MONGO_PASSWORD=testpassword
   tests_db:
     image: mongo
   
