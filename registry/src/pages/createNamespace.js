@@ -16,31 +16,24 @@ const NamespaceForm = () => {
   const isLoading = useSelector((state) => state.createNamespace.isLoading);
   const message = useSelector((state) => state.createNamespace.message);
   const statuscode = useSelector((state) => state.createNamespace.statuscode);
+  const toast_css = {
+    position: "top-center",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "light",
+  };
 
   useEffect(() => {
     if (statuscode === 200) {
       toast.success(message, {
-        position: "top-center",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
+        onClose: () => navigate("/manage/projects")
       });
-    }
-    if (statuscode !== 0 && statuscode !== 200) {
-      toast.error(message, {
-        position: "top-center",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
+    } else if (statuscode !== 0 && statuscode !== 200) {
+      toast.error(message, toast_css);
     }
   }, [statuscode]);
 
