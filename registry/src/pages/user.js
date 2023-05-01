@@ -58,7 +58,7 @@ const UserPage = () => {
           </Row>
         </Col>
         <Col sm={8}>
-          <Row style={{ fontSize: "20px", marginTop: "20px" }}>
+          <Row style={{ fontSize: "20px", marginTop: "20px" , padding:"5px"}}>
             {projects.length === 0
               ? "0 projects"
               : projects.length + " projects"} 
