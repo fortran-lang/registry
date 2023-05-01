@@ -57,11 +57,11 @@ const PackageItem = ({ packageEntity }) => {
           <h6 className="mb-2 text-muted">
             Namespace {packageEntity.namespace}
           </h6>
-          <label className="mb-2 text-muted">{packageEntity.description}</label>
+          <label className="mb-2 text-muted" style={{ fontSize: "18px" }}>{packageEntity.description}</label>
         </Col>
         <Col md={1} style={{ flex: 1, textAlign: "right" }}>
           <h6>By {packageEntity.author}</h6>
-          <label>{formatDate(packageEntity.updatedAt)}</label>
+          <label style={{ fontSize: "18px" }}>{formatDate(packageEntity.updatedAt)}</label>
         </Col>
       </Row>
     </MDBListGroupItem>
