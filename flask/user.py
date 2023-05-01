@@ -634,7 +634,7 @@ def remove_admins_from_namespace(username):
     
     # Check if the current user has authority to remove admins.
     # Only namespace authors can remove namespace admins.
-    if not checkIfNamespaceAuthor(user_id=user["_id"], namespace=namespace_doc):
+    if not checkIsNamespaceAdmin(user_id=user["_id"], namespace=namespace_doc) and not checkIfNamespaceAuthor(user_id=user["_id"], namespace=namespace_doc):
         return (
             jsonify(
                 {"message": "User is not authorized to remove admins", "code": 401}
