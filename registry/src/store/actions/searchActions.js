@@ -1,6 +1,5 @@
 import axios from "axios";
 
-export const SEARCH_PACKAGE = "SEARCH_PACKAGE";
 export const SEARCH_SUCCESS = "SEARCH_SUCCESS";
 export const SEARCH_FAILURE = "SEARCH_FAILURE";
 export const SEARCH_LOADING = "SEARCH_LOADING";
@@ -26,7 +25,7 @@ export const searchPackage =
     )}&sorted_by=${encodeURIComponent(sortedBy)}`;
 
     dispatch({
-      type: SEARCH_PACKAGE,
+      type: SEARCH_LOADING,
     });
 
     try {
