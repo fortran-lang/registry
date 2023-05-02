@@ -43,7 +43,7 @@ const PackageItem = ({ packageEntity }) => {
             height={60}
           />
         </Col>
-        <Col md={4}>
+        <Col md={4} style={{ padding: '10px' }}>
           <div>
             <h5 id="list-item-package-name">
               <a

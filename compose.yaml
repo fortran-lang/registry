@@ -28,6 +28,10 @@ services:
       - SUDO_PASSWORD=fortran
       - MONGO_USER_NAME=fortran
       - MONGO_PASSWORD=fortran
+      - HOST=localhost
+      - RESET_EMAIL=reset@localhost.com
+      - RESET_PASSWORD=reset
+      - SUDO_PASSWORD=fortran
 
     volumes:
       - ./flask:/src
