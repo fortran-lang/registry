@@ -149,7 +149,7 @@ def upload():
     
     # Check whether license identifier is valid or not.
     if not is_valid_license_identifier(license_str=package_license):
-        return jsonify({"code": 400, "message": "Invalid license identifier"})
+        return jsonify({"code": 400, "message": "Invalid license identifier. Please check the SPDX license identifier list."})
     
     # Find the document that contains the upload token.
     namespace_doc = db.namespaces.find_one({"upload_tokens": {"$elemMatch": {"token": upload_token}}})
