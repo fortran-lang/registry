@@ -31,12 +31,19 @@ services:
       - HOST=localhost
       - RESET_EMAIL=reset@localhost.com
       - RESET_PASSWORD=reset
-      - SUDO_PASSWORD=fortran
 
     volumes:
       - ./flask:/src
     depends_on:
       - mongo
+
+  validate_package:
+    build:
+      context: flask
+      dockerfile: validate_package.Dockerfile
+    stop_signal: SIGINT
+    volumes:
+      - ./flask:/src
 
   mongo:
     image: mongo
