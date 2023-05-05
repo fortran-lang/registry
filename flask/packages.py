@@ -593,6 +593,52 @@ def get_packages():
 
     return jsonify({"packages": response_packages})
 
+@app.route("/packages/<namespace_name>/<package_name>/uploadToken", methods=["POST"])
+def create_token_upload_token_package(namespace_name, package_name):
+    # Verify the uuid.
+    uuid = request.form.get("uuid")
+
+    if not uuid:
+        return jsonify({"code": 401, "message": "Unauthorized"}), 401
+    
+    # Get the user from uuid.
+    user_doc = db.users.find_one({"uuid": uuid})
+
+    if not user_doc:
+        return jsonify({"code": 401, "message": "Unauthorized"}), 401
+    
+    # Get the namespace from namespace_name.
+    namespace_doc = db.namespaces.find_one({"namespace": namespace_name})
+
+    if not namespace_doc:
+        return jsonify({"code": 404, "message": "Namespace not found"}), 404
+    
+    # Get the package from package_name & namespace_id.
+    package_doc = db.packages.find_one({"name": package_name, "namespace": namespace_doc["_id"]})
+
+    if not package_doc:
+        return jsonify({"code": 404, "message": "Package not found"}), 404
+    
+    # Check if the user is authorized to generate package token.
+    # Only package maintainers will have the option to generate tokens for a package.
+    if not str(user_doc["_id"]) in [str(obj_id) for obj_id in package_doc["maintainers"]]:
+        return jsonify({"code": 401, "message": "Only package maintainers can create tokens"}), 401
+    
+    # Generate the token.
+    upload_token = generate_uuid()
+
+    upload_token_obj = {
+        "token": upload_token,
+        "createdAt": datetime.utcnow(),
+        "createdBy": user_doc["_id"]
+    }
+
+    db.packages.update_one(
+        {"_id": package_doc["_id"]},
+        {"$addToSet": {"uploadTokens": upload_token_obj}}
+    )
+     
+    return jsonify({"code": 200, "message": "Upload token created successfully", "uploadToken": upload_token}), 200
 
 def sort_versions(versions):
     """
