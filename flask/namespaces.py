@@ -4,7 +4,7 @@ from mongo import db
 from flask import request, jsonify
 from app import swagger
 from flasgger.utils import swag_from
-from packages import checkUserUnauthorized
+from packages import checkUserUnauthorizedForNamespaceTokenCreation
 
 from datetime import datetime
 from auth import generate_uuid
@@ -80,7 +80,7 @@ def create_upload_token(namespace_name):
         return jsonify({"code": 404, "message": "Namespace not found"}), 404
     
     # Only namespace maintainers or admins can generate an upload token for now.
-    if checkUserUnauthorized(user_id=user_doc["_id"], package_namespace=namespace_doc):
+    if checkUserUnauthorizedForNamespaceTokenCreation(user_id=user_doc["_id"], namespace_doc=namespace_doc):
         return jsonify({"code": 401, "message": "Unauthorized"}), 401
     
     # Generate an upload token for upload packages to the namespace.

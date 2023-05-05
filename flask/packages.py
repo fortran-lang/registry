@@ -153,13 +153,21 @@ def upload():
     
     # Find the document that contains the upload token.
     namespace_doc = db.namespaces.find_one({"upload_tokens": {"$elemMatch": {"token": upload_token}}})
+    package_doc = db.packages.find_one({"upload_tokens": {"$elemMatch": {"token": upload_token}}})
 
-    # Check if there is a namespace connected to the given upload_token:
-    if not namespace_doc:
+    if not namespace_doc and not package_doc:
         return jsonify({"code": 401, "message": "Invalid upload token"})
-    
-    # Get the matching subdocument from the upload_token array
-    upload_token_doc = next(item for item in namespace_doc['upload_tokens'] if item['token'] == upload_token)
+
+    if namespace_doc:
+        upload_token_doc = next(item for item in namespace_doc['upload_tokens'] if item['token'] == upload_token)
+        package_doc = db.packages.find_one({"name": package_name, "namespace": namespace_doc["_id"]})
+
+    elif package_doc:
+        if package_doc["name"] != package_name:
+            return jsonify({"code": 401, "message": "Invalid upload token"})
+        
+        upload_token_doc = next(item for item in package_doc['upload_tokens'] if item['token'] == upload_token)
+        namespace_doc = db.namespaces.find_one({"_id": package_doc["namespace"]})
 
     # Check if the token is expired.
     # Expire the token after one week of it's creation.
@@ -173,8 +181,8 @@ def upload():
     if not user:
         return jsonify({"code": 404, "message": "User not found"})
     
-    # User should be either namespace maintainer or namespace admin to upload a package.
-    if checkUserUnauthorized(user_id=user["_id"], package_namespace=namespace_doc):
+    # User should be either namespace maintainer or namespace admin or package maintainer to upload a package.
+    if checkUserUnauthorized(user_id=user["_id"], package_namespace=namespace_doc, package_doc=package_doc):
         return jsonify({"message": "Unauthorized", "code": 401}), 401
     
     package_doc = db.packages.find_one({"name": package_name, "namespace": namespace_doc["_id"]})
@@ -635,7 +643,7 @@ def create_token_upload_token_package(namespace_name, package_name):
 
     db.packages.update_one(
         {"_id": package_doc["_id"]},
-        {"$addToSet": {"uploadTokens": upload_token_obj}}
+        {"$addToSet": {"upload_tokens": upload_token_obj}}
     )
      
     return jsonify({"code": 200, "message": "Upload token created successfully", "uploadToken": upload_token}), 200
@@ -648,8 +656,15 @@ def sort_versions(versions):
     return sorted(versions, key=lambda x: [int(i) for i in x.split(".")], reverse=True)
 
 # This function checks if user is authorized to upload/update a package in a namespace.
-def checkUserUnauthorized(user_id, package_namespace):
+def checkUserUnauthorized(user_id, package_namespace, package_doc):
     admins_id_list = [str(obj_id) for obj_id in package_namespace["admins"]]
     maintainers_id_list = [str(obj_id) for obj_id in package_namespace["maintainers"]]
+    pkg_maintainers_id_list = [str(obj_id) for obj_id in package_doc["maintainers"]]
+    str_user_id = str(user_id)
+    return str_user_id not in admins_id_list and str_user_id not in maintainers_id_list and str_user_id not in pkg_maintainers_id_list
+
+def checkUserUnauthorizedForNamespaceTokenCreation(user_id, namespace_doc):
+    admins_id_list = [str(obj_id) for obj_id in namespace_doc["admins"]]
+    maintainers_id_list = [str(obj_id) for obj_id in namespace_doc["maintainers"]]
     str_user_id = str(user_id)
     return str_user_id not in admins_id_list and str_user_id not in maintainers_id_list
