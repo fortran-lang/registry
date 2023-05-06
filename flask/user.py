@@ -154,7 +154,6 @@ def delete_user():
 
 
 @app.route("/users/account", methods=["POST"])
-@swag_from("documentation/account.yaml", methods=["POST"])
 def account():
     uuid = request.form.get("uuid")
     if not uuid:
@@ -176,7 +175,6 @@ def account():
 
 
 @app.route("/users/admin", methods=["POST"])
-@swag_from("documentation/admin.yaml", methods=["POST"])
 def admin():
     uuid = request.form.get("uuid")
     if not uuid:
@@ -197,7 +195,6 @@ def admin():
 
 
 @app.route("/users/admin/transfer", methods=["POST"])
-@swag_from("documentation/admin.yaml", methods=["POST"])
 def transfer_account():
     uuid = request.form.get("uuid")
     if not uuid:
