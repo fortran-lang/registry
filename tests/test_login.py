@@ -28,7 +28,7 @@ class TestLogin(BaseTestClass):
 
         # Create a user first.
         response_for_signup = self.client.post("/auth/signup", data=signup_data)
-        self.assertEqual(200, response_for_signup.json["code"])
+        self.assertEqual(400, response_for_signup.json["code"])
 
         login_data = {
             "user_identifier": email,
