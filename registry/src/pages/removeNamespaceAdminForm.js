@@ -91,8 +91,8 @@ const RemoveNamespaceAdminFormDialog = (props) => {
           {errorMessage && <p id="add-maintainer-error">{errorMessage}</p>}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="success" onClick={onSubmit}>
-            Add
+          <Button variant="danger" onClick={onSubmit}>
+            Remove
           </Button>
         </Modal.Footer>
       </Modal>
