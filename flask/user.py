@@ -633,7 +633,7 @@ def remove_admins_from_namespace(username):
         return jsonify({"message": "Namespace not found", "code": 404}), 404
     
     # Check if the current user has authority to remove admins.
-    # Only namespace authors can remove namespace admins.
+    # Only namespace authors or admins can remove namespace admins.
     if not checkIsNamespaceAdmin(user_id=user["_id"], namespace=namespace_doc) and not checkIfNamespaceAuthor(user_id=user["_id"], namespace=namespace_doc):
         return (
             jsonify(
@@ -649,7 +649,12 @@ def remove_admins_from_namespace(username):
         return jsonify(
             {"message": "Username to be removed as a admin not found", "code": 404}
         )
-    
+
+    # Check if a user is trying to remove original namespace author from admin role.
+    # Do not allow users to remove original namespace authors from admin role.
+    if str(namespace_doc["author"]) == str(username_to_be_removed["_id"]):
+        return jsonify({"code": 401, "message": "Namespace owners cannot be removed from admins"})
+
     # Update the document only if the user_to_be_added["_id"] is not already in the admins list.
     result = db.namespaces.update_one(
         {"namespace": namespace, "admins": username_to_be_removed["_id"]},
