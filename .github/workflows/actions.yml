@@ -21,9 +21,4 @@ jobs:
     - name: Print Logs for Container
       run: |
        export CONTAINER_ID=$(docker ps -aqf "name=ci")
-        docker logs -f "$CONTAINER_ID" | while read line ; do
-          echo "$line"
-          if echo "$line" | grep -qi 'FAILED'; then
-            exit 1
-          fi
-        done
+       `docker logs -f $CONTAINER_ID` | grep -i "FAILED" && exit 1 || exit 0
