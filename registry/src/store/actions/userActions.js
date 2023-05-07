@@ -21,7 +21,7 @@ export const fetchUserData = (user) => {
           payload: {
             email: data["user"].email,
             dateJoined: data["user"].createdAt,
-            projects: data["user"].packages,
+            projects: data["packages"],
           },
         });
       });

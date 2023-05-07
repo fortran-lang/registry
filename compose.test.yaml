@@ -1,5 +1,5 @@
 services:
-  test:
+  test_ci:
     build:
       context: flask
       target: builder
@@ -10,9 +10,17 @@ services:
       - ./flask:/src
     depends_on:
       - tests_db
-    environment:
+    environment: # these are the test environment variables.
       - MONGO_DB_NAME=testregistry
       - MONGO_URI=mongodb://mongo:27017/testregistry
+      - MONGO_USER_NAME=testuser
+      - MONGO_PASSWORD=testpassword
+      - SALT=MYSALT
+      - HOST=localhost
+      - RESET_EMAIL=reset@localhost.com
+      - RESET_PASSWORD=reset
+      - SUDO_PASSWORD=fortran
+
   tests_db:
     image: mongo
   

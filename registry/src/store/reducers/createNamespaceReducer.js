@@ -16,6 +16,8 @@ const createNamespaceReducer = (state = initialState, action) => {
       return {
         ...state,
         isLoading: true,
+        statuscode: 0,
+        message: "",
       };
     case CREATE_NAMESPACE_SUCCESS:
       return {

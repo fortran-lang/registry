@@ -22,6 +22,7 @@ const searchReducer = (state = initialState, action) => {
       return {
         ...state,
         isLoading: true,
+        packages: null,
       };
     case SEARCH_SUCCESS:
       return {

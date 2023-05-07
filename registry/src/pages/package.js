@@ -46,10 +46,10 @@ const PackagePage = () => {
   return !isLoading ? (
     <Container style={{ paddingTop: 25 }}>
       <p style={{ textAlign: "left", fontSize: 24 }}>{data.name}</p>
-      <div style={{ textAlign: "left", fontSize: 16 }}>
+      <p style={{ textAlign: "left", fontSize: 16 }}>
         v{data.latest_version_data.version} Published{" "}
         {updatedDays(data.updatedAt)} days ago
-      </div>
+      </p>
       <MDBTabs className="mb-3">
         <MDBTabsItem>
           <MDBTabsLink
@@ -82,8 +82,6 @@ const PackagePage = () => {
           <MDBContainer>
             <MDBRow>
               <MDBCol size="9">
-                <p style={{ fontSize: 20, textAlign: "left" }}>README</p>
-
                 {data.description}
               </MDBCol>
 
@@ -96,10 +94,10 @@ const PackagePage = () => {
             <MDBRow>
               <MDBCol size="9">
                 <p style={{ fontSize: 24, textAlign: "left" }}>Dependencies</p>
-                <hr></hr>
+                <hr/>
+
                 <br />
               </MDBCol>
-
               {sideBar(data)}
             </MDBRow>
           </MDBContainer>
@@ -112,7 +110,7 @@ const PackagePage = () => {
                   Version History
                 </p>
                 <hr></hr>
-                <MDBTable striped>
+                <MDBTable hover>
                   <MDBTableHead>
                     <tr>
                       <th scope="col" colSpan={3}>
@@ -127,19 +125,11 @@ const PackagePage = () => {
                     </tr>
                   </MDBTableHead>
                   <MDBTableBody>
-                    {data.version_history.sort((a, b) => {
-                        if (updatedDays(a.createdAt) < updatedDays(b.createdAt)) {
-                          return -1;
-                        } else if (updatedDays(a.createdAt) > updatedDays(b.createdAt)) {
-                          return 1;
-                        } else {
-                          return 0;
-                        } 
-                      }).map((ver) => (
+                    {sortedVersions(data.version_history).map((ver) => (
                       <tr key={ver.version}>
                         <td colSpan={3}>
                           <a
-                            href={`/packages/${namespace_name}/${package_name}`}
+                            href={`${process.env.REACT_APP_REGISTRY_API_URL}${ver.download_url}`}
                             style={{ textDecoration: "none" }}
                           >
                             v{ver.version}
@@ -178,7 +168,7 @@ const sideBar = (data) => {
     <MDBCol size="3">
       {/* TODO: update Package API for url,website,maintainers */}
       <p style={{ fontSize: 16, textAlign: "left" }}>Install</p>
-      <code style={{ background: "#ffffff" }}>
+      <code>
         fpm install {data.namespace}/{data.name}
       </code>
       <p style={{ fontSize: 16, textAlign: "left" }}>Repository</p>
@@ -196,8 +186,6 @@ const sideBar = (data) => {
       <p style={{ fontSize: 16, textAlign: "left" }}>Last publish</p>
       {updatedDays(data.updatedAt)} days ago
       <hr></hr>
-      <p style={{ fontSize: 16, textAlign: "left" }}>Maintainers</p>
-      {/* <Container>{{ maintainers }}</Container> */}
     </MDBCol>
   );
 };
@@ -208,4 +196,21 @@ const updatedDays = (date) => {
   var updatedTime = currentDate.getTime() - updatedDate.getTime();
   var updatedDays = Math.ceil(updatedTime / (1000 * 60 * 60 * 24));
   return updatedDays;
+};
+
+const sortedVersions = (version) => {
+  return version.sort((a, b) => {
+    const [aMajor, aMinor, aPatch] = a.version.split(".").map(Number);
+    const [bMajor, bMinor, bPatch] = b.version.split(".").map(Number);
+
+    if (aMajor === bMajor) {
+      if (aMinor === bMinor) {
+        return bPatch - aPatch;
+      } else {
+        return bMinor - aMinor;
+      }
+    } else {
+      return bMajor - aMajor;
+    }
+  });
 };
