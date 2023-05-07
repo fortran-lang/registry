@@ -137,5 +137,13 @@ body {
     cursor: pointer;
     padding: 8px;
     width: fit-content;
-    margin-bottom: 4px;
+    margin: 4px 4px 0px 0px;
+}
+
+.chip-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
 }
