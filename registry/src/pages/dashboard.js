@@ -103,12 +103,21 @@ const Dashboard = () => {
             <Card id="dashboard-card">
               <Card.Body>
                 <Card.Title>
-                  <a
-                    href={`/packages/${element.namespace}/${element.name}`}
-                    style={{ textDecoration: "none", color: "black" }}
-                  >
-                    {element.name}
-                  </a>
+                  <div className="d-flex justify-content-between">
+                    <a
+                      href={`/packages/${element.namespace}/${element.name}`}
+                      style={{ textDecoration: "none", color: "black" }}
+                    >
+                      {element.name}
+                    </a>
+                    {element.isNamespaceAdmin ? (
+                      <label className="chip">Namespace Admin</label>
+                    ) : element.isNamespaceMaintainer ? (
+                      <label className="chip">Namespace Maintainer</label>
+                    ) : element.isPackageMaintainer ? (
+                      <label className="chip">Package Maintainer</label>
+                    ) : null}
+                  </div>
                 </Card.Title>
                 <Card.Subtitle className="mb-2 text-muted">
                   {element.namespace}
@@ -121,7 +130,7 @@ const Dashboard = () => {
                   >
                     Add Maintainers
                   </div>
-                  {element.isNamespaceMaintainer ? (
+                  {element.isNamespaceMaintainer || element.isNamespaceAdmin ? (
                     <div
                       className="border border-danger rounded-pill chip-action"
                       onClick={() =>
@@ -163,14 +172,21 @@ const Dashboard = () => {
           <Col key={element.name} xs={6} md={4}>
             <Card id="dashboard-card">
               <Card.Body>
-                <Card.Title>
-                  <a
-                    href={`/namespaces/${element.name}`}
-                    style={{ textDecoration: "none", color: "black" }}
-                  >
-                    {element.name}
-                  </a>
-                </Card.Title>
+                <div className="d-flex justify-content-between">
+                  <Card.Title>
+                    <a
+                      href={`/namespaces/${element.name}`}
+                      style={{ textDecoration: "none", color: "black" }}
+                    >
+                      {element.name}
+                    </a>
+                  </Card.Title>
+                  {element.isNamespaceAdmin ? (
+                    <label className="chip">Namespace Admin</label>
+                  ) : element.isNamespaceMaintainer ? (
+                    <label className="chip">Namespace Maintainer</label>
+                  ) : null}
+                </div>
                 <Card.Text id="card-text">{element.description}</Card.Text>
                 <div className="chip-container">
                   <div
