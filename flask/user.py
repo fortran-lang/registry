@@ -543,6 +543,19 @@ def remove_maintainers_from_namespace(username):
             {"message": "Username to be removed as a maintainer not found", "code": 404}
         )
 
+    # Check if the user is trying to remove admins from the namespace.
+    # Namespace admins cannot be remove from the namespace maintainers role.
+    if checkIsNamespaceAdmin(user_id=user_to_be_removed["_id"], namespace=namespace_doc):
+        return (
+            jsonify(
+                {
+                    "message": "Admins cannot be removed from the namespace maintainer role",
+                    "code": 401,
+                }
+            ),
+            401,
+        )
+
     # Update the document only if the user_to_be_added["_id"] is not already in the maintainers list.
     result = db.namespaces.update_one(
         {"namespace": namespace}, {"$pull": {"maintainers": user_to_be_removed["_id"]}}
