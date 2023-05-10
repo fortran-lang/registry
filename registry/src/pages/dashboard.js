@@ -207,7 +207,7 @@ const Dashboard = () => {
                   ) : null}
                   {element.isNamespaceAdmin ? (
                     <div
-                      className="border border-success rounded-pill chip-action"
+                      className="border border-danger rounded-pill chip-action"
                       onClick={() =>
                         handleRemoveNamespaceAdminDialog(element.id, true)
                       }
