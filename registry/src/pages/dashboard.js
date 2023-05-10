@@ -106,7 +106,7 @@ const Dashboard = () => {
                   <div className="d-flex justify-content-between">
                     <a
                       href={`/packages/${element.namespace}/${element.name}`}
-                      style={{ textDecoration: "none", color: "black" }}
+                      className="dashboard-title"
                     >
                       {element.name}
                     </a>
@@ -176,7 +176,7 @@ const Dashboard = () => {
                   <Card.Title>
                     <a
                       href={`/namespaces/${element.name}`}
-                      style={{ textDecoration: "none", color: "black" }}
+                      className="dashboard-title"
                     >
                       {element.name}
                     </a>
