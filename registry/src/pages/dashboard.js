@@ -99,7 +99,7 @@ const Dashboard = () => {
     ) : (
       <Row>
         {packages.map((element, index) => (
-          <Col key={element.id} xs={6} md={4}>
+          <Col key={element.id} xs={12} md={4}>
             <Card id="dashboard-card">
               <Card.Body>
                 <Card.Title>
@@ -169,7 +169,7 @@ const Dashboard = () => {
     ) : (
       <Row>
         {namespaces.map((element, index) => (
-          <Col key={element.name} xs={6} md={4}>
+          <Col key={element.name} xs={12} md={4}>
             <Card id="dashboard-card">
               <Card.Body>
                 <div className="d-flex justify-content-between">
