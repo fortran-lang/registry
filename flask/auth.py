@@ -134,7 +134,7 @@ def signup():
 
     if not registry_user:
         db.users.insert_one(user)
-
+        # send_verify_email(email)        #TODO: uncomment this line
         return (
             jsonify(
                 {
@@ -266,3 +266,48 @@ def forgot_password(*email):
         jsonify({"message": "Password reset link sent to your email", "code": 200}),
         200,
     )
+
+
+def send_verify_email(email):
+    
+    user = db.users.find_one({"email": email})
+
+    if not user:
+        return jsonify({"message": "User not found", "code": 404}), 404
+
+    uuid = generate_uuid()
+    db.users.update_one({"email": email}, {"$set": {"uuid": uuid}})
+
+    message = f"""\n
+    Dear {user['username']},
+
+    We received a request to verify your email. To verify your email, please copy paste the link below in a new browser window:
+
+    {env_var['host']}/account/verify/{uuid}
+
+    Thank you,
+    The Fortran-lang Team"""
+
+    message = f'Subject: Verify email \nTo: {email}\n{message}'
+    
+    # sending the mail
+    smtp.sendmail(to_addrs=email, msg=message, from_addr=fortran_email)
+
+    return (
+        jsonify({"message": "verification link sent to your email", "code": 200}),
+        200,
+    )
+
+@app.route("/auth/verify-email", methods=["POST"])
+def verify_email():
+    uuid = request.form.get("uuid")
+
+    if not uuid:
+        return jsonify({"message": "Unauthorized", "code": 401}), 401
+    
+    user = db.users.find_one({"uuid": uuid})
+
+    if not user:
+        return jsonify({"message": "User not found", "code": 404}), 404
+    
+    return jsonify({"message": "Successfully Verified Email", "code": 200}), 200
