@@ -19,13 +19,13 @@ const VerifyEmail = () => {
     <Container style={{ paddingTop: 25 }} onLoad={handleSubmit}>
       <form id="login-form" onSubmit={handleSubmit}>
         <h1>Welcome to fpm Registry!</h1>
+        <h3>Verify your email</h3>
         {message &&
           (statuscode !== 200 ? (
             <p className="error">{message}</p>
           ) : (
             <p className="success">{message}</p>
           ))}
-        
         <p>
           Already have an account?<Link to="/account/login"> Login </Link>
         </p>
