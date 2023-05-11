@@ -339,4 +339,4 @@ def change_email():
     )
     send_verify_email(new_email)
     
-    return jsonify({"message": "Email Id Successfully changed", "code": 200}), 200
+    return jsonify({"message": "Email id Successfully changed", "code": 200}), 200

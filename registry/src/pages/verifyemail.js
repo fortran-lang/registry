@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { verify } from "../store/actions/verifyEmailActions";
 import { Link } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 
 const VerifyEmail = () => {
   const { uuid } = useParams();
+  const dispatch = useDispatch();
   const message = useSelector((state) => state.verifyemail.message);
   const statuscode = useSelector((state) => state.verifyemail.statuscode);
 

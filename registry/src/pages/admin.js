@@ -118,7 +118,7 @@ const AdminSection = () => {
   // const [newPassword, setNewPassword] = useState("");
 
   useEffect(() => {
-    dispatch(adminAuth());
+    dispatch(adminAuth(uuid));
     if (!isAdmin) {
       navigate("/404");
     }
