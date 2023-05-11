@@ -311,3 +311,32 @@ def verify_email():
         return jsonify({"message": "User not found", "code": 404}), 404
     
     return jsonify({"message": "Successfully Verified Email", "code": 200}), 200
+
+@app.route("/auth/change-email", methods=["POST"])
+def change_email():
+    uuid = request.form.get("uuid")
+    new_email = request.form.get("new_email")
+
+    if not uuid:
+        return jsonify({"message": "Unauthorized", "code": 401}), 401
+    
+    user = db.users.find_one({"uuid": uuid})
+
+    if not user:
+        return jsonify({"message": "User not found", "code": 404}), 404
+    
+    if not new_email:
+        return jsonify({"message": "Please enter new email", "code": 400}), 400
+    
+    used_email = db.users.find_one({"email": new_email})
+
+    if used_email:
+        return jsonify({"message": "Email already in use", "code": 400}), 400
+    
+    db.users.update_one(
+        {"uuid": uuid},
+        {"$set": {"email": new_email}},
+    )
+    send_verify_email(new_email)
+    
+    return jsonify({"message": "Email Id Successfully changed", "code": 200}), 200
