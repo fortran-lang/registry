@@ -12,6 +12,7 @@ import NoPage from "./pages/404";
 import UserPage from "./pages/user";
 import PackagePage from "./pages/package";
 import NamespaceForm from "./pages/createNamespace";
+import VerifyEmail from "./pages/verifyemail";
 import NamespacePage from "./pages/namespace";
 import AdminSection from "./pages/admin";
 import ForgotPassword from "./pages/forgotpassword";
@@ -31,6 +32,10 @@ function App() {
         <Route
           path="/account/reset-password/:uuid"
           element={<ResetPassword />}
+        />
+        <Route
+          path="/account/verify/:uuid"
+          element={<VerifyEmail />}
         />
         <Route path="/account/register" element={<Register />} />
         <Route path="/help" element={<Help />} />
