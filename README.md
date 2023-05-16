@@ -1,6 +1,21 @@
 # registry
 Registry for Fortran package manager
 
+Currently for the testing phase :
+1. backend APIs are hosted at:  http://registry-apis.vercel.app/
+2. frontend is hosted at: https://registry-frontend.vercel.app/
+3. Documentation for the APIs are available at: https://registry-apis.vercel.app/apidocs/
+
+*** Please note: the current registry is a playground: its database will be fully deleted once its functionality is established. Please do not use it for production yet! more information will follow then. ****
+
+The fpm release [0.8.2](https://fortran-lang.discourse.group/t/fpm-version-0-8-2-released-centralized-registry-playground/5792) introduces fpm support for uploading packages to the fpm-registry server directly from the command-line interface, via
+```
+fpm publish --token <token-here>
+```
+
+fpm will now interact with a web interface that will help to manage the namespaces & packages.
+
+
 ## Python Flask app with Nginx and  Mongo database
 
 Project structure:
