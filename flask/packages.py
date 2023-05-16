@@ -7,6 +7,8 @@ from gridfs.errors import NoFile
 from datetime import datetime, timedelta
 from auth import generate_uuid
 from app import swagger
+import zipfile
+import toml
 from flasgger.utils import swag_from
 from urllib.parse import unquote
 import math
@@ -184,6 +186,10 @@ def upload():
     file_object_id = file_storage.put(tarball, content_type="application/gzip", filename=tarball_name)
 
 
+
+    # Extract the package metadata from the tarball's fpm.toml file.
+    package_data = extract_fpm_toml(tarball_name)
+
     # TODO: Uncomment this when the package validation is enabled
 
     # validate the package
@@ -197,7 +203,9 @@ def upload():
         package_obj = {
             "name": package_name,
             "namespace": namespace_doc["_id"],
-            "description": "Sample Test description",
+            "description": package_data["description"],
+            "homepage": package_data["homepage"],
+            "repository": package_data["repository"],
             "license": package_license,
             "createdAt": datetime.utcnow(),
             "updatedAt": datetime.utcnow(),
@@ -416,6 +424,8 @@ def get_package(namespace_name, package_name):
             "name": package["name"],
             "namespace": namespace["namespace"],
             "description": package["description"],
+            "repository": package["repository"],
+            "homepage": package["homepage"],
             "latest_version_data": {
                 "dependencies": package["versions"][-1]["dependencies"],
                 "version": package["versions"][-1]["version"],
@@ -607,3 +617,11 @@ def checkUserUnauthorized(user_id, package_namespace):
     maintainers_id_list = [str(obj_id) for obj_id in package_namespace["maintainers"]]
     str_user_id = str(user_id)
     return str_user_id not in admins_id_list and str_user_id not in maintainers_id_list
+
+def extract_fpm_toml(file_obj):
+    with zipfile.ZipFile(file_obj, 'r') as zip_ref:
+        zip_ref.extract("fpm.toml")
+        with open("fpm.toml", 'r') as file:
+            data = toml.load(file)
+            
+    return data

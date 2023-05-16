@@ -166,16 +166,15 @@ export default PackagePage;
 const sideBar = (data) => {
   return (
     <MDBCol size="3">
-      {/* TODO: update Package API for url,website,maintainers */}
       <p style={{ fontSize: 16, textAlign: "left" }}>Install</p>
       <code>
         fpm install {data.namespace}/{data.name}
       </code>
       <p style={{ fontSize: 16, textAlign: "left" }}>Repository</p>
-      {/* <Container> { data.url }</Container> */}
+      <Container> { data.repository }</Container>
       <hr></hr>
       <p style={{ fontSize: 16, textAlign: "left" }}>Homepage</p>
-      {/* <Container>{ data.website }</Container> */}
+      <Container>{ data.homepage }</Container>
       <hr></hr>
       <p style={{ fontSize: 16, textAlign: "left" }}>License</p>
       {data.license}
