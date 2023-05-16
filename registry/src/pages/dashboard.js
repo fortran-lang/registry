@@ -142,12 +142,17 @@ const Dashboard = () => {
                     </div>
                   ) : null}
                 </div>
-                <div
-                  className="border border-success rounded-pill chip-action"
-                  onClick={() => handleGenerateTokenDialog(element.id, true)}
-                >
-                  Generate Token
-                </div>
+                {element.isPackageMaintainer &&
+                !element.isNamespaceAdmin &&
+                !element.isNamespaceMaintainer ? (
+                  <div
+                    className="border border-success rounded-pill chip-action"
+                    onClick={() => handleGenerateTokenDialog(element.id, true)}
+                  >
+                    Generate Token
+                  </div>
+                ) : null}
+
                 <AddMaintainerFormDialog
                   package={element.name}
                   namespace={element.namespace}

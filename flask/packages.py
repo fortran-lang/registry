@@ -215,7 +215,7 @@ def upload():
             "createdAt": datetime.utcnow(),
             "updatedAt": datetime.utcnow(),
             "author": user["_id"],
-            "maintainers": [user["_id"]],
+            "maintainers": [],
             "copyright": "Test copyright",
             "tags": ["fortran", "fpm"],
             "isDeprecated": False,
