@@ -40,16 +40,22 @@ def profile(username):
             # Iterate over all the namespaces and add it to the response_namespace.
             for namespace in namespaces:
                 isNamespaceAdmin = False
+                isNamespaceMaintainer = False
 
-                # Check if the user is adming of the namespace.
+                # Check if the user is admin of the namespace.
                 if user_doc["_id"] in namespace["admins"]:
                     isNamespaceAdmin = True
+
+                # Check if the user is maintainer of the namespace.
+                if user_doc["_id"] in namespace["maintainers"]:
+                    isNamespaceMaintainer = True
 
                 response_namespaces.append({
                     "id": str(namespace["_id"]),
                     "name": namespace["namespace"],
                     "description": namespace["description"],
-                    "isNamespaceAdmin": isNamespaceAdmin
+                    "isNamespaceAdmin": isNamespaceAdmin,
+                    "isNamespaceMaintainer": isNamespaceMaintainer,
                 })
 
                 # Iterate over all the packages in the namespace.
@@ -58,13 +64,21 @@ def profile(username):
                 for package_id in namespace["packages"]:
                     package_doc = db.packages.find_one({"_id": package_id})
 
+                    isPackageMaintainer = False
+
+                    # Check if the user is maintainer of the package.
+                    if user_doc["_id"] in package_doc["maintainers"]:
+                        isPackageMaintainer = True
+
                     response_packages.append({
                         "id": str(package_doc["_id"]),
                         "name": package_doc["name"],
                         "namespace": namespace["namespace"],
                         "description": package_doc["description"],
                         "updatedAt": package_doc["updatedAt"],
-                        "isNamespaceMaintainer": True,
+                        "isNamespaceMaintainer": isNamespaceMaintainer,
+                        "isNamespaceAdmin": isNamespaceAdmin,
+                        "isPackageMaintainer": isPackageMaintainer,
                     })
 
         # Check for the packages that user is maintainer of individually but not as namespace maintainer.
@@ -90,9 +104,13 @@ def profile(username):
                 namespace = db.namespaces.find_one({"_id": package["namespace"]})
                 
                 isNamespaceMaintainer = False
+                isPackageMaintainer = False
 
                 if user_doc["_id"] in namespace["maintainers"]:
                     isNamespaceMaintainer = True
+
+                if user_doc["_id"] in package["maintainers"]:
+                    isPackageMaintainer = True
 
                 response_packages.append(
                     {   
@@ -101,7 +119,8 @@ def profile(username):
                         "namespace": namespace["namespace"],
                         "description": package["description"],
                         "updatedAt": package["updatedAt"],
-                        "isNamespaceMaintainer": isNamespaceMaintainer
+                        "isNamespaceMaintainer": isNamespaceMaintainer,
+                        "isPackageMaintainer": isPackageMaintainer,
                     }
                 )
                 
@@ -519,6 +538,19 @@ def remove_maintainers_from_namespace(username):
     if not user_to_be_removed:
         return jsonify(
             {"message": "Username to be removed as a maintainer not found", "code": 404}
+        )
+
+    # Check if the user is trying to remove admins from the namespace.
+    # Namespace admins cannot be remove from the namespace maintainers role.
+    if checkIsNamespaceAdmin(user_id=user_to_be_removed["_id"], namespace=namespace_doc):
+        return (
+            jsonify(
+                {
+                    "message": "Admins cannot be removed from the namespace maintainer role",
+                    "code": 401,
+                }
+            ),
+            401,
         )
 
     # Update the document only if the user_to_be_added["_id"] is not already in the maintainers list.
