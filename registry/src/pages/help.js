@@ -8,6 +8,7 @@ const Help = () => {
     <p>For uploading a package from fpm, you will have to first create a namespace. A namespace represents a collection of packages. Each package is published under a namespace in order to avoid collision of same package names. Namespace names will be unique always.
     Now, that you will have created a namespace with a unique name and a nice description. You can go to dashboard by from the dropdown options in the Navigation bar on top.
     In the dashboard, you can see the namespace that has been created by you. You can now generate a token for this namespace.</p>
+    <p>This token will be valid for 1 week , but you can always generate a new token.</p>
   <p>  Use this token to upload packages from the fpm using the CLI:</p> 
     <code>fpm publish --token token-here </code>
     <p>After completing the above steps, you will receive a response in the fpm command line interface whether your upload was successful or not.
