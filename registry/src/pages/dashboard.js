@@ -7,6 +7,7 @@ import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import Spinner from "react-bootstrap/Spinner";
 import Container from "react-bootstrap/Container";
+import { Link } from "react-router-dom";
 import AddMaintainerFormDialog from "./addMaintainerDialogForm";
 import RemoveMaintainerFormDialog from "./removeMaintainerDialogForm";
 import GenerateNamespaceTokenDialogForm from "./generateNamespaceTokenDialogForm";
@@ -155,7 +156,7 @@ const Dashboard = () => {
   function Namespaces() {
     return namespaces.length === 0 ? (
       <div className="alert alert-secondary" role="alert">
-        You are not a maintainer of any namespace yet.
+        You are not a maintainer of any namespace yet. Add a namespace <Link to="/namespace/create">here</Link>
       </div>
     ) : (
       <Row>

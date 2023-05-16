@@ -36,6 +36,7 @@ const authReducer = (state = initialState, action) => {
         isAuthenticated: true,
         uuid: action.payload.uuid,
         username: action.payload.username,
+        isLoading: false,
       };
 
     case LOGIN_FAILURE:
@@ -43,6 +44,7 @@ const authReducer = (state = initialState, action) => {
         ...state,
         isAuthenticated: false,
         error: action.payload.error,
+        isLoading: false,
       };
 
     case LOGOUT_SUCCESS:
@@ -66,6 +68,7 @@ const authReducer = (state = initialState, action) => {
         isAuthenticated: true,
         uuid: action.payload.uuid,
         username: action.payload.username,
+        isLoading: false,
       };
 
     case SIGNUP_FAILURE:
@@ -73,6 +76,7 @@ const authReducer = (state = initialState, action) => {
         ...state,
         isAuthenticated: false,
         error: action.payload.error,
+        isLoading: false,
       };
     case RESET_ERROR_MESSAGE:
       return {
