@@ -181,9 +181,14 @@ def upload():
     if not user:
         return jsonify({"code": 404, "message": "User not found"})
     
-    # User should be either namespace maintainer or namespace admin or package maintainer to upload a package.
-    if checkUserUnauthorized(user_id=user["_id"], package_namespace=namespace_doc, package_doc=package_doc):
-        return jsonify({"message": "Unauthorized", "code": 401}), 401
+    if not package_doc:
+        # User should be either namespace maintainer or namespace admin to upload a package.
+        if checkUserUnauthorizedForNamespaceTokenCreation(user_id=user["_id"], namespace_doc=namespace_doc):
+            return jsonify({"code": 401, "message": "Unauthorized"})
+    else:
+        # User should be either namespace maintainer or namespace admin or package maintainer to upload a package.
+        if checkUserUnauthorized(user_id=user["_id"], package_namespace=namespace_doc, package_doc=package_doc):
+            return jsonify({"message": "Unauthorized", "code": 401})
     
     package_doc = db.packages.find_one({"name": package_name, "namespace": namespace_doc["_id"]})
 
