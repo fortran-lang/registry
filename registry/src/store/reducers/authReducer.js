@@ -23,12 +23,12 @@ const authReducer = (state = initialState, action) => {
     case LOGIN_REQUEST:
       return {
         ...state,
-        isLoading: True,
+        isLoading: true,
       };
       case SIGNUP_REQUEST:
       return {
         ...state,
-        isLoading: True,
+        isLoading: true,
       };
     case LOGIN_SUCCESS:
       return {
