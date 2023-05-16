@@ -1,12 +1,16 @@
 import axios from "axios";
 
 export const RESET_ERROR_MESSAGE = "RESET_ERROR_MESSAGE";
+export const LOGIN_REQUEST = "LOGIN_REQUEST";
 
 export const LOGIN_SUCCESS = "LOGIN_SUCCESS";
 export const LOGIN_FAILURE = "LOGIN_FAILURE";
 
 export const login = (user_identifier, password) => async (dispatch) => {
   // Make an api call to login
+  dispatch({
+    type: LOGIN_REQUEST,
+  });
   let formData = new FormData();
 
   formData.append("user_identifier", user_identifier);
@@ -91,8 +95,12 @@ export const logout = (uuid) => async (dispatch) => {
 
 export const SIGNUP_SUCCESS = "SIGNUP_SUCCESS";
 export const SIGNUP_FAILURE = "SIGNUP_FAILURE";
+export const SIGNUP_REQUEST = "SIGNUP_REQUEST";
 
 export const signup = (username, email, password) => async (dispatch) => {
+  dispatch({
+    type: SIGNUP_REQUEST,
+  });
   let formData = new FormData();
 
   formData.append("username", username);

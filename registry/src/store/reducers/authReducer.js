@@ -6,6 +6,8 @@ import {
   LOGOUT_SUCCESS,
   LOGOUT_FAILURE,
   RESET_ERROR_MESSAGE,
+  LOGIN_REQUEST,
+  SIGNUP_REQUEST
 } from "../actions/authActions";
 
 const initialState = {
@@ -13,10 +15,21 @@ const initialState = {
   uuid: null,
   error: null,
   username: null,
+  isLoading: false,
 };
 
 const authReducer = (state = initialState, action) => {
   switch (action.type) {
+    case LOGIN_REQUEST:
+      return {
+        ...state,
+        isLoading: True,
+      };
+      case SIGNUP_REQUEST:
+      return {
+        ...state,
+        isLoading: True,
+      };
     case LOGIN_SUCCESS:
       return {
         ...state,

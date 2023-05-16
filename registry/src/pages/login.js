@@ -14,6 +14,7 @@ const Login = () => {
 
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const errorMessage = useSelector((state) => state.auth.error);
+  const isLoading = useSelector((state) => state.auth.isLoading);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -49,7 +50,7 @@ const Login = () => {
     }
   };
 
-  return (
+  return !isLoading ? (
     <Container style={{ paddingTop: 25 }}>
       <form id="login-form" onSubmit={handleSubmit}>
         <h1>Welcome to fpm Registry!</h1>
@@ -83,6 +84,12 @@ const Login = () => {
           <Link to="/account/forgot-password"> Forgot password </Link>
         </p>
       </form>
+    </Container>
+   ) : (
+    <Container style={{ margin: "200px" }}>
+      <Spinner animation="border" role="status">
+        <span className="visually-hidden">Loading...</span>
+      </Spinner>
     </Container>
   );
 };

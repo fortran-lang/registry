@@ -14,6 +14,7 @@ const Register = () => {
   const dispatch = useDispatch();
 
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const isLoading = useSelector((state) => state.auth.isLoading);
   const errorMessage = useSelector((state) => state.auth.error);
 
   const handleSubmit = async (e) => {
@@ -54,7 +55,7 @@ const Register = () => {
     return Object.keys(errors).length === 0;
   };
 
-  return (
+  return !isLoading ? (
     <Container style={{ paddingTop: 25 }}>
       <form id="login-form" onSubmit={handleSubmit}>
         <h1>Welcome to fpm Registry!</h1>
@@ -98,8 +99,14 @@ const Register = () => {
           <Link to="/account/forgot-password"> Forgot password </Link>
         </p>
       </form>
+    </Container> ) : (
+    <Container style={{ margin: "200px" }}>
+      <Spinner animation="border" role="status">
+        <span className="visually-hidden">Loading...</span>
+      </Spinner>
     </Container>
   );
+  
 };
 
 export default Register;
