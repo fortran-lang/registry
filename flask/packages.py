@@ -652,6 +652,28 @@ def create_token_upload_token_package(namespace_name, package_name):
     )
      
     return jsonify({"code": 200, "message": "Upload token created successfully", "uploadToken": upload_token}), 200
+@app.route("/packages/<namespace>/<package>/maintainers", methods=["GET"])
+def package_maintainers(namespace, package):
+    namespace_doc = db.namespaces.find_one({"namespace": namespace})
+
+    if not namespace_doc:
+        return jsonify({"message": "Namespace not found", "code": 404})
+    
+    package_doc = db.packages.find_one({"name": package, "namespace": namespace_doc["_id"]})
+
+    if not package_doc:
+        return jsonify({"message": "Package not found", "code": 404})
+    
+    maintainers = []
+
+    for i in package_doc["maintainers"]:
+        maintainer = db.users.find_one({"_id": i}, {"_id": 1, "username": 1})
+        maintainers.append({
+            "id": str(maintainer["_id"]),
+            "username": maintainer["username"]
+        }) 
+
+    return jsonify({"code": 200, "maintainers": maintainers}), 200
 
 def sort_versions(versions):
     """

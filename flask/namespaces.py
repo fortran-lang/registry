@@ -170,3 +170,39 @@ def namespace_packages(namespace):
         ),
         200,
     )
+
+@app.route("/namespace/<namespace>/admins", methods=["GET"])
+def namespace_admins(namespace):
+    namespace_doc = db.namespaces.find_one({"namespace": namespace})
+
+    if not namespace_doc:
+        return jsonify({"code": 404, "message": "Namespace not found"}), 404
+    
+    admins = []
+
+    for i in namespace_doc["admins"]:
+        admin = db.users.find_one({"_id": i}, {"_id": 1, "username": 1})
+        admins.append({
+            "id": str(admin["_id"]),
+            "username": admin["username"]
+        })
+    
+    return jsonify({"code": 200, "admins": admins}), 200
+
+@app.route("/namespace/<namespace>/maintainers", methods=["GET"])
+def namespace_maintainers(namespace):
+    namespace_doc = db.namespaces.find_one({"namespace": namespace})
+
+    if not namespace_doc:
+        return jsonify({"code": 404, "message": "Namespace not found"}), 404
+    
+    maintainers = []
+
+    for i in namespace_doc["maintainers"]:
+        maintainer = db.users.find_one({"_id": i}, {"_id": 1, "username": 1})
+        maintainers.append({
+            "id": str(maintainer["_id"]),
+            "username": maintainer["username"]
+        })
+
+    return jsonify({"code": 200, "maintainers": maintainers}), 200
