@@ -15,8 +15,8 @@ import {
 
 const initialState = {
   error: null,
-  isAdmin: false,
-  message: "",
+  isAdmin: true,
+  message: null,
   statuscode: null,
 };
 

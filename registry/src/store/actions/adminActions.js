@@ -99,7 +99,6 @@ export const deleteUser = (username, uuid) => async (dispatch) => {
     }
   } catch (error) {
     //on failure
-    console.log(error);
     dispatch({
       type: DELETE_USER_ERROR,
       payload: {
@@ -119,7 +118,7 @@ export const deleteNamespace = (namespace, uuid) => async (dispatch) => {
   try {
     let result = await axios({
       method: "post",
-      url: `${process.env.REACT_APP_REGISTRY_API_URL}/packages/${namespace}/delete`,
+      url: `${process.env.REACT_APP_REGISTRY_API_URL}/namespace/${namespace}/delete`,
       data: formData,
       headers: {
         "Content-Type": "multipart/form-data",
@@ -166,7 +165,7 @@ export const deletePackage =
     try {
       let result = await axios({
         method: "post",
-        url: `${process.env.REACT_APP_REGISTRY_API_URL}/packages/${namespacename}/${packagename}/delete"`,
+        url: `${process.env.REACT_APP_REGISTRY_API_URL}/packages/${namespacename}/${packagename}/delete`,
         data: formData,
         headers: {
           "Content-Type": "multipart/form-data",

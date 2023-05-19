@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import {
   MDBBtn,
   MDBModal,
@@ -11,12 +13,10 @@ import {
   MDBModalFooter,
   MDBIcon,
 } from "mdb-react-ui-kit";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import {
   adminAuth,
   deleteUser,
-  deleteNamespace, 
+  deleteNamespace,
   deletePackage,
   deleteRelease,
   deprecatePackage,
@@ -32,18 +32,19 @@ const AdminSection = () => {
 
   useEffect(() => {
     dispatch(adminAuth(uuid));
-    console.log("adminAuth");
-    console.log(isAdmin);
     if (!isAdmin) {
       navigate("/404");
     }
   }, [isAdmin]);
 
   useEffect(() => {
-    if (statuscode !=null) {
-        toggleShowModal();
+    if (statuscode != null) {
+    //   toggleShowModal();    //   toggleShowModal();
+
+      openModal(statuscode+" Status Code", message, null);
     }
-    }, [statuscode]);
+  }, [statuscode,message]);
+
 
   const [formData, setFormData] = useState({
     namespaceName: "",
@@ -94,12 +95,6 @@ const AdminSection = () => {
       )
     );
 
-    console.log(
-      "Deleting package:",
-      formData.namespaceName,
-      formData.packageName
-    );
-
     // clear the form data
     setFormData({
       namespaceName: "",
@@ -111,22 +106,13 @@ const AdminSection = () => {
     openModal(
       "Delete Release",
       `You will not be able to recover ${formData.namespaceName}/${formData.packageName}/${formData.releaseName} release after you delete it.`,
-      deleteRelease
-    );
-
-    console.log(
-      "Deleting release:",
-      formData.namespaceName,
-      formData.packageName,
-      formData.releaseName
-    );
-
-    dispatch(
-      deleteRelease(
-        formData.namespaceName,
-        formData.packageName,
-        formData.releaseName,
-        uuid
+      dispatch(
+        deleteRelease(
+          formData.namespaceName,
+          formData.packageName,
+          formData.releaseName,
+          uuid
+        )
       )
     );
 
@@ -144,21 +130,8 @@ const AdminSection = () => {
       `You will not be able to recover ${formData.userName} user after you delete it.`,
       dispatch(deleteUser(formData.userName, uuid))
     );
-    console.log("Deleting user:", formData.userName);
-
-    // setModalData({
-    //     showModal: false,
-    //   });
-
-    setModalData({
-      showModal: true,
-      modalTitle: statuscode + " Status Code",
-      modalMessage: message,
-      modalAction: toggleShowModal(),
-    });
 
     // clear the form data
-    // openModal(statuscode + " Status Code", message, toggleShowModal());
     setFormData({
       userName: "",
     });
@@ -170,8 +143,7 @@ const AdminSection = () => {
       `You will not be able to recover ${formData.namespaceName} namespace after you delete it.`,
       dispatch(deleteNamespace(formData.namespaceName, uuid))
     );
-    console.log("Deleting namespace:", formData.namespaceName);
-    dispatch(deleteNamespace(formData.namespaceName, uuid));
+    
     // clear the form data
     setFormData({
       namespaceName: "",
@@ -186,14 +158,7 @@ const AdminSection = () => {
         deprecatePackage(formData.namespaceName, formData.packageName, uuid)
       )
     );
-    console.log(
-      "Deprecating package:",
-      formData.namespaceName,
-      formData.packageName
-    );
-    dispatch(
-      deprecatePackage(formData.namespaceName, formData.packageName, uuid)
-    );
+    
     // clear the form data
     setFormData({
       namespaceName: "",
@@ -201,15 +166,15 @@ const AdminSection = () => {
     });
   };
 
-  const changePassword = () => {
-    console.log("Changing password for user:", formData.userName);
-    // Add the logic to change the password
-    // clear the form data
-    setFormData({
-      userName: "",
-      newPassword: "",
-    });
-  };
+//   const changePassword = () => {   // TODO: Enable this feature
+//     console.log("Changing password for user:", formData.userName);
+//     // Add the logic to change the password
+//     // clear the form data
+//     setFormData({
+//       userName: "",
+//       newPassword: "",
+//     });
+//   };
 
   return (
     <Container>
@@ -331,7 +296,7 @@ const AdminSection = () => {
           Delete User
         </MDBBtn>
       </div>
-      <div>
+      {/* <div>            // TODO: Enable this feature
         <br></br>
         <h4>Change password</h4>
         <p style={{ textAlign: "left" }}>
@@ -364,7 +329,7 @@ const AdminSection = () => {
         >
           Change Password
         </MDBBtn>
-      </div>
+      </div> */}
       <MDBModal show={modalData.showModal} tabIndex="-1">
         <MDBModalDialog>
           <MDBModalContent>
@@ -394,12 +359,3 @@ const AdminSection = () => {
 };
 
 export default AdminSection;
-
-// fix workflow for the submit
-
-// workflow:
-// click show modal with data ,
-// modal with fn and close ,
-// fn click send and update with status
-// show new modal with status,
-// close modal
