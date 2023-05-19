@@ -39,12 +39,9 @@ const AdminSection = () => {
 
   useEffect(() => {
     if (statuscode != null) {
-    //   toggleShowModal();    //   toggleShowModal();
-
-      openModal(statuscode+" Status Code", message, null);
+      openModal(statuscode + " Status Code", message, null);
     }
-  }, [statuscode,message]);
-
+  }, [statuscode, message]);
 
   const [formData, setFormData] = useState({
     namespaceName: "",
@@ -90,9 +87,11 @@ const AdminSection = () => {
     openModal(
       "Delete Package",
       `You will not be able to recover ${formData.namespaceName}/${formData.packageName} package after you delete it.`,
-      dispatch(
-        deletePackage(formData.namespaceName, formData.packageName, uuid)
-      )
+      () => {
+        dispatch(
+          deletePackage(formData.namespaceName, formData.packageName, uuid)
+        );
+      }
     );
 
     // clear the form data
@@ -106,14 +105,16 @@ const AdminSection = () => {
     openModal(
       "Delete Release",
       `You will not be able to recover ${formData.namespaceName}/${formData.packageName}/${formData.releaseName} release after you delete it.`,
-      dispatch(
-        deleteRelease(
-          formData.namespaceName,
-          formData.packageName,
-          formData.releaseName,
-          uuid
-        )
-      )
+      () => {
+        dispatch(
+          deleteRelease(
+            formData.namespaceName,
+            formData.packageName,
+            formData.releaseName,
+            uuid
+          )
+        );
+      }
     );
 
     // clear the form data
@@ -128,7 +129,9 @@ const AdminSection = () => {
     openModal(
       "Delete User",
       `You will not be able to recover ${formData.userName} user after you delete it.`,
-      dispatch(deleteUser(formData.userName, uuid))
+      () => {
+        dispatch(deleteUser(formData.userName, uuid));
+      }
     );
 
     // clear the form data
@@ -141,9 +144,11 @@ const AdminSection = () => {
     openModal(
       "Delete Namespace",
       `You will not be able to recover ${formData.namespaceName} namespace after you delete it.`,
-      dispatch(deleteNamespace(formData.namespaceName, uuid))
+      () => {
+        dispatch(deleteNamespace(formData.namespaceName, uuid));
+      }
     );
-    
+
     // clear the form data
     setFormData({
       namespaceName: "",
@@ -154,11 +159,13 @@ const AdminSection = () => {
     openModal(
       "Delete Package",
       `You will not be able to recover ${formData.namespaceName}/${formData.packageName} package after you delete it.`,
-      dispatch(
-        deprecatePackage(formData.namespaceName, formData.packageName, uuid)
-      )
+      () => {
+        dispatch(
+          deprecatePackage(formData.namespaceName, formData.packageName, uuid)
+        );
+      }
     );
-    
+
     // clear the form data
     setFormData({
       namespaceName: "",
@@ -166,15 +173,15 @@ const AdminSection = () => {
     });
   };
 
-//   const changePassword = () => {   // TODO: Enable this feature
-//     console.log("Changing password for user:", formData.userName);
-//     // Add the logic to change the password
-//     // clear the form data
-//     setFormData({
-//       userName: "",
-//       newPassword: "",
-//     });
-//   };
+  //   const changePassword = () => {   // TODO: Enable this feature
+  //     console.log("Changing password for user:", formData.userName);
+  //     // Add the logic to change the password
+  //     // clear the form data
+  //     setFormData({
+  //       userName: "",
+  //       newPassword: "",
+  //     });
+  //   };
 
   return (
     <Container>
