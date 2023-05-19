@@ -43,7 +43,7 @@ def generate_latest_tarball():
         os.mkdir(backup_dir)
 
     # Execute the mongodump command
-    command = f"mongodump --host {mongo_uri} --authenticationDatabase admin --username {mongo_username} --password {mongo_password} --db {database_name} --out {backup_dir}"
+    command = f"mongodump --host {mongo_uri} --authenticationDatabase admin --username {mongo_username} --password {mongo_password} --db {database_name} --collection namespaces --collection packages --collection tarballs --out {backup_dir}"
     subprocess.call(command, shell=True)
 
     # Create a tar archive of the backup directory
