@@ -187,7 +187,7 @@ def namespace_admins(namespace):
             "username": admin["username"]
         })
     
-    return jsonify({"code": 200, "admins": admins}), 200
+    return jsonify({"code": 200, "users": admins}), 200
 
 @app.route("/namespace/<namespace>/maintainers", methods=["GET"])
 def namespace_maintainers(namespace):
@@ -205,4 +205,4 @@ def namespace_maintainers(namespace):
             "username": maintainer["username"]
         })
 
-    return jsonify({"code": 200, "maintainers": maintainers}), 200
+    return jsonify({"code": 200, "users": maintainers}), 200
