@@ -14,6 +14,7 @@ import AddNamespaceMaintainerFormDialog from "./addNamespaceMaintainerDialogForm
 import RemoveNamespaceMaintainerFormDialog from "./removeNamespaceMaintainerDialogForm";
 import AddNamespaceAdminFormDialog from "./addNamespaceAdminForm";
 import RemoveNamespaceAdminFormDialog from "./removeNamespaceAdminForm";
+import GeneratePackageTokenDialogForm from "./generatePackageTokenDialogForm";
 
 const Dashboard = () => {
   const [addMaintainerDialogState, setAddMaintainerDialogState] = useState({});
@@ -141,6 +142,17 @@ const Dashboard = () => {
                     </div>
                   ) : null}
                 </div>
+                {element.isPackageMaintainer &&
+                !element.isNamespaceAdmin &&
+                !element.isNamespaceMaintainer ? (
+                  <div
+                    className="border border-success rounded-pill chip-action"
+                    onClick={() => handleGenerateTokenDialog(element.id, true)}
+                  >
+                    Generate Token
+                  </div>
+                ) : null}
+
                 <AddMaintainerFormDialog
                   package={element.name}
                   namespace={element.namespace}
@@ -152,6 +164,12 @@ const Dashboard = () => {
                   namespace={element.namespace}
                   show={removeMaintainerDialogState[element.id]}
                   onHide={() => handleRemoveMaintainerDialog(element.id, false)}
+                />
+                <GeneratePackageTokenDialogForm
+                  namespace={element.namespace}
+                  package={element.name}
+                  show={showGenerateTokenDialog[element.id]}
+                  onHide={() => handleGenerateTokenDialog(element.id, false)}
                 />
               </Card.Body>
             </Card>
