@@ -169,7 +169,7 @@ class TestNamespaces(BaseTestClass):
         # Get the list of maintainers.
         response = self.client.get(f"/namespace/{namespace_name}/maintainers")
         self.assertEqual(200, response.json["code"])
-        self.assertEqual(1, len(response.json["maintainers"]))
+        self.assertEqual(1, len(response.json["users"]))
 
     def test_namespace_admins_list(self):
         """
@@ -200,4 +200,4 @@ class TestNamespaces(BaseTestClass):
         # Get the list of admins.
         response = self.client.get(f"/namespace/{namespace_name}/admins")
         self.assertEqual(200, response.json["code"])
-        self.assertEqual(1, len(response.json["admins"]))
+        self.assertEqual(1, len(response.json["users"]))
