@@ -9,6 +9,10 @@ const ShowUserListDialog = (props) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    if (!props.show) {
+      return;
+    }
+
     dispatch(
       fetchUserListData({
         namespaceAdmins: props.admins,
@@ -16,7 +20,7 @@ const ShowUserListDialog = (props) => {
         namespace: props.namespace,
       })
     );
-  }, [props.isListDialogOpen]);
+  }, [props.show]);
 
   return (
     <>

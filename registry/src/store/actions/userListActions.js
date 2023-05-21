@@ -6,7 +6,7 @@ export const FETCH_USERS_LIST_ERROR = "FETCH_USERS_LIST_ERROR";
 
 export const fetchUserListData = ({
   namespaceAdmins = false,
-  namespaceMaintainer = false,
+  namespaceMaintainers = false,
   packageMaintainers = false,
   namespace,
   packageName,
@@ -17,7 +17,7 @@ export const fetchUserListData = ({
 
     if (namespaceAdmins) {
       url = `${process.env.REACT_APP_REGISTRY_API_URL}/namespace/${namespace}/admins`;
-    } else if (namespaceMaintainer) {
+    } else if (namespaceMaintainers) {
       url = `${process.env.REACT_APP_REGISTRY_API_URL}/namespace/${namespace}/maintainers`;
     } else if (packageMaintainers) {
       url = `${process.env.REACT_APP_REGISTRY_API_URL}/packages/${namespace}/${packageName}/maintainers`;
