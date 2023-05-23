@@ -144,7 +144,7 @@ def namespace_packages(namespace):
 
     packages = []
     for i in namespace_document["packages"]:
-        package = db.packages.find(
+        package = db.packages.find_one(
             {"_id": i},
             {
                 "_id": 0,
@@ -152,14 +152,32 @@ def namespace_packages(namespace):
                 "description": 1,
                 "author": 1,
                 "updatedAt": 1,
+                "maintainers": 1
             },
         )
-        for p in package:
-            p["namespace"] = namespace
-            author = db.users.find_one({"_id": p["author"]})
-            p["author"] = author["username"]
-            packages.append(p)
+        
+        # Get the package author name.
+        author = db.users.find_one({"_id": package["author"]})
 
+        package_maintainers = []
+
+        # Get the package maintainer's data.
+        for maintainer_id in package["maintainers"]:
+            maintainer = db.users.find_one({"_id": maintainer_id})
+            package_maintainers.append({
+                "id": str(maintainer["_id"]),
+                "username": maintainer["username"]
+            })
+        
+        packages.append({
+            "namespace" : namespace,
+            "name": package["name"],
+            "description": package["description"],
+            "author": author["username"],
+            "updatedAt": package["updatedAt"],
+            "maintainers": package_maintainers,
+        })
+            
     return (
         jsonify(
             {
