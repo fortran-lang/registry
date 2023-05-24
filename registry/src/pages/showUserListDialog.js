@@ -17,7 +17,9 @@ const ShowUserListDialog = (props) => {
       fetchUserListData({
         namespaceAdmins: props.admins,
         namespaceMaintainers: props.maintainers,
+        packageMaintainers: props.packagemaintainers,
         namespace: props.namespace,
+        packageName: props.package,
       })
     );
   }, [props.show]);
@@ -34,6 +36,7 @@ const ShowUserListDialog = (props) => {
         </Modal.Header>
 
         <Modal.Body>
+          {users.length === 0 ? <p>No users found</p> : null}
           {users.map((user, index) => {
             return (
               <Card

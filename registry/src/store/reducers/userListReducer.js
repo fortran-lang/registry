@@ -18,6 +18,7 @@ const userListReducer = (state = initialState, action) => {
       };
     case FETCH_USERS_LIST_SUCCESS:
       return {
+        ...state,
         users: action.payload.users,
         isLoading: false,
       };
