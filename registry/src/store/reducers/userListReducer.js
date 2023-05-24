@@ -5,7 +5,7 @@ import {
 } from "../actions/userListActions";
 
 const initialState = {
-  users: [],
+  users: null,
   isLoading: true,
 };
 

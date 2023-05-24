@@ -36,39 +36,40 @@ const ShowUserListDialog = (props) => {
         </Modal.Header>
 
         <Modal.Body>
-          {users.length === 0 ? <p>No users found</p> : null}
-          {users.map((user, index) => {
-            return (
-              <Card
-                key={user.id}
-                style={{
-                  marginBottom: "10px",
-                }}
-              >
-                <Card.Body
+          {users && users.length === 0 ? <p>No users found</p> : null}
+          {users &&
+            users.map((user, index) => {
+              return (
+                <Card
+                  key={user.id}
                   style={{
-                    display: "flex",
-                    alignItems: "center",
+                    marginBottom: "10px",
                   }}
                 >
-                  <MDBIcon
+                  <Card.Body
                     style={{
-                      paddingRight: "10px",
-                    }}
-                    fas
-                    icon="user"
-                  />
-                  <h6
-                    style={{
-                      marginBottom: "0",
+                      display: "flex",
+                      alignItems: "center",
                     }}
                   >
-                    {user.username}
-                  </h6>
-                </Card.Body>
-              </Card>
-            );
-          })}
+                    <MDBIcon
+                      style={{
+                        paddingRight: "10px",
+                      }}
+                      fas
+                      icon="user"
+                    />
+                    <h6
+                      style={{
+                        marginBottom: "0",
+                      }}
+                    >
+                      {user.username}
+                    </h6>
+                  </Card.Body>
+                </Card>
+              );
+            })}
         </Modal.Body>
       </Modal>
     </>
