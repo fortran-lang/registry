@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   MDBIcon,
@@ -18,6 +18,7 @@ import {
 import Container from "react-bootstrap/Container";
 import Spinner from "react-bootstrap/Spinner";
 import { fetchPackageData } from "../store/actions/packageActions";
+import ShowUserListDialog from "./showUserListDialog";
 
 const PackagePage = () => {
   const [iconsActive, setIconsActive] = useState("readme");
@@ -27,6 +28,12 @@ const PackagePage = () => {
   const data = useSelector((state) => state.package.data);
   const isLoading = useSelector((state) => state.package.isLoading);
   const navigate = useNavigate();
+  const location = useLocation();
+  const [togglePackageMaintainersDialog, settogglePackageMaintainersDialog] =
+    useState(false);
+
+  const showPackageMaintainers =
+    location.state != null ? location.state.showPackageMaintainers : false;
 
   const handleIconsClick = (value) => {
     if (value === iconsActive) {
@@ -45,7 +52,40 @@ const PackagePage = () => {
 
   return !isLoading ? (
     <Container style={{ paddingTop: 25 }}>
-      <p style={{ textAlign: "left", fontSize: 24 }}>{data.name}</p>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
+        <p style={{ textAlign: "left", fontSize: 24 }}>{data.name}</p>
+        {showPackageMaintainers ? (
+          <p
+            className="border border-success"
+            style={{
+              padding: "8px",
+              borderRadius: "25px",
+              fontSize: "14px",
+              color: "green",
+              cursor: "pointer",
+            }}
+            onClick={() => settogglePackageMaintainersDialog(true)}
+          >
+            View Package Maintainers
+          </p>
+        ) : null}
+
+        {showPackageMaintainers ? (
+          <ShowUserListDialog
+            packagemaintainers={true}
+            show={togglePackageMaintainersDialog}
+            onHide={() => settogglePackageMaintainersDialog(false)}
+            package={package_name}
+            namespace={namespace_name}
+          />
+        ) : null}
+      </div>
+
       <p style={{ textAlign: "left", fontSize: 16 }}>
         v{data.latest_version_data.version} Published{" "}
         {updatedDays(data.updatedAt)} days ago
@@ -81,9 +121,7 @@ const PackagePage = () => {
         <MDBTabsPane show={iconsActive === "readme"}>
           <MDBContainer>
             <MDBRow>
-              <MDBCol size="9">
-                {data.description}
-              </MDBCol>
+              <MDBCol size="9">{data.description}</MDBCol>
 
               {sideBar(data)}
             </MDBRow>
@@ -94,7 +132,7 @@ const PackagePage = () => {
             <MDBRow>
               <MDBCol size="9">
                 <p style={{ fontSize: 24, textAlign: "left" }}>Dependencies</p>
-                <hr/>
+                <hr />
 
                 <br />
               </MDBCol>
@@ -139,7 +177,7 @@ const PackagePage = () => {
                           {updatedDays(ver.createdAt)} Days ago
                         </td>
                         <td colSpan={3}>
-                          {ver.isDeprecated == "true" ? "Yes" : "No"}
+                          {ver.isDeprecated === "true" ? "Yes" : "No"}
                         </td>
                       </tr>
                     ))}
@@ -199,7 +237,8 @@ const updatedDays = (date) => {
 };
 
 const sortedVersions = (version) => {
-  return version.sort((a, b) => {
+  let sortedVersions = [...version];
+  return sortedVersions.sort((a, b) => {
     const [aMajor, aMinor, aPatch] = a.version.split(".").map(Number);
     const [bMajor, bMinor, bPatch] = b.version.split(".").map(Number);
 
