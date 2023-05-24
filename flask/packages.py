@@ -673,7 +673,7 @@ def package_maintainers(namespace, package):
             "username": maintainer["username"]
         }) 
 
-    return jsonify({"code": 200, "maintainers": maintainers}), 200
+    return jsonify({"code": 200, "users": maintainers}), 200
 
 def sort_versions(versions):
     """
