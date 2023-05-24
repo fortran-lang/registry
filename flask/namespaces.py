@@ -152,22 +152,11 @@ def namespace_packages(namespace):
                 "description": 1,
                 "author": 1,
                 "updatedAt": 1,
-                "maintainers": 1
             },
         )
         
         # Get the package author name.
         author = db.users.find_one({"_id": package["author"]})
-
-        package_maintainers = []
-
-        # Get the package maintainer's data.
-        for maintainer_id in package["maintainers"]:
-            maintainer = db.users.find_one({"_id": maintainer_id})
-            package_maintainers.append({
-                "id": str(maintainer["_id"]),
-                "username": maintainer["username"]
-            })
         
         packages.append({
             "namespace" : namespace,
@@ -175,7 +164,6 @@ def namespace_packages(namespace):
             "description": package["description"],
             "author": author["username"],
             "updatedAt": package["updatedAt"],
-            "maintainers": package_maintainers,
         })
             
     return (
