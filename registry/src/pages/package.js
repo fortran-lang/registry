@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   MDBIcon,
@@ -17,7 +17,10 @@ import {
 } from "mdb-react-ui-kit";
 import Container from "react-bootstrap/Container";
 import Spinner from "react-bootstrap/Spinner";
-import { fetchPackageData } from "../store/actions/packageActions";
+import {
+  fetchPackageData,
+  verifyUserRole,
+} from "../store/actions/packageActions";
 import ShowUserListDialog from "./showUserListDialog";
 
 const PackagePage = () => {
@@ -28,12 +31,8 @@ const PackagePage = () => {
   const data = useSelector((state) => state.package.data);
   const isLoading = useSelector((state) => state.package.isLoading);
   const navigate = useNavigate();
-  const location = useLocation();
   const [togglePackageMaintainersDialog, settogglePackageMaintainersDialog] =
     useState(false);
-
-  const showPackageMaintainers =
-    location.state != null ? location.state.showPackageMaintainers : false;
 
   const handleIconsClick = (value) => {
     if (value === iconsActive) {
@@ -59,31 +58,20 @@ const PackagePage = () => {
         }}
       >
         <p style={{ textAlign: "left", fontSize: 24 }}>{data.name}</p>
-        {showPackageMaintainers ? (
-          <p
-            className="border border-success"
-            style={{
-              padding: "8px",
-              borderRadius: "25px",
-              fontSize: "14px",
-              color: "green",
-              cursor: "pointer",
-            }}
-            onClick={() => settogglePackageMaintainersDialog(true)}
-          >
-            View Package Maintainers
-          </p>
-        ) : null}
 
-        {showPackageMaintainers ? (
-          <ShowUserListDialog
-            packagemaintainers={true}
-            show={togglePackageMaintainersDialog}
-            onHide={() => settogglePackageMaintainersDialog(false)}
-            package={package_name}
-            namespace={namespace_name}
-          />
-        ) : null}
+        <ViewPackageMaintainersButton
+          namespace_name={namespace_name}
+          package_name={package_name}
+          settogglePackageMaintainersDialog={settogglePackageMaintainersDialog}
+        />
+
+        <ShowUserListDialog
+          packagemaintainers={true}
+          show={togglePackageMaintainersDialog}
+          onHide={() => settogglePackageMaintainersDialog(false)}
+          package={package_name}
+          namespace={namespace_name}
+        />
       </div>
 
       <p style={{ textAlign: "left", fontSize: 16 }}>
@@ -200,6 +188,43 @@ const PackagePage = () => {
 };
 
 export default PackagePage;
+
+const ViewPackageMaintainersButton = ({
+  namespace_name,
+  package_name,
+  settogglePackageMaintainersDialog,
+}) => {
+  const dispatch = useDispatch();
+  const uuid = useSelector((state) => state.auth.uuid);
+  const isVerified = useSelector((state) => state.package.isVerified);
+
+  useEffect(() => {
+    // Only make the API request when the user is logged in.
+    if (uuid) {
+      dispatch(verifyUserRole(namespace_name, package_name, uuid));
+    }
+  }, []);
+
+  return (
+    <React.Fragment>
+      {isVerified && (
+        <p
+          className="border border-success"
+          style={{
+            padding: "8px",
+            borderRadius: "25px",
+            fontSize: "14px",
+            color: "green",
+            cursor: "pointer",
+          }}
+          onClick={() => settogglePackageMaintainersDialog(true)}
+        >
+          View Package Maintainers
+        </p>
+      )}
+    </React.Fragment>
+  );
+};
 
 const sideBar = (data) => {
   return (

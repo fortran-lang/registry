@@ -122,7 +122,6 @@ const NamespacePage = () => {
             <PackageItem
               key={packageEntity.name + packageEntity.namespace}
               packageEntity={packageEntity}
-              showPackageMaintainers={true}
             />
           ))}
         </Col>

@@ -2,11 +2,7 @@ import { MDBListGroupItem } from "mdb-react-ui-kit";
 import { Row, Col, Image } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
-const PackageItem = ({ packageEntity, showPackageMaintainers = false }) => {
-  const prop = {
-    showPackageMaintainers: showPackageMaintainers,
-  };
-
+const PackageItem = ({ packageEntity }) => {
   function formatDate(timestamp) {
     const now = new Date();
     const date = new Date(timestamp);
@@ -51,7 +47,6 @@ const PackageItem = ({ packageEntity, showPackageMaintainers = false }) => {
         <Col md={4} style={{ padding: "10px" }}>
           <Link
             to={`/packages/${packageEntity.namespace}/${packageEntity.name}`}
-            state={prop}
             style={{
               textDecoration: "none",
             }}
