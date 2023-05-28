@@ -438,8 +438,34 @@ def get_package(namespace_name, package_name):
         }
 
         return jsonify({"data": package, "code": 200}), 200
-        
+    
+@app.route("/packages/<namespace_name>/<package_name>/verify", methods=["POST"])
+def verify_user_role(namespace_name, package_name):
+    uuid = request.form.get("uuid")
 
+    if not uuid:
+        return jsonify({"status": "error", "message": "Unauthorized", "code": 401}), 401
+
+    user = db.users.find_one({"uuid": uuid})
+
+    if not user:
+        return jsonify({"status": "error", "message": "Unauthorized", "code": 401}), 401
+
+    namespace = db.namespaces.find_one({"namespace": namespace_name})
+
+    if not namespace:
+        return jsonify({"status": "error", "message": "Namespace not found", "code": 404}), 404
+    
+    package = db.packages.find_one({"name": package_name, "namespace": namespace["_id"]})
+
+    if not package:
+        return jsonify({"status": "error", "message": "Package not found", "code": 404}), 404
+    
+    if str(user["_id"]) in [str(obj_id) for obj_id in namespace["maintainers"]] or str(user["_id"]) in [str(obj_id) for obj_id in namespace["admins"]] or str(user["_id"]) in [str(obj_id) for obj_id in package["maintainers"]]:
+        return jsonify({"status": "success", "code": 200, "isVerified": True}), 200
+    else:
+        return jsonify({"status": "error", "code": 401, "isVerified": False}), 401
+    
 @app.route("/packages/<namespace_name>/<package_name>/<version>", methods=["GET"])
 @swag_from("documentation/get_version.yaml", methods=["GET"])
 def get_package_from_version(namespace_name, package_name, version):
