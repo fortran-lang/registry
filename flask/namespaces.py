@@ -101,6 +101,7 @@ def create_upload_token(namespace_name):
     return jsonify({"code": 200, "message": "Upload token created", "uploadToken": upload_token})
 
 @app.route("/namespace/<namespace_name>/delete", methods=["POST"])
+@swag_from("documentation/delete_namespace.yaml", methods=["POST"])
 def delete_namespace(namespace_name):
     uuid = request.form.get("uuid")
 
