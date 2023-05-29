@@ -13,10 +13,10 @@ from auth import generate_uuid
 NAMESPACE_NAME_PATTERN = r'^[a-zA-Z0-9_-]+$'
 
 @app.route("/namespaces", methods=["POST"])
+@swag_from("documentation/create_namespace.yaml", methods=["POST"])
 def create_namespace():
     uuid = request.form.get("uuid")
     
-
     if not uuid:
         return jsonify({"code": 401, "message": "Unauthorized"}), 401
     
