@@ -141,6 +141,7 @@ def delete_namespace(namespace_name):
     
 
 @app.route("/namespace/<namespace>", methods=["GET"])
+@swag_from("documentation/get_namespace_packages.yaml", methods=["GET"])
 def namespace_packages(namespace):
     namespace_document = db.namespaces.find_one({"namespace": namespace})
 
@@ -174,7 +175,7 @@ def namespace_packages(namespace):
     return (
         jsonify(
             {
-                "status": 200,
+                "code": 200,
                 "packages": packages,
                 "createdAt": namespace_document["createdAt"],
             }
