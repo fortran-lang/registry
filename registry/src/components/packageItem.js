@@ -1,5 +1,6 @@
 import { MDBListGroupItem } from "mdb-react-ui-kit";
 import { Row, Col, Image } from "react-bootstrap";
+import { Link } from "react-router-dom";
 
 const PackageItem = ({ packageEntity }) => {
   function formatDate(timestamp) {
@@ -44,14 +45,15 @@ const PackageItem = ({ packageEntity }) => {
           />
         </Col>
         <Col md={4} style={{ padding: "10px" }}>
-          <h5 id="list-item-package-name">
-            <a
-              href={`/packages/${packageEntity.namespace}/${packageEntity.name}`}
-              style={{ textDecoration: "none" }}
-            >
-              {packageEntity.name}
-            </a>
-          </h5>
+          <Link
+            to={`/packages/${packageEntity.namespace}/${packageEntity.name}`}
+            style={{
+              textDecoration: "none",
+            }}
+          >
+            <h5 id="list-item-package-name">{packageEntity.name}</h5>
+          </Link>
+
           <h6 className="mb-2 text-muted">
             Namespace {packageEntity.namespace}
           </h6>
