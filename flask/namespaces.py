@@ -62,6 +62,7 @@ def create_namespace():
     return jsonify({"code": 200, "message": "Namespace created successfully"}), 200
 
 @app.route("/namespaces/<namespace_name>/uploadToken", methods=["POST"])
+@swag_from("documentation/create_namespace_upload_token.yaml", methods=["POST"])
 def create_upload_token(namespace_name):
     uuid = request.form.get("uuid")
 
