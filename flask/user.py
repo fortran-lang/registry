@@ -216,6 +216,7 @@ def admin():
 
 
 @app.route("/users/admin/transfer", methods=["POST"])
+@swag_from("documentation/transfer_account.yaml", methods=["POST"])
 def transfer_account():
     uuid = request.form.get("uuid")
     if not uuid:
