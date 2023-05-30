@@ -17,7 +17,7 @@ except KeyError as err:
 
 
 @app.route("/users/<username>", methods=["GET"])
-@swag_from("documentation/user.yaml", methods=["GET"])
+@swag_from("documentation/get_user_profile.yaml", methods=["GET"])
 def profile(username):
     user_doc = db.users.find_one({"username": username})
     if user_doc:
