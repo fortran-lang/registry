@@ -195,6 +195,7 @@ def account():
 
 
 @app.route("/users/admin", methods=["POST"])
+@swag_from("documentation/check_admin_user.yaml", methods=["POST"])
 def admin():
     uuid = request.form.get("uuid")
     if not uuid:
