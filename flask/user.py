@@ -259,6 +259,7 @@ def transfer_account():
 
 
 @app.route("/<username>/maintainer", methods=["POST"])
+@swag_from("documentation/add_package_maintainer.yaml", methods=["POST"])
 def add_maintainers_to_package(username):
     uuid = request.form.get("uuid")
     username_to_be_added = request.form.get("username")
