@@ -203,6 +203,7 @@ def namespace_admins(namespace):
     return jsonify({"code": 200, "users": admins}), 200
 
 @app.route("/namespace/<namespace>/maintainers", methods=["GET"])
+@swag_from("documentation/get_namespace_maintainers.yaml", methods=["GET"])
 def namespace_maintainers(namespace):
     namespace_doc = db.namespaces.find_one({"namespace": namespace})
 
