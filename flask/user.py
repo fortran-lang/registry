@@ -173,6 +173,7 @@ def delete_user():
 
 
 @app.route("/users/account", methods=["POST"])
+@swag_from("documentation/get_user_account.yaml", methods=["POST"])
 def account():
     uuid = request.form.get("uuid")
     if not uuid:
