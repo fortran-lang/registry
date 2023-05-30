@@ -1,0 +1,39 @@
+description: Get admins of a namespace.
+parameters:
+  - name: namespace
+    in: path
+    description: Namespace name
+    required: true
+    type: string
+responses:
+  200:
+    description: Admins found
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response status code
+        admins:
+          type: array
+          description: list of admins of the namespace
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: id of the admin
+              username:
+                type: string
+                description: username of the admin
+  404:
+    description: Namespace not found
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response status code
+        message:
+          type: string
+          description: Error message

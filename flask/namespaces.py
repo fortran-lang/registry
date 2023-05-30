@@ -184,6 +184,7 @@ def namespace_packages(namespace):
     )
 
 @app.route("/namespace/<namespace>/admins", methods=["GET"])
+@swag_from("documentation/get_namespace_admins.yaml", methods=["GET"])
 def namespace_admins(namespace):
     namespace_doc = db.namespaces.find_one({"namespace": namespace})
 
