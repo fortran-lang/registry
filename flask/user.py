@@ -158,7 +158,7 @@ def delete_user():
         user = db.users.find_one({"uuid": uuid})
 
     if not user:
-        return "Invalid email or password", 401
+       return jsonify({"message": "Unauthorized", "code": 401}), 401
 
     if username and "admin" in user["roles"]:
         delete_user = db.users.find_one({"username": username})
