@@ -635,6 +635,7 @@ def add_admins_to_namespace(username):
         return jsonify({"message": "Admin already added", "code": 200}), 200
     
 @app.route("/<username>/namespace/admin/remove", methods=["POST"])
+@swag_from("documentation/remove_namespace_admin.yaml", methods=["POST"])
 def remove_admins_from_namespace(username):
     uuid = request.form.get("uuid")
     username_to_be_removed = request.form.get("username")
