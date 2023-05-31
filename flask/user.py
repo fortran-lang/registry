@@ -571,6 +571,7 @@ def remove_maintainers_from_namespace(username):
         return jsonify({"message": "Namespace maintainer not found", "code": 200}), 200
     
 @app.route("/<username>/namespace/admin", methods=["POST"])
+@swag_from("documentation/add_namespace_admin.yaml", methods=["POST"])
 def add_admins_to_namespace(username):
     uuid = request.form.get("uuid")
     username_to_be_added = request.form.get("username")

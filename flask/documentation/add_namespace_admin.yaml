@@ -1,0 +1,58 @@
+description: Adds admins to namespace.
+
+parameters:
+  - name: uuid
+    in: formData
+    description: The uuid of the user
+    required: true
+    type: string
+  - name: username
+    in: formData
+    description: The username of the user to be added as a new admin
+    required: true
+    type: string
+  - name: namespace
+    in: formData
+    description: The name of the namespace
+    required: true
+    type: string
+
+responses:
+  200:
+    description: Admin added successfully or admin already added
+    schema:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: Response status code
+        message:
+          type: string
+          description: Response message
+  404:
+    description: Namespace or Admin not found
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+        code:
+          type: integer
+  400:
+    description: Invalid request body or missing parameters
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+        code:
+          type: integer
+  401:
+    description: Unauthorized access
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+        code:
+          type: integer
