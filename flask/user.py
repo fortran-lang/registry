@@ -495,6 +495,7 @@ def add_maintainers_to_namespace(username):
 
 
 @app.route("/<username>/namespace/maintainer/remove", methods=["POST"])
+@swag_from("documentation/remove_namespace_maintainer.yaml", methods=["POST"])
 def remove_maintainers_from_namespace(username):
     uuid = request.form.get("uuid")
     username_to_be_removed = request.form.get("username")
