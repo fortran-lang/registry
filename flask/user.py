@@ -340,6 +340,7 @@ def add_maintainers_to_package(username):
 
 
 @app.route("/<username>/maintainer/remove", methods=["POST"])
+@swag_from("documentation/remove_package_maintainer.yaml", methods=["POST"])
 def remove_maintainers_from_package(username):
     uuid = request.form.get("uuid")
     username_to_be_removed = request.form.get("username")
