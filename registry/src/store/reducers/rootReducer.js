@@ -15,6 +15,7 @@ import generatePackageTokenReducer from "./generatePackageTokenReducer";
 import addRemoveNamespaceMaintainerReducer from "./namespaceMaintainersReducer";
 import addRemoveNamespaceAdminReducer from "./namespaceAdminReducer";
 import verifyEmailReducer from "./verifyEmailReducer";
+import userListReducer from "./userListReducer";
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -33,6 +34,7 @@ const rootReducer = combineReducers({
   addRemoveNamespaceMaintainer: addRemoveNamespaceMaintainerReducer,
   addRemoveNamespaceAdmin: addRemoveNamespaceAdminReducer,
   verifyemail: verifyEmailReducer,
+  userList: userListReducer,
 });
 
 export default rootReducer;

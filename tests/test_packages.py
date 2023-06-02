@@ -480,3 +480,46 @@ class TestPackages(BaseTestClass):
         created_at_now = datetime.now()
         response = check_token_expiry(created_at_now)
         self.assertEqual(False, response)
+
+    def test_package_maintainers(self):
+        """
+        Test case to verify the behaviour of the system when a user tries to get the maintainers of a package.
+
+        Parameters:
+        None
+
+        Returns:
+        None
+
+        Raises:
+        AssertionError: If the response received from the server is not as expected.
+        """
+        response = self.client.post("/auth/signup", data=TestPackages.test_user_data)
+        self.assertEqual(200, response.json["code"])
+
+        uuid = response.json["uuid"]
+
+        TestPackages.test_namespace_data["uuid"] = uuid
+
+        # Try to create a namespace.
+        response = self.client.post("/namespaces", data=TestPackages.test_namespace_data)
+        self.assertEqual(200, response.json["code"])
+
+        # Create an upload token for the namespace.
+        response = self.client.post(f"/namespaces/{TestPackages.test_namespace_data['namespace']}/uploadToken", 
+            data={
+            "uuid": uuid
+            }
+        )
+        self.assertEqual(200, response.json["code"])
+
+        upload_token = response.json["uploadToken"]
+        TestPackages.test_package_data["upload_token"] = upload_token
+        TestPackages.test_package_data["tarball"] = TestPackages.generate_tarball()        
+
+        # Upload the package.
+        response = self.client.post("/packages", data=TestPackages.test_package_data)
+        self.assertEqual(200, response.json["code"])
+
+        response = self.client.get(f"/packages/{TestPackages.test_namespace_data['namespace']}/{TestPackages.test_package_data['package_name']}/maintainers")
+        self.assertEqual(200, response.json["code"])

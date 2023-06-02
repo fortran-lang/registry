@@ -17,7 +17,11 @@ import {
 } from "mdb-react-ui-kit";
 import Container from "react-bootstrap/Container";
 import Spinner from "react-bootstrap/Spinner";
-import { fetchPackageData } from "../store/actions/packageActions";
+import {
+  fetchPackageData,
+  verifyUserRole,
+} from "../store/actions/packageActions";
+import ShowUserListDialog from "./showUserListDialog";
 
 const PackagePage = () => {
   const [iconsActive, setIconsActive] = useState("readme");
@@ -27,6 +31,8 @@ const PackagePage = () => {
   const data = useSelector((state) => state.package.data);
   const isLoading = useSelector((state) => state.package.isLoading);
   const navigate = useNavigate();
+  const [togglePackageMaintainersDialog, settogglePackageMaintainersDialog] =
+    useState(false);
 
   const handleIconsClick = (value) => {
     if (value === iconsActive) {
@@ -45,7 +51,29 @@ const PackagePage = () => {
 
   return !isLoading ? (
     <Container style={{ paddingTop: 25 }}>
-      <p style={{ textAlign: "left", fontSize: 24 }}>{data.name}</p>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
+        <p style={{ textAlign: "left", fontSize: 24 }}>{data.name}</p>
+
+        <ViewPackageMaintainersButton
+          namespace_name={namespace_name}
+          package_name={package_name}
+          settogglePackageMaintainersDialog={settogglePackageMaintainersDialog}
+        />
+
+        <ShowUserListDialog
+          packagemaintainers={true}
+          show={togglePackageMaintainersDialog}
+          onHide={() => settogglePackageMaintainersDialog(false)}
+          package={package_name}
+          namespace={namespace_name}
+        />
+      </div>
+
       <p style={{ textAlign: "left", fontSize: 16 }}>
         v{data.latest_version_data.version} Published{" "}
         {updatedDays(data.updatedAt)} days ago
@@ -81,9 +109,7 @@ const PackagePage = () => {
         <MDBTabsPane show={iconsActive === "readme"}>
           <MDBContainer>
             <MDBRow>
-              <MDBCol size="9">
-                {data.description}
-              </MDBCol>
+              <MDBCol size="9">{data.description}</MDBCol>
 
               {sideBar(data)}
             </MDBRow>
@@ -94,7 +120,7 @@ const PackagePage = () => {
             <MDBRow>
               <MDBCol size="9">
                 <p style={{ fontSize: 24, textAlign: "left" }}>Dependencies</p>
-                <hr/>
+                <hr />
 
                 <br />
               </MDBCol>
@@ -139,7 +165,7 @@ const PackagePage = () => {
                           {updatedDays(ver.createdAt)} Days ago
                         </td>
                         <td colSpan={3}>
-                          {ver.isDeprecated == "true" ? "Yes" : "No"}
+                          {ver.isDeprecated === "true" ? "Yes" : "No"}
                         </td>
                       </tr>
                     ))}
@@ -162,6 +188,43 @@ const PackagePage = () => {
 };
 
 export default PackagePage;
+
+const ViewPackageMaintainersButton = ({
+  namespace_name,
+  package_name,
+  settogglePackageMaintainersDialog,
+}) => {
+  const dispatch = useDispatch();
+  const uuid = useSelector((state) => state.auth.uuid);
+  const isVerified = useSelector((state) => state.package.isVerified);
+
+  useEffect(() => {
+    // Only make the API request when the user is logged in.
+    if (uuid) {
+      dispatch(verifyUserRole(namespace_name, package_name, uuid));
+    }
+  }, []);
+
+  return (
+    <React.Fragment>
+      {isVerified && (
+        <p
+          className="border border-success"
+          style={{
+            padding: "8px",
+            borderRadius: "25px",
+            fontSize: "14px",
+            color: "green",
+            cursor: "pointer",
+          }}
+          onClick={() => settogglePackageMaintainersDialog(true)}
+        >
+          View Package Maintainers
+        </p>
+      )}
+    </React.Fragment>
+  );
+};
 
 const sideBar = (data) => {
   return (
@@ -198,7 +261,8 @@ const updatedDays = (date) => {
 };
 
 const sortedVersions = (version) => {
-  return version.sort((a, b) => {
+  let sortedVersions = [...version];
+  return sortedVersions.sort((a, b) => {
     const [aMajor, aMinor, aPatch] = a.version.split(".").map(Number);
     const [bMajor, bMinor, bPatch] = b.version.split(".").map(Number);
 
