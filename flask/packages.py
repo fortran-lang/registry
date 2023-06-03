@@ -184,9 +184,13 @@ def upload():
     
     package_doc = db.packages.find_one({"name": package_name, "namespace": namespace_doc["_id"]})
 
-    tarball_name = "{}-{}.tar.gz".format(package_name, package_version)
+    if tarball.content_type not in ["application/gzip", "application/zip"]:
+        return jsonify({"code": 400, "message": "Invalid file type"}),400
+    
+    extn = "tar.gz" if tarball.content_type == "application/gzip" else "zip"
+    tarball_name = "{}-{}.{}".format(package_name, package_version, extn)
     # Upload the tarball to the Grid FS storage.
-    file_object_id = file_storage.put(tarball, content_type="application/gzip", filename=tarball_name)
+    file_object_id = file_storage.put(tarball, content_type=tarball.content_type, filename=tarball_name)
 
 
 
