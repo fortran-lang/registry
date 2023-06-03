@@ -139,3 +139,65 @@ class TestNamespaces(BaseTestClass):
         # This user is not a maintainer nor an admin of the namespace.
         response = self.client.post(f"/namespaces/{namespace_name}/uploadToken", data={"uuid": new_uuid})
         self.assertEqual(401, response.json["code"])
+
+    def test_namespace_maintainers_list(self):
+        """
+        Test case to verify the behaviour of the system when a user tries to get the list of maintainers of a namespace.
+
+        Parameters:
+        None
+
+        Returns:
+        None
+
+        Raises:
+        AssertionError: If the response code received from the server is not as expected.
+        """
+
+        response = self.client.post("/auth/signup", data=TestNamespaces.test_user_data)
+        self.assertEqual(200, response.json["code"])
+
+        uuid = response.json["uuid"]
+        TestNamespaces.test_namespace_data["uuid"] = uuid
+
+        # Create a namespace.
+        response = self.client.post("/namespaces", data=TestNamespaces.test_namespace_data)
+        self.assertEqual(200, response.json["code"])
+
+        namespace_name = TestNamespaces.test_namespace_data['namespace']
+
+        # Get the list of maintainers.
+        response = self.client.get(f"/namespace/{namespace_name}/maintainers")
+        self.assertEqual(200, response.json["code"])
+        self.assertEqual(1, len(response.json["users"]))
+
+    def test_namespace_admins_list(self):
+        """
+        Test case to verify the behaviour of the system when a user tries to get the list of admins of a namespace.
+
+        Parameters:
+        None
+
+        Returns:
+        None
+
+        Raises:
+        AssertionError: If the response code received from the server is not as expected.
+        """
+
+        response = self.client.post("/auth/signup", data=TestNamespaces.test_user_data)
+        self.assertEqual(200, response.json["code"])
+
+        uuid = response.json["uuid"]
+        TestNamespaces.test_namespace_data["uuid"] = uuid
+
+        # Create a namespace.
+        response = self.client.post("/namespaces", data=TestNamespaces.test_namespace_data)
+        self.assertEqual(200, response.json["code"])
+
+        namespace_name = TestNamespaces.test_namespace_data['namespace']
+
+        # Get the list of admins.
+        response = self.client.get(f"/namespace/{namespace_name}/admins")
+        self.assertEqual(200, response.json["code"])
+        self.assertEqual(1, len(response.json["users"]))

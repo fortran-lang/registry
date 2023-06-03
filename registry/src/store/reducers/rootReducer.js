@@ -11,9 +11,11 @@ import adminReducer from "./adminReducer";
 import { combineReducers } from "redux";
 import addRemoveMaintainerReducer from "./addRemoveMaintainerReducer";
 import generateNamespaceTokenReducer from "./generateNamespaceTokenReducer";
+import generatePackageTokenReducer from "./generatePackageTokenReducer";
 import addRemoveNamespaceMaintainerReducer from "./namespaceMaintainersReducer";
 import addRemoveNamespaceAdminReducer from "./namespaceAdminReducer";
 import verifyEmailReducer from "./verifyEmailReducer";
+import userListReducer from "./userListReducer";
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -26,11 +28,13 @@ const rootReducer = combineReducers({
   resetpassword: resetPasswordReducer,
   addRemoveMaintainer: addRemoveMaintainerReducer,
   generateNamespaceToken: generateNamespaceTokenReducer,
+  generatePackageToken: generatePackageTokenReducer,
   admin: adminReducer,
   createNamespace: createNamespaceReducer,
   addRemoveNamespaceMaintainer: addRemoveNamespaceMaintainerReducer,
   addRemoveNamespaceAdmin: addRemoveNamespaceAdminReducer,
   verifyEmail: verifyEmailReducer,
+  userList: userListReducer,
 });
 
 export default rootReducer;

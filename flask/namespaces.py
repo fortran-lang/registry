@@ -4,7 +4,7 @@ from mongo import db
 from flask import request, jsonify
 from app import swagger
 from flasgger.utils import swag_from
-from packages import checkUserUnauthorized
+from packages import checkUserUnauthorizedForNamespaceTokenCreation
 
 from datetime import datetime
 from auth import generate_uuid
@@ -80,7 +80,7 @@ def create_upload_token(namespace_name):
         return jsonify({"code": 404, "message": "Namespace not found"}), 404
     
     # Only namespace maintainers or admins can generate an upload token for now.
-    if checkUserUnauthorized(user_id=user_doc["_id"], package_namespace=namespace_doc):
+    if checkUserUnauthorizedForNamespaceTokenCreation(user_id=user_doc["_id"], namespace_doc=namespace_doc):
         return jsonify({"code": 401, "message": "Unauthorized"}), 401
     
     # Generate an upload token for upload packages to the namespace.
@@ -144,7 +144,7 @@ def namespace_packages(namespace):
 
     packages = []
     for i in namespace_document["packages"]:
-        package = db.packages.find(
+        package = db.packages.find_one(
             {"_id": i},
             {
                 "_id": 0,
@@ -154,12 +154,18 @@ def namespace_packages(namespace):
                 "updatedAt": 1,
             },
         )
-        for p in package:
-            p["namespace"] = namespace
-            author = db.users.find_one({"_id": p["author"]})
-            p["author"] = author["username"]
-            packages.append(p)
-
+        
+        # Get the package author name.
+        author = db.users.find_one({"_id": package["author"]})
+        
+        packages.append({
+            "namespace" : namespace,
+            "name": package["name"],
+            "description": package["description"],
+            "author": author["username"],
+            "updatedAt": package["updatedAt"],
+        })
+            
     return (
         jsonify(
             {
@@ -170,3 +176,39 @@ def namespace_packages(namespace):
         ),
         200,
     )
+
+@app.route("/namespace/<namespace>/admins", methods=["GET"])
+def namespace_admins(namespace):
+    namespace_doc = db.namespaces.find_one({"namespace": namespace})
+
+    if not namespace_doc:
+        return jsonify({"code": 404, "message": "Namespace not found"}), 404
+    
+    admins = []
+
+    for i in namespace_doc["admins"]:
+        admin = db.users.find_one({"_id": i}, {"_id": 1, "username": 1})
+        admins.append({
+            "id": str(admin["_id"]),
+            "username": admin["username"]
+        })
+    
+    return jsonify({"code": 200, "users": admins}), 200
+
+@app.route("/namespace/<namespace>/maintainers", methods=["GET"])
+def namespace_maintainers(namespace):
+    namespace_doc = db.namespaces.find_one({"namespace": namespace})
+
+    if not namespace_doc:
+        return jsonify({"code": 404, "message": "Namespace not found"}), 404
+    
+    maintainers = []
+
+    for i in namespace_doc["maintainers"]:
+        maintainer = db.users.find_one({"_id": i}, {"_id": 1, "username": 1})
+        maintainers.append({
+            "id": str(maintainer["_id"]),
+            "username": maintainer["username"]
+        })
+
+    return jsonify({"code": 200, "users": maintainers}), 200

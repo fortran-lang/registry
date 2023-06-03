@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchNamespaceData } from "../store/actions/namespaceActions";
 import { MDBIcon } from "mdbreact";
@@ -10,7 +10,7 @@ import Col from "react-bootstrap/Col";
 import Spinner from "react-bootstrap/Spinner";
 import PackageItem from "../components/packageItem";
 import "./upload.css";
-
+import ShowUserListDialog from "./showUserListDialog";
 
 const NamespacePage = () => {
   const { namespace } = useParams();
@@ -20,6 +20,11 @@ const NamespacePage = () => {
   const notFound = useSelector((state) => state.namespace.notFound);
   const isLoading = useSelector((state) => state.namespace.isLoading);
   const dispatch = useDispatch();
+
+  const [isListDialogOpen, setListDialogOpen] = useState(false);
+  const [findNamespaceAdmins, setFindNamespaceAdmins] = useState(false);
+  const [findNamespaceMaintainers, setFindNamespaceMaintainers] =
+    useState(false);
 
   useEffect(() => {
     dispatch(fetchNamespaceData(namespace));
@@ -39,21 +44,73 @@ const NamespacePage = () => {
                 width={171}
                 height={180}
                 alt={`Avatar for ${namespace} from gravatar.com`}
-                src={`https://www.gravatar.com/avatar/${namespace}`}   // render image from Storage Service
+                src={`https://www.gravatar.com/avatar/${namespace}`} // render image from Storage Service
               />
             </Figure>
           </Row>
           <Row
             style={{ marginLeft: "10px", marginTop: "10px", fontSize: "20px" }}
           >
-         <MDBIcon style={{ marginTop: "5px"}} fas icon="box" >
+            <MDBIcon style={{ marginTop: "5px" }} fas icon="box">
               {" Namespace: " + namespace}
-              </MDBIcon>
-            <MDBIcon style={{ marginTop: "5px" }} far icon="calendar-alt">
-              {" Created " + Date(dateJoined).slice(4, 15)}
             </MDBIcon>
-
+            <MDBIcon style={{ marginTop: "5px" }} far icon="calendar-alt">
+              {" Created " + dateJoined.slice(4, 16)}
+            </MDBIcon>
           </Row>
+          <Row
+            style={{
+              marginLeft: "10px",
+              marginTop: "10px",
+              fontSize: "20px",
+              cursor: "pointer",
+            }}
+          >
+            <MDBIcon
+              style={{ marginTop: "5px" }}
+              fas
+              icon="user"
+              onClick={() => {
+                setFindNamespaceMaintainers(false);
+                setFindNamespaceAdmins(true);
+                setListDialogOpen(true);
+              }}
+            >
+              {" "}
+              Admins
+            </MDBIcon>
+          </Row>
+          <Row
+            style={{
+              marginLeft: "10px",
+              marginTop: "10px",
+              fontSize: "20px",
+              cursor: "pointer",
+            }}
+          >
+            <MDBIcon
+              style={{ marginTop: "5px" }}
+              fas
+              icon="user"
+              onClick={() => {
+                setFindNamespaceMaintainers(true);
+                setFindNamespaceAdmins(false);
+                setListDialogOpen(true);
+              }}
+            >
+              {" "}
+              Namespace Maintainers
+            </MDBIcon>
+          </Row>
+          {findNamespaceAdmins || findNamespaceMaintainers ? (
+            <ShowUserListDialog
+              maintainers={findNamespaceMaintainers}
+              admins={findNamespaceAdmins}
+              onHide={() => setListDialogOpen(false)}
+              namespace={namespace}
+              show={isListDialogOpen}
+            />
+          ) : null}
         </Col>
         <Col sm={8}>
           <Row style={{ fontSize: 24, marginTop: "20px" }}>
@@ -62,11 +119,11 @@ const NamespacePage = () => {
               : projects.length + " Packages"}
           </Row>
           {projects.map((packageEntity) => (
-        <PackageItem
-          key={packageEntity.name + packageEntity.namespace}
-          packageEntity={packageEntity}
-        />
-      ))}
+            <PackageItem
+              key={packageEntity.name + packageEntity.namespace}
+              packageEntity={packageEntity}
+            />
+          ))}
         </Col>
       </Row>
     </Container>

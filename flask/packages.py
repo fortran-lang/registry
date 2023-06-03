@@ -159,13 +159,21 @@ def upload():
     
     # Find the document that contains the upload token.
     namespace_doc = db.namespaces.find_one({"upload_tokens": {"$elemMatch": {"token": upload_token}}})
+    package_doc = db.packages.find_one({"upload_tokens": {"$elemMatch": {"token": upload_token}}})
 
-    # Check if there is a namespace connected to the given upload_token:
-    if not namespace_doc:
+    if not namespace_doc and not package_doc:
         return jsonify({"code": 401, "message": "Invalid upload token"})
-    
-    # Get the matching subdocument from the upload_token array
-    upload_token_doc = next(item for item in namespace_doc['upload_tokens'] if item['token'] == upload_token)
+
+    if namespace_doc:
+        upload_token_doc = next(item for item in namespace_doc['upload_tokens'] if item['token'] == upload_token)
+        package_doc = db.packages.find_one({"name": package_name, "namespace": namespace_doc["_id"]})
+
+    elif package_doc:
+        if package_doc["name"] != package_name:
+            return jsonify({"code": 401, "message": "Invalid upload token"})
+        
+        upload_token_doc = next(item for item in package_doc['upload_tokens'] if item['token'] == upload_token)
+        namespace_doc = db.namespaces.find_one({"_id": package_doc["namespace"]})
 
     # Check if the token is expired.
     # Expire the token after one week of it's creation.
@@ -179,9 +187,14 @@ def upload():
     if not user:
         return jsonify({"code": 404, "message": "User not found"})
     
-    # User should be either namespace maintainer or namespace admin to upload a package.
-    if checkUserUnauthorized(user_id=user["_id"], package_namespace=namespace_doc):
-        return jsonify({"message": "Unauthorized", "code": 401}), 401
+    if not package_doc:
+        # User should be either namespace maintainer or namespace admin to upload a package.
+        if checkUserUnauthorizedForNamespaceTokenCreation(user_id=user["_id"], namespace_doc=namespace_doc):
+            return jsonify({"code": 401, "message": "Unauthorized"})
+    else:
+        # User should be either namespace maintainer or namespace admin or package maintainer to upload a package.
+        if checkUserUnauthorized(user_id=user["_id"], package_namespace=namespace_doc, package_doc=package_doc):
+            return jsonify({"message": "Unauthorized", "code": 401})
     
     package_doc = db.packages.find_one({"name": package_name, "namespace": namespace_doc["_id"]})
 
@@ -228,7 +241,7 @@ def upload():
             }
         except KeyError as e:
             return jsonify({"code": 400, "message": f"Invalid package metadata. {e} is missing"}), 400
-
+        
         version_obj = {
             "version": package_version,
             "tarball": tarball_name,
@@ -456,8 +469,34 @@ def get_package(namespace_name, package_name):
         }
 
         return jsonify({"data": package, "code": 200}), 200
-        
+    
+@app.route("/packages/<namespace_name>/<package_name>/verify", methods=["POST"])
+def verify_user_role(namespace_name, package_name):
+    uuid = request.form.get("uuid")
 
+    if not uuid:
+        return jsonify({"status": "error", "message": "Unauthorized", "code": 401}), 401
+
+    user = db.users.find_one({"uuid": uuid})
+
+    if not user:
+        return jsonify({"status": "error", "message": "Unauthorized", "code": 401}), 401
+
+    namespace = db.namespaces.find_one({"namespace": namespace_name})
+
+    if not namespace:
+        return jsonify({"status": "error", "message": "Namespace not found", "code": 404}), 404
+    
+    package = db.packages.find_one({"name": package_name, "namespace": namespace["_id"]})
+
+    if not package:
+        return jsonify({"status": "error", "message": "Package not found", "code": 404}), 404
+    
+    if str(user["_id"]) in [str(obj_id) for obj_id in namespace["maintainers"]] or str(user["_id"]) in [str(obj_id) for obj_id in namespace["admins"]] or str(user["_id"]) in [str(obj_id) for obj_id in package["maintainers"]]:
+        return jsonify({"status": "success", "code": 200, "isVerified": True}), 200
+    else:
+        return jsonify({"status": "error", "code": 401, "isVerified": False}), 401
+    
 @app.route("/packages/<namespace_name>/<package_name>/<version>", methods=["GET"])
 @swag_from("documentation/get_version.yaml", methods=["GET"])
 def get_package_from_version(namespace_name, package_name, version):
@@ -624,6 +663,74 @@ def get_packages():
 
     return jsonify({"packages": response_packages})
 
+@app.route("/packages/<namespace_name>/<package_name>/uploadToken", methods=["POST"])
+def create_token_upload_token_package(namespace_name, package_name):
+    # Verify the uuid.
+    uuid = request.form.get("uuid")
+
+    if not uuid:
+        return jsonify({"code": 401, "message": "Unauthorized"}), 401
+    
+    # Get the user from uuid.
+    user_doc = db.users.find_one({"uuid": uuid})
+
+    if not user_doc:
+        return jsonify({"code": 401, "message": "Unauthorized"}), 401
+    
+    # Get the namespace from namespace_name.
+    namespace_doc = db.namespaces.find_one({"namespace": namespace_name})
+
+    if not namespace_doc:
+        return jsonify({"code": 404, "message": "Namespace not found"}), 404
+    
+    # Get the package from package_name & namespace_id.
+    package_doc = db.packages.find_one({"name": package_name, "namespace": namespace_doc["_id"]})
+
+    if not package_doc:
+        return jsonify({"code": 404, "message": "Package not found"}), 404
+    
+    # Check if the user is authorized to generate package token.
+    # Only package maintainers will have the option to generate tokens for a package.
+    if not str(user_doc["_id"]) in [str(obj_id) for obj_id in package_doc["maintainers"]]:
+        return jsonify({"code": 401, "message": "Only package maintainers can create tokens"}), 401
+    
+    # Generate the token.
+    upload_token = generate_uuid()
+
+    upload_token_obj = {
+        "token": upload_token,
+        "createdAt": datetime.utcnow(),
+        "createdBy": user_doc["_id"]
+    }
+
+    db.packages.update_one(
+        {"_id": package_doc["_id"]},
+        {"$addToSet": {"upload_tokens": upload_token_obj}}
+    )
+     
+    return jsonify({"code": 200, "message": "Upload token created successfully", "uploadToken": upload_token}), 200
+@app.route("/packages/<namespace>/<package>/maintainers", methods=["GET"])
+def package_maintainers(namespace, package):
+    namespace_doc = db.namespaces.find_one({"namespace": namespace})
+
+    if not namespace_doc:
+        return jsonify({"message": "Namespace not found", "code": 404})
+    
+    package_doc = db.packages.find_one({"name": package, "namespace": namespace_doc["_id"]})
+
+    if not package_doc:
+        return jsonify({"message": "Package not found", "code": 404})
+    
+    maintainers = []
+
+    for i in package_doc["maintainers"]:
+        maintainer = db.users.find_one({"_id": i}, {"_id": 1, "username": 1})
+        maintainers.append({
+            "id": str(maintainer["_id"]),
+            "username": maintainer["username"]
+        }) 
+
+    return jsonify({"code": 200, "users": maintainers}), 200
 
 def sort_versions(versions):
     """
@@ -633,9 +740,16 @@ def sort_versions(versions):
     return sorted(versions, key=lambda x: [int(i) for i in x.split(".")], reverse=True)
 
 # This function checks if user is authorized to upload/update a package in a namespace.
-def checkUserUnauthorized(user_id, package_namespace):
+def checkUserUnauthorized(user_id, package_namespace, package_doc):
     admins_id_list = [str(obj_id) for obj_id in package_namespace["admins"]]
     maintainers_id_list = [str(obj_id) for obj_id in package_namespace["maintainers"]]
+    pkg_maintainers_id_list = [str(obj_id) for obj_id in package_doc["maintainers"]]
+    str_user_id = str(user_id)
+    return str_user_id not in admins_id_list and str_user_id not in maintainers_id_list and str_user_id not in pkg_maintainers_id_list
+
+def checkUserUnauthorizedForNamespaceTokenCreation(user_id, namespace_doc):
+    admins_id_list = [str(obj_id) for obj_id in namespace_doc["admins"]]
+    maintainers_id_list = [str(obj_id) for obj_id in namespace_doc["maintainers"]]
     str_user_id = str(user_id)
     return str_user_id not in admins_id_list and str_user_id not in maintainers_id_list
 
