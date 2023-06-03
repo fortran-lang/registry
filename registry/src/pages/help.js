@@ -6,10 +6,17 @@ const Help = () => {
     fontFamily: "Arial, sans-serif",
     fontSize: "18px",
     lineHeight: "1.5",
-    paddingLeft: "20px",
+    paddingLeft: "30px",
     paddingTop: "20px",
     paddinBottom: "20px",
     color: "#333",
+    paddingRight: "30px",
+  };
+  
+  const h2Style = {
+    textAlign: "left",
+    alignContent: "left",
+    fontSize: "26px",
   };
 
   const codeStyle = {
@@ -23,6 +30,7 @@ const Help = () => {
     <div style={containerStyle}>
       <h1>Help</h1>
       <br></br>
+      <h2 style={h2Style}>Account Registration</h2>
       <div>First of all, you will need to register a user account:</div>
       <div>
         For uploading your package to the registry, you will have to step by
@@ -33,6 +41,7 @@ const Help = () => {
         password to set up your account.
       </div>
       <br></br>
+      <h2 style={h2Style}>Namespace Creation</h2>
       <div>
         For uploading a package from fpm, you will have to first create a
         namespace. A namespace represents a collection of packages. Each package
@@ -44,6 +53,7 @@ const Help = () => {
         been created by you. You can now generate a token for this namespace.
       </div>
       <br></br>
+      <h2 style={h2Style}>Token Generation and Package Upload</h2>
       <div>
         This token will be valid for 1 week , but you can always generate a new
         token.
@@ -51,7 +61,7 @@ const Help = () => {
       <div> Use this token to upload packages from the fpm using the CLI:</div>
       <br></br>
       <code style={codeStyle}>fpm publish --token token-here </code>
-      <br></br>
+      <br></br><br></br>
       <div>
         After completing the above steps, you will receive a response in the fpm
         command line interface whether your upload was successful or not. If
