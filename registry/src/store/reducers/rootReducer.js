@@ -30,7 +30,7 @@ const rootReducer = combineReducers({
   createNamespace: createNamespaceReducer,
   addRemoveNamespaceMaintainer: addRemoveNamespaceMaintainerReducer,
   addRemoveNamespaceAdmin: addRemoveNamespaceAdminReducer,
-  verifyemail: verifyEmailReducer,
+  verifyEmail: verifyEmailReducer,
 });
 
 export default rootReducer;

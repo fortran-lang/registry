@@ -8,8 +8,8 @@ import Container from "react-bootstrap/Container";
 const VerifyEmail = () => {
   const { uuid } = useParams();
   const dispatch = useDispatch();
-  const message = useSelector((state) => state.verifyemail.message);
-  const statuscode = useSelector((state) => state.verifyemail.statuscode);
+  const message = useSelector((state) => state.verifyEmail.message);
+  const statuscode = useSelector((state) => state.verifyEmail.statuscode);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
