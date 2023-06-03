@@ -207,21 +207,24 @@ def upload():
 
     # No previous recorded versions of the package found.
     if not package_doc:
-        package_obj = {
-            "name": package_name,
-            "namespace": namespace_doc["_id"],
-            "description": package_data["description"],
-            "homepage": package_data["homepage"],
-            "repository": package_data["repository"],
-            "license": package_license,
-            "createdAt": datetime.utcnow(),
-            "updatedAt": datetime.utcnow(),
-            "author": user["_id"],
-            "maintainers": [user["_id"]],
-            "copyright": "Test copyright",
-            "tags": ["fortran", "fpm"],
-            "isDeprecated": False,
-        }
+        try:
+            package_obj = {
+                "name": package_name,
+                "namespace": namespace_doc["_id"],
+                "description": package_data["description"],
+                "homepage": package_data["homepage"],
+                "repository": package_data["repository"],
+                "license": package_license,
+                "createdAt": datetime.utcnow(),
+                "updatedAt": datetime.utcnow(),
+                "author": user["_id"],
+                "maintainers": [user["_id"]],
+                "copyright": "Test copyright",
+                "tags": ["fortran", "fpm"],
+                "isDeprecated": False,
+            }
+        except KeyError as e:
+            return jsonify({"code": 400, "message": f"Invalid package metadata. {e} is missing"}), 400
 
         version_obj = {
             "version": package_version,
