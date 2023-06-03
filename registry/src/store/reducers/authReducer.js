@@ -7,7 +7,8 @@ import {
   LOGOUT_FAILURE,
   RESET_ERROR_MESSAGE,
   LOGIN_REQUEST,
-  SIGNUP_REQUEST
+  SIGNUP_REQUEST,
+  LOGOUT_REQUEST
 } from "../actions/authActions";
 
 const initialState = {
@@ -25,6 +26,11 @@ const authReducer = (state = initialState, action) => {
         ...state,
         isLoading: true,
       };
+      case LOGOUT_REQUEST:
+        return {
+          ...state,
+          isLoading: true,
+        };
       case SIGNUP_REQUEST:
       return {
         ...state,

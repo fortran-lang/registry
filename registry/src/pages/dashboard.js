@@ -28,7 +28,7 @@ const Dashboard = () => {
   const username = useSelector((state) => state.auth.username);
   const packages = useSelector((state) => state.dashboard.packages);
   const namespaces = useSelector((state) => state.dashboard.namespaces);
-  const isLoading = useSelector((state) => state.dashboard.isLoading);
+  const isLoading = useSelector((state) => state.dashboard.isLoading || state.auth.isLoading);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
