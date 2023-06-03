@@ -131,7 +131,10 @@ def upload():
     package_name = request.form.get("package_name")
     package_version = request.form.get("package_version")
     package_license = request.form.get("package_license")
+    dry_run = request.form.get("dry_run")
     tarball = request.files["tarball"]
+
+    dry_run = True if dry_run == "true" else False
 
     if not upload_token:
         return jsonify({"code": 400, "message": "Upload token missing"})
@@ -269,6 +272,10 @@ def upload():
         package_doc["versions"].append(new_version)
         package_doc["versions"] = sorted(package_doc["versions"], key=lambda x: x['version'])
         package_doc["updatedAt"] = datetime.utcnow()
+
+        if dry_run:
+            return jsonify({"message": "Dry run Successful.", "code": 200})
+        
         db.packages.update_one(
             {"_id": package_doc["_id"]},
             {"$set": package_doc},
