@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 from auth import generate_uuid
 from app import swagger
 import zipfile
+import tarfile
 import toml
 from flasgger.utils import swag_from
 from urllib.parse import unquote
@@ -195,10 +196,12 @@ def upload():
 
 
     # Extract the package metadata from the tarball's fpm.toml file.
-    package_data = extract_fpm_toml(tarball_name)
+    try:
+        package_data = extract_fpm_toml(tarball_name,extn)
+    except Exception as e:
+        return jsonify({"code": 400, "message": "Invalid package tarball."}), 400
 
     # TODO: Uncomment this when the package validation is enabled
-
     # validate the package
     # valid_package = validate_package(tarball_name, tarball_name)
     # if not valid_package:
@@ -219,7 +222,7 @@ def upload():
                 "updatedAt": datetime.utcnow(),
                 "author": user["_id"],
                 "maintainers": [user["_id"]],
-                "copyright": "Test copyright",
+                "copyright": package_data["copyright"],
                 "tags": ["fortran", "fpm"],
                 "isDeprecated": False,
             }
@@ -255,6 +258,10 @@ def upload():
 
         # Current user is the author of the package.
         user["authorOf"].append(package["_id"])
+
+        if dry_run:
+            return jsonify({"message": "Dry run Successful.", "code": 200})
+        
         db.users.update_one({"_id": user["_id"]}, {"$set": user})
 
         return jsonify({"message": "Package Uploaded Successfully.", "code": 200})
@@ -362,7 +369,7 @@ def check_version(current_version, new_version):
     return new_list > current_list
 
 
-@app.route("/packages/<namespace_name>/<package_name>", methods=["GET"])
+@app.route("/packages/<namespace_name>/<package_name>", methods=["GET","POST"])
 @swag_from("documentation/get_package.yaml", methods=["GET"])
 def get_package(namespace_name, package_name):
     # Get namespace from namespace name.
@@ -632,10 +639,19 @@ def checkUserUnauthorized(user_id, package_namespace):
     str_user_id = str(user_id)
     return str_user_id not in admins_id_list and str_user_id not in maintainers_id_list
 
-def extract_fpm_toml(file_obj):
-    with zipfile.ZipFile(file_obj, 'r') as zip_ref:
-        zip_ref.extract("fpm.toml")
-        with open("fpm.toml", 'r') as file:
-            data = toml.load(file)
-            
+def extract_fpm_toml(file_obj,extn):
+    if extn == "zip":
+        with zipfile.ZipFile(file_obj, 'r') as zip_ref:
+            zip_ref.extract("fpm.toml")
+            with open("fpm.toml", 'r') as file:
+                data = toml.load(file)
+    else:
+        with tarfile.open(file_obj, 'r') as tar:
+            for member in tar.getmembers():
+                if member.name == "fpm.toml":
+                    file = tar.extractfile(member)
+                    if file:
+                        content = file.read()
+                        file.close()
+                        data = toml.loads(content.decode())
     return data
