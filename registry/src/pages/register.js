@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { signup, resetErrorMessage } from "../store/actions/authActions";
 import { Link } from "react-router-dom";
-import Spinner from "react-bootstrap/Spinner";
 import Container from "react-bootstrap/Container";
 
 const Register = () => {
@@ -56,7 +55,7 @@ const Register = () => {
     return Object.keys(errors).length === 0;
   };
 
-  return !isLoading ? (
+  return (
     <Container style={{ paddingTop: 25 }}>
       <form id="login-form" onSubmit={handleSubmit}>
         <h1>Welcome to fpm Registry!</h1>
@@ -92,7 +91,7 @@ const Register = () => {
           <p className="error">{fromValidationErrors.password}</p>
         )}
         {errorMessage != null ? <p className="error">{errorMessage}</p> : null}
-        <input type="submit" value="Sign Up" />
+        <input type="submit" value={!isLoading ? "Sign Up" : "Loading..."} />
         <p>
           Already have an account?<Link to="/account/login"> Log in </Link>
         </p>
@@ -100,14 +99,8 @@ const Register = () => {
           <Link to="/account/forgot-password"> Forgot password </Link>
         </p>
       </form>
-    </Container> ) : (
-    <Container style={{ margin: "200px" }}>
-      <Spinner animation="border" role="status">
-        <span className="visually-hidden">Loading...</span>
-      </Spinner>
     </Container>
   );
-  
 };
 
 export default Register;

@@ -12,7 +12,7 @@ import NoPage from "./pages/404";
 import UserPage from "./pages/user";
 import PackagePage from "./pages/package";
 import NamespaceForm from "./pages/createNamespace";
-import VerifyEmail from "./pages/verifyemail";
+import VerifyEmail from "./pages/verifyEmail";
 import NamespacePage from "./pages/namespace";
 import AdminSection from "./pages/admin";
 import ForgotPassword from "./pages/forgotpassword";

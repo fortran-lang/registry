@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { login, resetErrorMessage } from "../store/actions/authActions";
 import { Link } from "react-router-dom";
-import Spinner from "react-bootstrap/Spinner";
 import Container from "react-bootstrap/Container";
 
 const Login = () => {
@@ -51,7 +50,7 @@ const Login = () => {
     }
   };
 
-  return !isLoading ? (
+  return (
     <Container style={{ paddingTop: 25 }}>
       <form id="login-form" onSubmit={handleSubmit}>
         <h1>Welcome to fpm Registry!</h1>
@@ -77,7 +76,7 @@ const Login = () => {
           <p className="error">{fromValidationErrors.password}</p>
         )}
         {errorMessage != null ? <p className="error">{errorMessage}</p> : null}
-        <input type="submit" value="Log In" />
+        <input type="submit" value={!isLoading ? "Log In" : "Loading..."} />
         <p>
           Don't have an account?<Link to="/account/register"> Sign up </Link>
         </p>
@@ -85,12 +84,6 @@ const Login = () => {
           <Link to="/account/forgot-password"> Forgot password </Link>
         </p>
       </form>
-    </Container>
-   ) : (
-    <Container style={{ margin: "200px" }}>
-      <Spinner animation="border" role="status">
-        <span className="visually-hidden">Loading...</span>
-      </Spinner>
     </Container>
   );
 };
