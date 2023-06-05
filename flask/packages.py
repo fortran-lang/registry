@@ -374,72 +374,26 @@ def get_package(namespace_name, package_name):
     if not package:
         return jsonify({"message": "Package not found", "code": 404})
 
-    if request.method == "GET":
-        # Get the package author from id.
-        package_author = db.users.find_one({"_id": package["author"]})
 
-        # Only latest version of the package will be sent as a response.
-        package_response_data = {
-            "name": package["name"],
-            "namespace": namespace["namespace"],
-            "latest_version_data": package["versions"][-1],
-            "author": package_author["username"],
-            "tags": package["tags"],
-            "license": package["license"],
-            "createdAt": package["createdAt"],
-            "version_history": package["versions"],
-            "updatedAt": package["updatedAt"],
-            "description": package["description"],
-        }
+    # Get the package author from id.
+    package_author = db.users.find_one({"_id": package["author"]})
 
-        return jsonify({"data": package_response_data, "code": 200})
+    # Only latest version of the package will be sent as a response.
+    package_response_data = {
+        "name": package["name"],
+        "namespace": namespace["namespace"],
+        "latest_version_data": package["versions"][-1],
+        "author": package_author["username"],
+        "tags": package["tags"],
+        "license": package["license"],
+        "createdAt": package["createdAt"],
+        "version_history": package["versions"],
+        "updatedAt": package["updatedAt"],
+        "description": package["description"],
+    }
 
-    elif request.method == "POST":
-        """
-        API for checking whether the latest version of a particular package
-        is already there in local registry or not.
-        """
-        versions = request.get_json()["cached_versions"]
+    return jsonify({"data": package_response_data, "code": 200})
 
-        # Versions should not be empty array.
-        if len(versions) == 0:
-            return jsonify({"message": "cached versions list is empty", "code": 400})
-
-        # Sort the versions received in request body.
-        sorted_versions = sort_versions(versions)
-
-        # Get the latest version stored in the backend database.
-        latest_version_backend = package["versions"][-1]["version"]
-
-        # Get the latest version that is in the local registry for that package.
-        latest_version_local_registry = sorted_versions[0]
-
-        latest_version_backend_list = list(map(int, latest_version_backend.split(".")))
-        latest_version_local_registry_list = list(
-            map(int, latest_version_local_registry.split("."))
-        )
-
-        # Check if the local registry already has the latest version.
-        if latest_version_backend_list <= latest_version_local_registry_list:
-            return (
-                jsonify({"message": "Latest version is already there in local registry"}),
-                200,
-            )
-
-        # If local registry does not have the latest version. Then send it from the backend.
-        package = {
-            "name": package["name"],
-            "namespace": namespace["namespace"],
-            "description": package["description"],
-            "latest_version_data": {
-                "dependencies": package["versions"][-1]["dependencies"],
-                "version": package["versions"][-1]["version"],
-                "tarball": package["versions"][-1]["tarball"],
-                "isDeprecated": package["versions"][-1]["isDeprecated"],
-            }
-        }
-
-        return jsonify({"data": package, "code": 200}), 200
     
 @app.route("/packages/<namespace_name>/<package_name>/verify", methods=["POST"])
 def verify_user_role(namespace_name, package_name):
