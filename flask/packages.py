@@ -438,6 +438,7 @@ def get_package_from_version(namespace_name, package_name, version):
 
 
 @app.route("/packages/<namespace_name>/<package_name>/delete", methods=["POST"])
+@swag_from("documentation/delete_package.yaml", methods=["POST"])
 def delete_package(namespace_name, package_name):
     uuid = request.form.get("uuid")
 
