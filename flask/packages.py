@@ -396,6 +396,7 @@ def get_package(namespace_name, package_name):
 
     
 @app.route("/packages/<namespace_name>/<package_name>/verify", methods=["POST"])
+@swag_from("documentation/verify_user_role.yaml", methods=["POST"])
 def verify_user_role(namespace_name, package_name):
     uuid = request.form.get("uuid")
 
