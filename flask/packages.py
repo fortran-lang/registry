@@ -314,41 +314,6 @@ def serve_gridfs_file(oid):
     except NoFile:
         abort(404)
 
-
-@app.route("/packages", methods=["PUT"])
-def update_package():
-    uuid = request.form.get("uuid")
-    if not uuid:
-        return jsonify({"status": "error", "message": "Unauthorized", "code": 401}), 401
-
-    user = db.users.find_one({"uuid": uuid})
-
-    if not user:
-        return jsonify({"status": "error", "message": "Unauthorized", "code": 401}), 401
-
-    name = request.form.get("name")
-    namespace = request.form.get("namespace")
-    isDeprecated = request.form.get("isDeprecated")
-
-    # Get the package namespace.
-    package_namespace = db.namespaces.find_one({"namespace": namespace})
-
-    if checkUserUnauthorized(user_id=user["_id"], package_namespace=package_namespace):
-        return jsonify({"status": "error", "message": "Unauthorized", "code": 401}), 401
-
-    package = db.packages.find_one(
-        {"name": name, "namespace": package_namespace["_id"]}
-    )
-    if package is None:
-        return jsonify({"status": "error", "message": "Package doesn't exist", "code": 404}), 404
-
-    isDeprecated = True if isDeprecated == "true" else False
-    package["isDeprecated"] = isDeprecated
-    package["updatedAt"] = datetime.utcnow()
-    db.packages.update_one({"_id": package["_id"]}, {"$set": package})
-    return jsonify({"message": "Package Updated Successfully.", "code": 200})
-
-
 def check_version(current_version, new_version):
     current_list = list(map(int, current_version.split(".")))
     new_list = list(map(int, new_version.split(".")))
@@ -567,33 +532,6 @@ def delete_package_version(namespace_name, package_name, version):
     else:
         return jsonify({"status": "error", "message": "Package version not found", "code": 404}), 404
 
-
-@app.route("/packages/list", methods=["GET"])
-def get_packages():
-    page = int(request.args.get("page", 0))
-
-    packages = db.packages.find().limit(10).skip(page * 10)
-    response_packages = []
-    for package in packages:
-        # Get the namespace id of the package.
-        namespace_id = package["namespace"]
-
-        # Get the namespace document from namespace id.
-        namespace = db.namespaces.find_one({"_id": namespace_id})
-
-        # Check if namespace does not exists.
-        if not namespace:
-            return jsonify({"message": "Namespace does not found", "code": 404})
-
-        response_packages.append(
-            {
-                "package_name": package["name"],
-                "namespace_name": namespace["namespace"],
-                "description": package["description"],
-            }
-        )
-
-    return jsonify({"packages": response_packages})
 
 @app.route("/packages/<namespace_name>/<package_name>/uploadToken", methods=["POST"])
 def create_token_upload_token_package(namespace_name, package_name):
