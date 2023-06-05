@@ -124,6 +124,7 @@ def search_packages():
         return jsonify({"status": "error", "message": "packages not found", "code": 404}), 404
 
 @app.route("/packages", methods=["POST"])
+@swag_from("documentation/package_upload.yaml", methods=["POST"])
 def upload():
     upload_token = request.form.get("upload_token")
     package_name = request.form.get("package_name")
