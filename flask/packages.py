@@ -536,6 +536,7 @@ def delete_package_version(namespace_name, package_name, version):
 
 
 @app.route("/packages/<namespace_name>/<package_name>/uploadToken", methods=["POST"])
+@swag_from("documentation/create_package_upload_token.yaml", methods=["POST"])
 def create_token_upload_token_package(namespace_name, package_name):
     # Verify the uuid.
     uuid = request.form.get("uuid")

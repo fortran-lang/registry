@@ -1,4 +1,4 @@
-description: Deletes package version.
+description: Creates upload token for uploading newer versions of existing package in a namespace. Only package maintainers can create upload tokens for packages.
 
 parameters:
   - name: namespace_name
@@ -13,12 +13,6 @@ parameters:
     required: true
     type: string
 
-  - name: version
-    description: version of the package
-    in: path
-    required: true
-    type: string
-
   - name: uuid
     description: uuid of the user
     in: formData
@@ -26,8 +20,8 @@ parameters:
     type: string
 
 responses:
-  200:
-    description: Package version deleted.
+  401:
+    description: Unauthorized access
     schema:
       type: object
       properties:
@@ -36,7 +30,7 @@ responses:
           description: response status code
         message:
           type: string
-          description: Package version deleted successfully
+          description: Unauthorized access
 
   404:
     description: Package or namespace not found
@@ -50,8 +44,8 @@ responses:
           type: string
           description: Package or namespace not found
 
-  401:
-    description: Unauthorized access
+  200:
+    description: Upload token created successfully
     schema:
       type: object
       properties:
@@ -60,4 +54,7 @@ responses:
           description: response status code
         message:
           type: string
-          description: Unauthorized access
+          description: Upload token created successfully
+        uploadToken:
+          type: string
+          description: Upload token
