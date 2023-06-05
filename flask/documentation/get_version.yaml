@@ -19,50 +19,51 @@ responses:
   200:
     description: Package Found.
     schema:
-        type: object
-        properties:
-          data:
-            type: object
-            description: package data
-            properties:
-              name:
-                type: string
-                description: name of package
-              namespace:
-                type: string
-                description: namespace of package
-              author:
-                type: string
-                description: author of package
-              tags:
-                type: string
-                description: tags of package
-              license:
-                type: string
-                description: license of package
-              createdAt:
-                type: string
-                description: createdAt of package
-              version_data:
-                type: object
-                description: version data of package
-              updatedAt:
-                type: string
-                description: updatedAt of package
-          code:
-            type: string
-            description: response status code
+      type: object
+      properties:
+        data:
+          type: object
+          description: package data
+          properties:
+            name:
+              type: string
+              description: name of package
+            namespace:
+              type: string
+              description: namespace of package
+            author:
+              type: string
+              description: author of package
+            tags:
+              type: string
+              description: tags of package
+            license:
+              type: string
+              description: license of package
+            createdAt:
+              type: string
+              description: createdAt of package
+            version_data:
+              type: object
+              description: version data of package
+            updatedAt:
+              type: string
+              description: updatedAt of package
+            description:
+              type: string
+              description: description of the package
+        code:
+          type: string
+          description: response status code
 
   404:
     description: package or not namespace not found.
     schema:
-      type: array
-      items:
-        type: object
-        properties:
-          message:
-            type: string
-            description: package or namespace not found.
-          status:
-            type: string
-            description: response status code
+      type: object
+      properties:
+        message:
+          type: string
+          description: package or namespace not found.
+        code:
+          type: integer
+          description: response status code
