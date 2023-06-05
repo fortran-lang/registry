@@ -304,6 +304,7 @@ def check_token_expiry(upload_token_created_at):
     return False
     
 @app.route('/tarballs/<oid>', methods=["GET"])
+@swag_from("documentation/get_tarball.yaml", methods=["GET"])
 def serve_gridfs_file(oid):
     try:
         file = file_storage.get(ObjectId(oid))
