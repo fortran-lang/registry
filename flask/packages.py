@@ -583,6 +583,7 @@ def create_token_upload_token_package(namespace_name, package_name):
      
     return jsonify({"code": 200, "message": "Upload token created successfully", "uploadToken": upload_token}), 200
 @app.route("/packages/<namespace>/<package>/maintainers", methods=["GET"])
+@swag_from("documentation/package_maintainers.yaml", methods=["GET"])
 def package_maintainers(namespace, package):
     namespace_doc = db.namespaces.find_one({"namespace": namespace})
 
