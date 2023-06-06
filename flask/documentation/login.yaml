@@ -1,7 +1,7 @@
 description: Makes a POST request, verifies by user identifier(email/username) and password and returns the uuid after successful login.
 parameters:
-  - name: email
-    description: email of the user.
+  - name: user_identifier
+    description: email or username of the user.
     in: formData
     required: true
     type: string
