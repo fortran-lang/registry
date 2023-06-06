@@ -108,6 +108,9 @@ def delete_namespace(namespace_name):
 
     user = db.users.find_one({"uuid": uuid})
 
+    if not user:
+        return jsonify({"code": 404, "message": "User not found"}), 404
+
     # Check if the user is authorized to delete the package.
     if not "admin" in user["roles"]:
         return (
