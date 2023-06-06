@@ -39,7 +39,7 @@ responses:
           description: Package version deleted successfully
 
   404:
-    description: Package or namespace not found
+    description: Package or namespace or user not found
     schema:
       type: object
       properties:

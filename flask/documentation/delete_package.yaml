@@ -45,7 +45,7 @@ responses:
           description: Internal Server Error
 
   404:
-    description: Package or Namespace not found.
+    description: Package or Namespace or user not found.
     schema:
       type: object
       properties:

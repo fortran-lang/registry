@@ -34,7 +34,7 @@ responses:
           type: string
           description: Response message
   404:
-    description: Namespace not found
+    description: Namespace or user not found
     schema:
       type: object
       properties:
