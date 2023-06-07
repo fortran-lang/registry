@@ -13,14 +13,14 @@ const VerifyEmail = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-      dispatch(verify(uuid));
+    dispatch(verify(uuid));
   };
 
   return (
-    <Container style={{ paddingTop: 25 }} onLoad={handleSubmit}>
+    <Container style={{ paddingTop: 25 }}>
       <form id="login-form" onSubmit={handleSubmit}>
         <h1>Welcome to fpm Registry!</h1>
-        <h3>Verify your email</h3>
+        <input type="submit" value="Verify Email" />
         {message &&
           (statuscode !== 200 ? (
             <p className="error">{message}</p>
