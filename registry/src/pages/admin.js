@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
+import Button from "react-bootstrap/Button";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import {
-  MDBBtn,
   MDBModal,
   MDBModalDialog,
   MDBModalContent,
@@ -21,21 +20,19 @@ import {
   deleteRelease,
   deprecatePackage,
 } from "../store/actions/adminActions";
+import NoPage from "./404";
 
 const AdminSection = () => {
   const uuid = useSelector((state) => state.auth.uuid);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const message = useSelector((state) => state.admin.message);
   const statuscode = useSelector((state) => state.admin.statuscode);
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const isAdmin = useSelector((state) => state.admin.isAdmin);
 
   useEffect(() => {
     dispatch(adminAuth(uuid));
-    if (!isAdmin) {
-      navigate("/404");
-    }
-  }, [isAdmin]);
+  }, [isAuthenticated, uuid]);
 
   useEffect(() => {
     if (statuscode != null) {
@@ -76,6 +73,16 @@ const AdminSection = () => {
     setModalData({ ...modalData, showModal: !modalData.showModal });
   };
 
+  const isEmpty = (...values) => {
+    if (values.some((value) => value === "")) {
+      openModal("Empty Fields", "Please fill out all fields.", () => {
+        toggleShowModal();
+      });
+      return true;
+    }
+    return false;
+  };
+
   const handleAction = () => {
     if (modalData.modalAction) {
       modalData.modalAction();
@@ -84,15 +91,17 @@ const AdminSection = () => {
   };
 
   const handleDeletePackage = () => {
-    openModal(
-      "Delete Package",
-      `You will not be able to recover ${formData.namespaceName}/${formData.packageName} package after you delete it.`,
-      () => {
-        dispatch(
-          deletePackage(formData.namespaceName, formData.packageName, uuid)
-        );
-      }
-    );
+    if (!isEmpty(formData.namespaceName, formData.packageName)) {
+      openModal(
+        "Delete Package",
+        `You will not be able to recover ${formData.namespaceName}/${formData.packageName} package after you delete it.`,
+        () => {
+          dispatch(
+            deletePackage(formData.namespaceName, formData.packageName, uuid)
+          );
+        }
+      );
+    }
 
     // clear the form data
     setFormData({
@@ -102,20 +111,29 @@ const AdminSection = () => {
   };
 
   const handleDeleteRelease = () => {
-    openModal(
-      "Delete Release",
-      `You will not be able to recover ${formData.namespaceName}/${formData.packageName}/${formData.releaseName} release after you delete it.`,
-      () => {
-        dispatch(
-          deleteRelease(
-            formData.namespaceName,
-            formData.packageName,
-            formData.releaseName,
-            uuid
-          )
-        );
-      }
-    );
+    if (
+      !isEmpty(
+        formData.namespaceName,
+        formData.packageName,
+        formData.releaseName,
+        uuid
+      )
+    ) {
+      openModal(
+        "Delete Release",
+        `You will not be able to recover ${formData.namespaceName}/${formData.packageName}/${formData.releaseName} release after you delete it.`,
+        () => {
+          dispatch(
+            deleteRelease(
+              formData.namespaceName,
+              formData.packageName,
+              formData.releaseName,
+              uuid
+            )
+          );
+        }
+      );
+    }
 
     // clear the form data
     setFormData({
@@ -126,13 +144,15 @@ const AdminSection = () => {
   };
 
   const handleDeleteUser = () => {
-    openModal(
-      "Delete User",
-      `You will not be able to recover ${formData.userName} user after you delete it.`,
-      () => {
-        dispatch(deleteUser(formData.userName, uuid));
-      }
-    );
+    if (!isEmpty(formData.userName, uuid)) {
+      openModal(
+        "Delete User",
+        `You will not be able to recover ${formData.userName} user after you delete it.`,
+        () => {
+          dispatch(deleteUser(formData.userName, uuid));
+        }
+      );
+    }
 
     // clear the form data
     setFormData({
@@ -141,13 +161,15 @@ const AdminSection = () => {
   };
 
   const handleDeleteNamespace = () => {
-    openModal(
-      "Delete Namespace",
-      `You will not be able to recover ${formData.namespaceName} namespace after you delete it.`,
-      () => {
-        dispatch(deleteNamespace(formData.namespaceName, uuid));
-      }
-    );
+    if (!isEmpty(formData.namespaceName, uuid)) {
+      openModal(
+        "Delete Namespace",
+        `You will not be able to recover ${formData.namespaceName} namespace after you delete it.`,
+        () => {
+          dispatch(deleteNamespace(formData.namespaceName, uuid));
+        }
+      );
+    }
 
     // clear the form data
     setFormData({
@@ -156,15 +178,17 @@ const AdminSection = () => {
   };
 
   const handleDeprecatePackage = () => {
-    openModal(
-      "Delete Package",
-      `You will not be able to recover ${formData.namespaceName}/${formData.packageName} package after you delete it.`,
-      () => {
-        dispatch(
-          deprecatePackage(formData.namespaceName, formData.packageName, uuid)
-        );
-      }
-    );
+    if (!isEmpty(formData.namespaceName, formData.packageName, uuid)) {
+      openModal(
+        "Delete Package",
+        `You will not be able to recover ${formData.namespaceName}/${formData.packageName} package after you delete it.`,
+        () => {
+          dispatch(
+            deprecatePackage(formData.namespaceName, formData.packageName, uuid)
+          );
+        }
+      );
+    }
 
     // clear the form data
     setFormData({
@@ -183,7 +207,7 @@ const AdminSection = () => {
   //     });
   //   };
 
-  return (
+  return isAdmin? ( 
     <Container>
       <br></br>
       <h2 style={{ textAlign: "left" }}>Admin Settings</h2>
@@ -207,9 +231,9 @@ const AdminSection = () => {
             style={{ width: 300 }}
           />
         </p>
-        <MDBBtn onClick={handleDeletePackage} style={{ fontSize: 16 }}>
+        <Button onClick={handleDeletePackage} style={{ fontSize: 16 }}>
           Delete Package
-        </MDBBtn>
+        </Button>
       </div>
       <div>
         <br></br>
@@ -240,9 +264,9 @@ const AdminSection = () => {
             style={{ width: 300 }}
           />
         </p>
-        <MDBBtn onClick={handleDeleteRelease} style={{ fontSize: 16 }}>
+        <Button onClick={handleDeleteRelease} style={{ fontSize: 16 }}>
           Delete Release
-        </MDBBtn>
+        </Button>
       </div>
       <div>
         <br></br>
@@ -265,9 +289,9 @@ const AdminSection = () => {
             style={{ width: 300 }}
           />
         </p>
-        <MDBBtn onClick={handleDeprecatePackage} style={{ fontSize: 16 }}>
+        <Button onClick={handleDeprecatePackage} style={{ fontSize: 16 }}>
           Deprecate Package
-        </MDBBtn>
+        </Button>
       </div>
       <div>
         <br></br>
@@ -282,9 +306,9 @@ const AdminSection = () => {
             style={{ width: 300 }}
           />
         </p>
-        <MDBBtn onClick={handleDeleteNamespace} style={{ fontSize: 16 }}>
+        <Button onClick={handleDeleteNamespace} style={{ fontSize: 16 }}>
           Delete Namespace
-        </MDBBtn>
+        </Button>
       </div>
       <div>
         <br></br>
@@ -299,9 +323,9 @@ const AdminSection = () => {
             style={{ width: 300 }}
           />
         </p>
-        <MDBBtn onClick={handleDeleteUser} style={{ fontSize: 16 }}>
+        <Button onClick={handleDeleteUser} style={{ fontSize: 16 }}>
           Delete User
-        </MDBBtn>
+        </Button>
       </div>
       {/* <div>            // TODO: Enable this feature
         <br></br>
@@ -324,7 +348,7 @@ const AdminSection = () => {
             style={{ width: 300 }}
           />
         </p>
-        <MDBBtn
+        <Button
           onClick={() =>
             openModal(
               "Change Password",
@@ -335,34 +359,34 @@ const AdminSection = () => {
           style={{ fontSize: 16 }}
         >
           Change Password
-        </MDBBtn>
+        </Button>
       </div> */}
       <MDBModal show={modalData.showModal} tabIndex="-1">
         <MDBModalDialog>
           <MDBModalContent>
             <MDBModalHeader>
               <MDBModalTitle>{modalData.modalTitle}</MDBModalTitle>
-              <MDBBtn
+              <Button
                 className="btn-close"
                 color="none"
                 onClick={toggleShowModal}
-              ></MDBBtn>
+              ></Button>
             </MDBModalHeader>
             <MDBModalBody>
               <MDBIcon fas icon="exclamation-triangle" />{" "}
               {modalData.modalMessage}
             </MDBModalBody>
             <MDBModalFooter>
-              <MDBBtn color="secondary" onClick={toggleShowModal}>
+              <Button color="secondary" onClick={toggleShowModal}>
                 Close
-              </MDBBtn>
-              <MDBBtn onClick={handleAction}>Delete</MDBBtn>
+              </Button>
+              <Button onClick={handleAction}>Delete</Button>
             </MDBModalFooter>
           </MDBModalContent>
         </MDBModalDialog>
       </MDBModal>
     </Container>
-  );
+  ):(<NoPage/>);
 };
 
 export default AdminSection;
