@@ -275,8 +275,7 @@ def send_verify_email(email):
     if not user:
         return jsonify({"message": "User not found", "code": 404}), 404
 
-    uuid = generate_uuid()
-    db.users.update_one({"email": email}, {"$set": {"uuid": uuid}})
+    uuid = user["uuid"]
 
     message = f"""\n
     Dear {user['username']},
@@ -309,6 +308,8 @@ def verify_email():
 
     if not user:
         return jsonify({"message": "User not found", "code": 404}), 404
+    
+    db.users.update_one({"uuid": uuid}, {"$set": {"isverified": True}})
     
     return jsonify({"message": "Successfully Verified Email", "code": 200}), 200
 
