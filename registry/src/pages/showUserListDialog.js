@@ -6,6 +6,9 @@ import { MDBIcon } from "mdbreact";
 
 const ShowUserListDialog = (props) => {
   const users = useSelector((state) => state.userList.users);
+  const uuid = useSelector((state) => state.auth.uuid);
+  const error = useSelector((state) => state.userList.error);
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -20,6 +23,7 @@ const ShowUserListDialog = (props) => {
         packageMaintainers: props.packagemaintainers,
         namespace: props.namespace,
         packageName: props.package,
+        uuid: uuid,
       })
     );
   }, [props.show]);
@@ -36,6 +40,7 @@ const ShowUserListDialog = (props) => {
         </Modal.Header>
 
         <Modal.Body>
+          {error ? <p className="error">{error}</p> : null}
           {users && users.length === 0 ? <p>No users found</p> : null}
           {users &&
             users.map((user, index) => {

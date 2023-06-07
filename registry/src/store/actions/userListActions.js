@@ -10,23 +10,27 @@ export const fetchUserListData = ({
   packageMaintainers = false,
   namespace,
   packageName,
+  uuid,
 }) => {
   return async (dispatch) => {
     dispatch({ type: FETCH_USERS_LIST });
     let url;
+    let formData = new FormData();
+    formData.append("uuid", uuid);
 
     if (namespaceAdmins) {
-      url = `${process.env.REACT_APP_REGISTRY_API_URL}/namespace/${namespace}/admins`;
+      url = `${process.env.REACT_APP_REGISTRY_API_URL}/namespaces/${namespace}/admins`;
     } else if (namespaceMaintainers) {
-      url = `${process.env.REACT_APP_REGISTRY_API_URL}/namespace/${namespace}/maintainers`;
+      url = `${process.env.REACT_APP_REGISTRY_API_URL}/namespaces/${namespace}/maintainers`;
     } else if (packageMaintainers) {
       url = `${process.env.REACT_APP_REGISTRY_API_URL}/packages/${namespace}/${packageName}/maintainers`;
     }
 
     try {
       const result = await axios({
-        method: "get",
+        method: "post",
         url: url,
+        data: formData,
       });
 
       dispatch({
@@ -36,6 +40,7 @@ export const fetchUserListData = ({
         },
       });
     } catch (error) {
+      console.log(error);
       dispatch({
         type: FETCH_USERS_LIST_ERROR,
         payload: {
