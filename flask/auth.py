@@ -23,9 +23,9 @@ try:
     env_var["host"] = host
     env_var["salt"] = salt
     env_var["sudo_password"] = sudo_password
-    # smtp = smtplib.SMTP('smtp.gmail.com', 587)
-    # smtp.starttls()
-    # smtp.login(fortran_email, fortran_password)
+    smtp = smtplib.SMTP('smtp.gmail.com', 587)
+    smtp.starttls()
+    smtp.login(fortran_email, fortran_password)
 
 except KeyError as err:
     print("Add SALT to .env file")
@@ -134,7 +134,7 @@ def signup():
 
     if not registry_user:
         db.users.insert_one(user)
-        # send_verify_email(email)        #TODO: uncomment this line
+        send_verify_email(email)        #TODO: uncomment this line
         return (
             jsonify(
                 {

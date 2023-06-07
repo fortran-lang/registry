@@ -206,8 +206,6 @@ def upload():
     # Upload the tarball to the Grid FS storage.
     file_object_id = file_storage.put(tarball, content_type=tarball.content_type, filename=tarball_name)
 
-
-
     # Extract the package metadata from the tarball's fpm.toml file.
     try:
         package_data = extract_fpm_toml(tarball_name,extn)
@@ -255,6 +253,10 @@ def upload():
 
         # Append the first version document.
         package_obj["versions"].append(version_obj)
+        
+        if dry_run:
+            return jsonify({"message": "Dry run Successful.", "code": 200})
+
         db.packages.insert_one(package_obj)
 
         package = db.packages.find_one(
@@ -271,9 +273,6 @@ def upload():
 
         # Current user is the author of the package.
         user["authorOf"].append(package["_id"])
-
-        if dry_run:
-            return jsonify({"message": "Dry run Successful.", "code": 200})
         
         db.users.update_one({"_id": user["_id"]}, {"$set": user})
 
