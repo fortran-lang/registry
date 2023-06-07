@@ -60,12 +60,14 @@ const authReducer = (state = initialState, action) => {
         uuid: null,
         username: null,
         error: null,
+        isLoading: false,
       };
 
     case LOGOUT_FAILURE:
       return {
         ...state,
         error: action.payload.error,
+        isLoading: false,
       };
 
     case SIGNUP_SUCCESS:
