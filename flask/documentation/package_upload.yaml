@@ -1,0 +1,78 @@
+description: POST request uploads a package to the namespace.
+
+parameters:
+  - name: package_name
+    in: formData
+    required: true
+    type: string
+    description: Name of the package
+
+  - name: package_version
+    in: formData
+    required: true
+    type: string
+    description: Version of the package
+
+  - name: package_license
+    in: formData
+    required: true
+    type: string
+    description: License of the package
+
+  - name: upload_token
+    in: formData
+    required: true
+    type: string
+    description: Upload token of the namespace/package
+
+  - name: tarball
+    in: formData
+    required: true
+    type: file
+    description: Tarball of the package
+
+responses:
+  200:
+    description: Package uploaded successfully
+    schema:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: Response status code
+        message:
+          type: string
+          description: Response message
+  400:
+    description: Bad request
+    schema:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: Response status code
+        message:
+          type: string
+          description: Response message
+  401:
+    description: Unauthorized
+    schema:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: Response status code
+        message:
+          type: string
+          description: Response message
+  404:
+    description: Not found
+    schema:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: Response status code
+        message:
+          type: string
+          description: Response message

@@ -1,0 +1,40 @@
+description: Get packages under a namespace.
+parameters:
+  - name: namespace
+    in: path
+    description: Namespace name
+    required: true
+    type: string
+responses:
+  200:
+    description: Packages found
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response status code
+        createdAt:
+          type: string
+          description: createdAt timestamp of namespace
+        packages:
+          type: array
+          description: list of packages under the namespace
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: name of package
+              namespace:
+                type: string
+                description: namespace of package
+              description:
+                type: string
+                description: description of the package
+              author:
+                type: string
+                description: author of package
+              updatedAt:
+                type: string
+                description: updatedAt timestamp of package

@@ -124,6 +124,7 @@ def search_packages():
         return jsonify({"status": "error", "message": "packages not found", "code": 404}), 404
 
 @app.route("/packages", methods=["POST"])
+@swag_from("documentation/package_upload.yaml", methods=["POST"])
 def upload():
     upload_token = request.form.get("upload_token")
     package_name = request.form.get("package_name")
@@ -303,6 +304,7 @@ def check_token_expiry(upload_token_created_at):
     return False
     
 @app.route('/tarballs/<oid>', methods=["GET"])
+@swag_from("documentation/get_tarball.yaml", methods=["GET"])
 def serve_gridfs_file(oid):
     try:
         file = file_storage.get(ObjectId(oid))
@@ -311,41 +313,6 @@ def serve_gridfs_file(oid):
         return send_file(file, download_name=file.filename, as_attachment=True, mimetype=file.content_type)
     except NoFile:
         abort(404)
-
-
-@app.route("/packages", methods=["PUT"])
-def update_package():
-    uuid = request.form.get("uuid")
-    if not uuid:
-        return jsonify({"status": "error", "message": "Unauthorized", "code": 401}), 401
-
-    user = db.users.find_one({"uuid": uuid})
-
-    if not user:
-        return jsonify({"status": "error", "message": "Unauthorized", "code": 401}), 401
-
-    name = request.form.get("name")
-    namespace = request.form.get("namespace")
-    isDeprecated = request.form.get("isDeprecated")
-
-    # Get the package namespace.
-    package_namespace = db.namespaces.find_one({"namespace": namespace})
-
-    if checkUserUnauthorized(user_id=user["_id"], package_namespace=package_namespace):
-        return jsonify({"status": "error", "message": "Unauthorized", "code": 401}), 401
-
-    package = db.packages.find_one(
-        {"name": name, "namespace": package_namespace["_id"]}
-    )
-    if package is None:
-        return jsonify({"status": "error", "message": "Package doesn't exist", "code": 404}), 404
-
-    isDeprecated = True if isDeprecated == "true" else False
-    package["isDeprecated"] = isDeprecated
-    package["updatedAt"] = datetime.utcnow()
-    db.packages.update_one({"_id": package["_id"]}, {"$set": package})
-    return jsonify({"message": "Package Updated Successfully.", "code": 200})
-
 
 def check_version(current_version, new_version):
     current_list = list(map(int, current_version.split(".")))
@@ -372,74 +339,29 @@ def get_package(namespace_name, package_name):
     if not package:
         return jsonify({"message": "Package not found", "code": 404})
 
-    if request.method == "GET":
-        # Get the package author from id.
-        package_author = db.users.find_one({"_id": package["author"]})
 
-        # Only latest version of the package will be sent as a response.
-        package_response_data = {
-            "name": package["name"],
-            "namespace": namespace["namespace"],
-            "latest_version_data": package["versions"][-1],
-            "author": package_author["username"],
-            "tags": package["tags"],
-            "license": package["license"],
-            "createdAt": package["createdAt"],
-            "version_history": package["versions"],
-            "updatedAt": package["updatedAt"],
-            "description": package["description"],
-        }
+    # Get the package author from id.
+    package_author = db.users.find_one({"_id": package["author"]})
 
-        return jsonify({"data": package_response_data, "code": 200})
+    # Only latest version of the package will be sent as a response.
+    package_response_data = {
+        "name": package["name"],
+        "namespace": namespace["namespace"],
+        "latest_version_data": package["versions"][-1],
+        "author": package_author["username"],
+        "tags": package["tags"],
+        "license": package["license"],
+        "createdAt": package["createdAt"],
+        "version_history": package["versions"],
+        "updatedAt": package["updatedAt"],
+        "description": package["description"],
+    }
 
-    elif request.method == "POST":
-        """
-        API for checking whether the latest version of a particular package
-        is already there in local registry or not.
-        """
-        versions = request.get_json()["cached_versions"]
+    return jsonify({"data": package_response_data, "code": 200})
 
-        # Versions should not be empty array.
-        if len(versions) == 0:
-            return jsonify({"message": "cached versions list is empty", "code": 400})
-
-        # Sort the versions received in request body.
-        sorted_versions = sort_versions(versions)
-
-        # Get the latest version stored in the backend database.
-        latest_version_backend = package["versions"][-1]["version"]
-
-        # Get the latest version that is in the local registry for that package.
-        latest_version_local_registry = sorted_versions[0]
-
-        latest_version_backend_list = list(map(int, latest_version_backend.split(".")))
-        latest_version_local_registry_list = list(
-            map(int, latest_version_local_registry.split("."))
-        )
-
-        # Check if the local registry already has the latest version.
-        if latest_version_backend_list <= latest_version_local_registry_list:
-            return (
-                jsonify({"message": "Latest version is already there in local registry"}),
-                200,
-            )
-
-        # If local registry does not have the latest version. Then send it from the backend.
-        package = {
-            "name": package["name"],
-            "namespace": namespace["namespace"],
-            "description": package["description"],
-            "latest_version_data": {
-                "dependencies": package["versions"][-1]["dependencies"],
-                "version": package["versions"][-1]["version"],
-                "tarball": package["versions"][-1]["tarball"],
-                "isDeprecated": package["versions"][-1]["isDeprecated"],
-            }
-        }
-
-        return jsonify({"data": package, "code": 200}), 200
     
 @app.route("/packages/<namespace_name>/<package_name>/verify", methods=["POST"])
+@swag_from("documentation/verify_user_role.yaml", methods=["POST"])
 def verify_user_role(namespace_name, package_name):
     uuid = request.form.get("uuid")
 
@@ -516,6 +438,7 @@ def get_package_from_version(namespace_name, package_name, version):
 
 
 @app.route("/packages/<namespace_name>/<package_name>/delete", methods=["POST"])
+@swag_from("documentation/delete_package.yaml", methods=["POST"])
 def delete_package(namespace_name, package_name):
     uuid = request.form.get("uuid")
 
@@ -568,6 +491,7 @@ def delete_package(namespace_name, package_name):
 @app.route(
     "/packages/<namespace_name>/<package_name>/<version>/delete", methods=["POST"]
 )
+@swag_from("documentation/delete_package_version.yaml", methods=["POST"])
 def delete_package_version(namespace_name, package_name, version):
     uuid = request.form.get("uuid")
 
@@ -611,34 +535,8 @@ def delete_package_version(namespace_name, package_name, version):
         return jsonify({"status": "error", "message": "Package version not found", "code": 404}), 404
 
 
-@app.route("/packages/list", methods=["GET"])
-def get_packages():
-    page = int(request.args.get("page", 0))
-
-    packages = db.packages.find().limit(10).skip(page * 10)
-    response_packages = []
-    for package in packages:
-        # Get the namespace id of the package.
-        namespace_id = package["namespace"]
-
-        # Get the namespace document from namespace id.
-        namespace = db.namespaces.find_one({"_id": namespace_id})
-
-        # Check if namespace does not exists.
-        if not namespace:
-            return jsonify({"message": "Namespace does not found", "code": 404})
-
-        response_packages.append(
-            {
-                "package_name": package["name"],
-                "namespace_name": namespace["namespace"],
-                "description": package["description"],
-            }
-        )
-
-    return jsonify({"packages": response_packages})
-
 @app.route("/packages/<namespace_name>/<package_name>/uploadToken", methods=["POST"])
+@swag_from("documentation/create_package_upload_token.yaml", methods=["POST"])
 def create_token_upload_token_package(namespace_name, package_name):
     # Verify the uuid.
     uuid = request.form.get("uuid")
@@ -685,6 +583,7 @@ def create_token_upload_token_package(namespace_name, package_name):
      
     return jsonify({"code": 200, "message": "Upload token created successfully", "uploadToken": upload_token}), 200
 @app.route("/packages/<namespace>/<package>/maintainers", methods=["GET"])
+@swag_from("documentation/package_maintainers.yaml", methods=["GET"])
 def package_maintainers(namespace, package):
     namespace_doc = db.namespaces.find_one({"namespace": namespace})
 

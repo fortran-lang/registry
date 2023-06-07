@@ -17,7 +17,7 @@ except KeyError as err:
 
 
 @app.route("/users/<username>", methods=["GET"])
-@swag_from("documentation/user.yaml", methods=["GET"])
+@swag_from("documentation/get_user_profile.yaml", methods=["GET"])
 def profile(username):
     user_doc = db.users.find_one({"username": username})
     if user_doc:
@@ -158,7 +158,7 @@ def delete_user():
         user = db.users.find_one({"uuid": uuid})
 
     if not user:
-        return "Invalid email or password", 401
+       return jsonify({"message": "Unauthorized", "code": 401}), 401
 
     if username and "admin" in user["roles"]:
         delete_user = db.users.find_one({"username": username})
@@ -173,6 +173,7 @@ def delete_user():
 
 
 @app.route("/users/account", methods=["POST"])
+@swag_from("documentation/get_user_account.yaml", methods=["POST"])
 def account():
     uuid = request.form.get("uuid")
     if not uuid:
@@ -194,6 +195,7 @@ def account():
 
 
 @app.route("/users/admin", methods=["POST"])
+@swag_from("documentation/check_admin_user.yaml", methods=["POST"])
 def admin():
     uuid = request.form.get("uuid")
     if not uuid:
@@ -214,6 +216,7 @@ def admin():
 
 
 @app.route("/users/admin/transfer", methods=["POST"])
+@swag_from("documentation/transfer_account.yaml", methods=["POST"])
 def transfer_account():
     uuid = request.form.get("uuid")
     if not uuid:
@@ -256,6 +259,7 @@ def transfer_account():
 
 
 @app.route("/<username>/maintainer", methods=["POST"])
+@swag_from("documentation/add_package_maintainer.yaml", methods=["POST"])
 def add_maintainers_to_package(username):
     uuid = request.form.get("uuid")
     username_to_be_added = request.form.get("username")
@@ -336,6 +340,7 @@ def add_maintainers_to_package(username):
 
 
 @app.route("/<username>/maintainer/remove", methods=["POST"])
+@swag_from("documentation/remove_package_maintainer.yaml", methods=["POST"])
 def remove_maintainers_from_package(username):
     uuid = request.form.get("uuid")
     username_to_be_removed = request.form.get("username")
@@ -421,6 +426,7 @@ def remove_maintainers_from_package(username):
 
 
 @app.route("/<username>/namespace/maintainer", methods=["POST"])
+@swag_from("documentation/add_namespace_maintainer.yaml", methods=["POST"])
 def add_maintainers_to_namespace(username):
     uuid = request.form.get("uuid")
     username_to_be_added = request.form.get("username")
@@ -489,6 +495,7 @@ def add_maintainers_to_namespace(username):
 
 
 @app.route("/<username>/namespace/maintainer/remove", methods=["POST"])
+@swag_from("documentation/remove_namespace_maintainer.yaml", methods=["POST"])
 def remove_maintainers_from_namespace(username):
     uuid = request.form.get("uuid")
     username_to_be_removed = request.form.get("username")
@@ -564,6 +571,7 @@ def remove_maintainers_from_namespace(username):
         return jsonify({"message": "Namespace maintainer not found", "code": 200}), 200
     
 @app.route("/<username>/namespace/admin", methods=["POST"])
+@swag_from("documentation/add_namespace_admin.yaml", methods=["POST"])
 def add_admins_to_namespace(username):
     uuid = request.form.get("uuid")
     username_to_be_added = request.form.get("username")
@@ -627,6 +635,7 @@ def add_admins_to_namespace(username):
         return jsonify({"message": "Admin already added", "code": 200}), 200
     
 @app.route("/<username>/namespace/admin/remove", methods=["POST"])
+@swag_from("documentation/remove_namespace_admin.yaml", methods=["POST"])
 def remove_admins_from_namespace(username):
     uuid = request.form.get("uuid")
     username_to_be_removed = request.form.get("username")

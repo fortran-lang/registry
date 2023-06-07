@@ -1,0 +1,39 @@
+description: Get maintainers of a namespace.
+parameters:
+  - name: namespace
+    in: path
+    description: Namespace name
+    required: true
+    type: string
+responses:
+  200:
+    description: Maintainers found
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response status code
+        maintainers:
+          type: array
+          description: list of maintainers of the namespace
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: id of the maintainer
+              username:
+                type: string
+                description: username of the maintainer
+  404:
+    description: Namespace not found
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response status code
+        message:
+          type: string
+          description: Error message

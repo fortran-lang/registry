@@ -1,0 +1,72 @@
+description: Deletes a package from the database.
+
+parameters:
+  - name: namespace_name
+    description: namespace name of the package
+    in: path
+    required: true
+    type: string
+
+  - name: package_name
+    description: name of the package
+    in: path
+    required: true
+    type: string
+
+  - name: uuid
+    in: formData
+    required: true
+    type: string
+    description: UUID of the user
+
+responses:
+  200:
+    description: Package deleted.
+    schema:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: response status code
+        message:
+          type: string
+          description: Package deleted successfully
+
+  500:
+    description: Internal Server Error
+    schema:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: response status code
+        message:
+          type: string
+          description: Internal Server Error
+
+  404:
+    description: Package or Namespace or user not found.
+    schema:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: response status code
+        message:
+          type: string
+          description: Package or Namespace not found.
+
+  401:
+    description: Unauthorized access
+    schema:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: response status code
+        message:
+          type: string
+          description: Unauthorized access
+        status:
+          type: string
+          description: error
