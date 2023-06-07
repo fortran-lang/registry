@@ -554,6 +554,9 @@ def delete_package(namespace_name, package_name):
 
     user = db.users.find_one({"uuid": uuid})
 
+    if not user:
+        return jsonify({"message": "User not found", "code": 404}), 404
+
     # Check if the user is authorized to delete the package.
     if not "admin" in user["roles"]:
         return (
@@ -602,6 +605,9 @@ def delete_package_version(namespace_name, package_name, version):
         return jsonify({"status": "error", "message": "Unauthorized", "code": 401}), 401
 
     user = db.users.find_one({"uuid": uuid})
+
+    if not user:
+        return jsonify({"message": "User not found", "code": 404}), 404
 
     # Check if the user is authorized to delete the package.
     if not "admin" in user["roles"]:
