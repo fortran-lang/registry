@@ -167,7 +167,7 @@ class TestNamespaces(BaseTestClass):
         namespace_name = TestNamespaces.test_namespace_data['namespace']
 
         # Get the list of maintainers.
-        response = self.client.get(f"/namespace/{namespace_name}/maintainers")
+        response = self.client.post(f"/namespaces/{namespace_name}/maintainers", data={"uuid": uuid})
         self.assertEqual(200, response.json["code"])
         self.assertEqual(1, len(response.json["users"]))
 
@@ -198,6 +198,6 @@ class TestNamespaces(BaseTestClass):
         namespace_name = TestNamespaces.test_namespace_data['namespace']
 
         # Get the list of admins.
-        response = self.client.get(f"/namespace/{namespace_name}/admins")
+        response = self.client.post(f"/namespaces/{namespace_name}/admins", data={"uuid": uuid})
         self.assertEqual(200, response.json["code"])
         self.assertEqual(1, len(response.json["users"]))
