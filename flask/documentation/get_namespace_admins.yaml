@@ -1,10 +1,18 @@
-description: Get admins of a namespace.
+description: Verifies by uuid of the user and gets the namespace admins.
+
 parameters:
   - name: namespace
     in: path
     description: Namespace name
     required: true
     type: string
+
+  - name: uuid
+    in: formData
+    required: true
+    type: string
+    description: UUID of the user
+
 responses:
   200:
     description: Admins found
@@ -12,7 +20,7 @@ responses:
       type: object
       properties:
         code:
-          type: string
+          type: integer
           description: Response status code
         admins:
           type: array
@@ -32,7 +40,7 @@ responses:
       type: object
       properties:
         code:
-          type: string
+          type: integer
           description: Response status code
         message:
           type: string
