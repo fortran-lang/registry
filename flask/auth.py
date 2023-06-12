@@ -316,7 +316,7 @@ def verify_email():
 @app.route("/auth/change-email", methods=["POST"])
 def change_email():
     uuid = request.form.get("uuid")
-    new_email = request.form.get("new_email")
+    new_email = request.form.get("newemail")
 
     if not uuid:
         return jsonify({"message": "Unauthorized", "code": 401}), 401
