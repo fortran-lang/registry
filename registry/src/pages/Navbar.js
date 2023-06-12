@@ -42,6 +42,7 @@ const NavbarComponent = () => {
             fluid
             width={60}
             height={60}
+            alt="Fortran-logo"
           />
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
