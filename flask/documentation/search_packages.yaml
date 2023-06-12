@@ -7,62 +7,64 @@ parameters:
 
   - name: page
     description: page number of the query , 10 documents per page
-    required: true
     type: string
 
   - name: sorted_by
     description: package sort parameter can be name, author, createdat ,updatedAt. (case insensitive)
-    required: true
     type: string
 
   - name: sort
     description: sort by ascending (asc) or descending (desc)
-    required: true
     type: string
 
 responses:
   200:
     description: Packages Found.
     schema:
-      type: array
-      items:
-        type: object
-        properties:
-          packages:
-            type: array
-            description: array of packages
-            items:
-              type: object
-              properties:
-                name:
-                  type: string
-                  description: name of package
-                namespace:
-                  type: string
-                  description: namespace of package
-                author:
-                  type: string
-                  description: author of package
-                description:
-                  type: string
-                  description: description of package
-                tags:
-                  type: string
-                  description: tags of package
-          status:
-            type: string
-            description: response status code
+      type: object
+      properties:
+        packages:
+          type: array
+          description: array of packages
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: name of package
+              namespace:
+                type: string
+                description: namespace of package
+              author:
+                type: string
+                description: author of package
+              description:
+                type: string
+                description: description of package
+              tags:
+                type: string
+                description: tags of package
+              updatedAt:
+                type: string
+                description: updatedAt timestamp of package
+        code:
+          type: integer
+          description: response status code
+        total_pages:
+          type: integer
+          description: total pages of the query
 
   404:
     description: package not found.
     schema:
-      type: array
-      items:
-        type: object
-        properties:
-          message:
-            type: string
-            description: Invalid email or password
-          status:
-            type: string
-            description: response status code
+      type: object
+      properties:
+        message:
+          type: string
+          description: Invalid email or password
+        code:
+          type: integer
+          description: response status code
+        status:
+          type: string
+          description: error

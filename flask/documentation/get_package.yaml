@@ -2,76 +2,67 @@ description: Makes a GET request to retrieve a package using namespace and packa
 parameters:
   - name: namespace_name
     description: namespace name of the package
+    in: path
     required: true
     type: string
 
   - name: package_name
     description: name of the package
+    in: path
     required: true
     type: string
-
-  - name: body
-    description: The list of versions in local registry. (Only for POST method)
-    required: true
-    type: array
-    items:
-      type: string
 
 responses:
   200:
     description: Package Found.
     schema:
-        type: object
-        properties:
-          data:
-            type: object
-            description: package data
-            properties:
-              name:
-                type: string
-                description: name of package
-              namespace:
-                type: string
-                description: namespace of package
-              author:
-                type: string
-                description: author of package
-              tags:
-                type: string
-                description: tags of package
-              license:
-                type: string
-                description: license of package
-              createdAt:
-                type: string
-                description: createdAt of package
-              latest_version_data:
-                type: object
-                description: data of the latest version of the package
-              version_history:
-                type: object
-                description: version history of package
-              updatedAt:
-                type: string
-                description: updatedAt of package
-              description:
-                type: string
-                description: description of the package
-              license:
-                type: string
-                description: license of the package
-          code:
-            type: string
-            description: response status code
-
+      type: object
+      properties:
+        code:
+          type: integer
+          description: response status code
+        data:
+          type: object
+          description: package data
+          properties:
+            name:
+              type: string
+              description: name of package
+            namespace:
+              type: string
+              description: namespace of package
+            author:
+              type: string
+              description: author of package
+            tags:
+              type: string
+              description: tags of package
+            license:
+              type: string
+              description: license of package
+            createdAt:
+              type: string
+              description: createdAt of package
+            latest_version_data:
+              type: object
+              description: data of the latest version of the package
+            version_history:
+              type: object
+              description: version history of package
+            updatedAt:
+              type: string
+              description: updatedAt of package
+            description:
+              type: string
+              description: description of the package
   404:
     description: Package or Namespace not found.
     schema:
       type: object
       properties:
-          message:
-            type: string
-            description: package or namespace not found.
-          code:
-            type: string
-            description: response status code
+        message:
+          type: string
+          description: package or namespace not found.
+        code:
+          type: integer
+          description: response status code

@@ -1,0 +1,52 @@
+description: Create a new namespace.
+parameters:
+  - name: uuid
+    in: formData
+    required: true
+    type: string
+    description: UUID of the user
+  - name: namespace
+    in: formData
+    required: true
+    type: string
+    description: Name of the namespace
+  - name: namespace_description
+    in: formData
+    required: true
+    type: string
+    description: Description of the namespace
+
+responses:
+  200:
+    description: Namespace created successfully
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response status code
+        message:
+          type: string
+          description: Response message
+  400:
+    description: Bad request
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response status code
+        message:
+          type: string
+          description: Response message
+  401:
+    description: Unauthorized
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response status code
+        message:
+          type: string
+          description: Response message

@@ -2,13 +2,14 @@ description: Makes a POST request, verifies by uuid and returns status after suc
 parameters:
   - name: uuid
     description: uuid of the user.
+    in: formData
     required: true
     type: string
 
 responses:
   200:
     description: Logout successful
-    schema: 
+    schema:
       type: array
       items:
         type: object
@@ -22,7 +23,7 @@ responses:
 
   404:
     description: User not found
-    schema: 
+    schema:
       type: array
       items:
         type: object

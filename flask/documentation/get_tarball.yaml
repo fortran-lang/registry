@@ -1,0 +1,17 @@
+description: Get the tarball of the package.
+
+parameters:
+  - name: oid
+    in: path
+    required: true
+    type: string
+    description: Object ID of the package
+
+responses:
+  200:
+    description: Package tarball
+    schema:
+      type: file
+
+  404:
+    description: Package not found

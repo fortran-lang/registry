@@ -1,0 +1,57 @@
+description: Transfers an account to another user.
+parameters:
+  - name: uuid
+    in: formData
+    description: The uuid of the user
+    required: true
+    type: string
+  - name: old_username
+    in: formData
+    description: Old username of the account
+    required: true
+    type: string
+  - name: new_username
+    in: formData
+    description: New username of the account
+    required: true
+    type: string
+  - name: new_email
+    in: formData
+    description: New email of the account
+    required: true
+    type: string
+
+responses:
+  200:
+    description: Account transferred successfully and password reset request sent
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response status code
+        message:
+          type: string
+          description: Response message
+  404:
+    description: User not found
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response status code
+        message:
+          type: string
+          description: Error message
+  401:
+    description: Unauthorized
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response status code
+        message:
+          type: string
+          description: Error message

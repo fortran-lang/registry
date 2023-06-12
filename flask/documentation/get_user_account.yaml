@@ -1,0 +1,61 @@
+description: Get user account.
+parameters:
+  - name: uuid
+    in: formData
+    description: The uuid of the user
+    required: true
+    type: string
+
+responses:
+  200:
+    description: User found
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response status code
+        message:
+          type: string
+          description: Response message
+        user:
+          type: object
+          description: User account
+          properties:
+            username:
+              type: string
+              description: username of the user
+            email:
+              type: string
+              description: email of the user
+            createdAt:
+              type: string
+              description: createdAt timestamp of user
+            updatedAt:
+              type: string
+              description: updatedAt timestamp of user
+            lastLogout:
+              type: string
+              description: lastLogout timestamp of user
+  404:
+    description: User not found
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response status code
+        message:
+          type: string
+          description: Error message
+  401:
+    description: Unauthorized
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response status code
+        message:
+          type: string
+          description: Error message

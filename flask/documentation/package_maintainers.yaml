@@ -1,0 +1,48 @@
+description: Gets package maintainers of a package.
+
+parameters:
+  - name: namespace
+    description: namespace name of the package
+    in: path
+    required: true
+    type: string
+
+  - name: package
+    description: name of the package
+    in: path
+    required: true
+    type: string
+
+responses:
+  200:
+    description: Package Found.
+    schema:
+      type: object
+      properties:
+        users:
+          type: array
+          description: list of package maintainers
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: id of the maintainer
+              username:
+                type: string
+                description: username of the maintainer
+        code:
+          type: integer
+          description: response status code
+
+  404:
+    description: Package or Namespace not found.
+    schema:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: response status code
+        message:
+          type: string
+          description: Package or Namespace not found.

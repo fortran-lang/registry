@@ -1,43 +1,44 @@
-description: Makes a POST request, verifies by email and password and returns the uuid after successful login.
+description: Makes a POST request, verifies by user identifier(email/username) and password and returns the uuid after successful login.
 parameters:
-  - name: email
-    description: email of the user.
+  - name: user_identifier
+    description: email or username of the user.
+    in: formData
     required: true
     type: string
 
   - name: password
     description: password of the user.
+    in: formData
     required: true
     type: string
 
 responses:
   200:
     description: Login Successful.
-    schema: 
-      type: array
-      items:
-        type: object
-        properties:
-          uuid:
-            type: string
-            description: The uuid of the user
-          message:
-            type: string
-            description: The message of successfull login
-          code:
-            type: string
-            description: response status code
+    schema:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: The uuid of the user
+        message:
+          type: string
+          description: The message of successfull login
+        code:
+          type: integer
+          description: response status code
+        username:
+          type: string
+          description: The username of the user
 
   401:
     description: Invalid email or password
-    schema: 
-      type: array
-      items:
-        type: object
-        properties:
-          message:
-            type: string
-            description: Invalid email or password
-          code:
-            type: string
-            description: response status code
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Invalid email or password
+        code:
+          type: integer
+          description: response status code

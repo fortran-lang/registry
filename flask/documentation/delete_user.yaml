@@ -1,35 +1,50 @@
-description: Deletes a user by uuid.
+description: Deletes a user by username.
 parameters:
   - name: uuid
-    description: The uuid of the user to be deleted.
+    in: formData
+    description: The uuid of the user (admin)
+    required: true
+    type: string
+
+  - name: username
+    in: formData
+    description: The username of the user to be deleted
     required: true
     type: string
 
 responses:
   200:
-    description: User deleted
-    schema: 
-      type: array
-      items:
-        type: object
-        properties:
-          message:
-            type: string
-            description: The message of successful deletion
-          code:
-            type: string
-            description: response status code
+    description: User deleted successfully
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message of successful deletion
+        code:
+          type: string
+          description: response status code
+
+  404:
+    description: User to be deleted not found
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+          description: User not found
+        code:
+          type: string
+          description: response status code
 
   401:
-    description: User not found
-    schema: 
-      type: array
-      items:
-        type: object
-        properties:
-          message:
-            type: string
-            description: User not found
-          code:
-            type: string
-            description: response status code
+    description: Unauthorized
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Unauthorized
+        code:
+          type: string
+          description: response status code

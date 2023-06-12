@@ -1,0 +1,60 @@
+description: Creates upload token for uploading newer versions of existing package in a namespace. Only package maintainers can create upload tokens for packages.
+
+parameters:
+  - name: namespace_name
+    description: namespace name of the package
+    in: path
+    required: true
+    type: string
+
+  - name: package_name
+    description: name of the package
+    in: path
+    required: true
+    type: string
+
+  - name: uuid
+    description: uuid of the user
+    in: formData
+    required: true
+    type: string
+
+responses:
+  401:
+    description: Unauthorized access
+    schema:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: response status code
+        message:
+          type: string
+          description: Unauthorized access
+
+  404:
+    description: Package or namespace not found
+    schema:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: response status code
+        message:
+          type: string
+          description: Package or namespace not found
+
+  200:
+    description: Upload token created successfully
+    schema:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: response status code
+        message:
+          type: string
+          description: Upload token created successfully
+        uploadToken:
+          type: string
+          description: Upload token
