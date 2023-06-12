@@ -1,0 +1,96 @@
+description: Retrieves the list of packages & namespaces connected to the user.
+parameters:
+  - name: username
+    in: path
+    description: Username of the user
+    required: true
+    type: string
+
+responses:
+  200:
+    description: User found
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response status code
+        message:
+          type: string
+          description: Success message
+        user:
+          type: object
+          properties:
+            username:
+              type: string
+              description: Username of the user
+            email:
+              type: string
+              description: Email of the user
+            createdAt:
+              type: string
+              description: createdAt timestamp of the user
+        packages:
+          type: array
+          description: list of packages user is connected to
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: id of the package
+              name:
+                type: string
+                description: name of package
+              namespace:
+                type: string
+                description: namespace name of package
+              description:
+                type: string
+                description: description of the package
+              updatedAt:
+                type: string
+                description: updatedAt timestamp of the package
+              isNamespaceMaintainer:
+                type: boolean
+                description: whether the user is a maintainer of the namespace
+              isNamespaceAdmin:
+                type: boolean
+                description: whether the user is an admin of the namespace
+              isPackageMaintainer:
+                type: boolean
+                description: whether the user is a maintainer of the package
+
+        namespaces:
+          type: array
+          description: list of namespaces user is connected to
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: id of the namespace
+              name:
+                type: string
+                description: name of namespace
+              description:
+                type: string
+                description: description of the namespace
+              isNamespaceAdmin:
+                type: boolean
+                description: whether the user is an admin of the namespace
+              isNamespaceMaintainer:
+                type: boolean
+                description: whether the user is a maintainer of the namespace
+
+  404:
+    description: User not found
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response status code
+        message:
+          type: string
+          description: Error message

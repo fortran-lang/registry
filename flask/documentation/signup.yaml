@@ -1,48 +1,50 @@
-description: Makes a POST request, verifies by name, email and password and returns the uuid after successful register.
+description: Makes a POST request, verifies by username, email and password and returns the uuid after successful register.
 parameters:
-  - name: name
-    description: name of the user.
+  - name: username
+    description: username of the user.
+    in: formData
     required: true
     type: string
 
   - name: email
     description: email of the user.
+    in: formData
     required: true
     type: string
 
   - name: password
     description: password of the user.
+    in: formData
     required: true
     type: string
 
 responses:
   200:
     description: Signup successful
-    schema: 
-      type: array
-      items:
-        type: object
-        properties:
-          uuid:
-            type: string
-            description: The uuid of the user
-          message:
-            type: string
-            description: The message of successfull login
-          code:
-            type: string
-            description: response status code
+    schema:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: The uuid of the user
+        message:
+          type: string
+          description: The message of successfull login
+        code:
+          type: integer
+          description: response status code
+        username:
+          type: string
+          description: The username of the user
 
   400:
-    description: Invalid email or password
-    schema: 
-      type: array
-      items:
-        type: object
-        properties:
-          message:
-            type: string
-            description: Invalid email or password
-          code:
-            type: string
-            description: response status code
+    description: Bad request
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Bad request
+        code:
+          type: integer
+          description: response status code

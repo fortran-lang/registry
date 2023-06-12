@@ -1,0 +1,57 @@
+description: Api for the admin for deleting the namespace.
+parameters:
+  - name: namespace_name
+    in: path
+    description: Namespace name
+    required: true
+    type: string
+  - name: uuid
+    in: formData
+    description: UUID of the user.
+    required: true
+    type: string
+responses:
+  200:
+    description: Namespace deleted successfully
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response status code
+        message:
+          type: string
+          description: Response message
+  401:
+    description: Unauthorized
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response status code
+        message:
+          type: string
+          description: Response message
+  404:
+    description: Namespace or user not found
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response status code
+        message:
+          type: string
+          description: Response message
+  500:
+    description: Internal Server Error
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response status code
+        message:
+          type: string
+          description: Response message

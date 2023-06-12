@@ -13,10 +13,10 @@ from auth import generate_uuid
 NAMESPACE_NAME_PATTERN = r'^[a-zA-Z0-9_-]+$'
 
 @app.route("/namespaces", methods=["POST"])
+@swag_from("documentation/create_namespace.yaml", methods=["POST"])
 def create_namespace():
     uuid = request.form.get("uuid")
     
-
     if not uuid:
         return jsonify({"code": 401, "message": "Unauthorized"}), 401
     
@@ -62,6 +62,7 @@ def create_namespace():
     return jsonify({"code": 200, "message": "Namespace created successfully"}), 200
 
 @app.route("/namespaces/<namespace_name>/uploadToken", methods=["POST"])
+@swag_from("documentation/create_namespace_upload_token.yaml", methods=["POST"])
 def create_upload_token(namespace_name):
     uuid = request.form.get("uuid")
 
@@ -100,6 +101,7 @@ def create_upload_token(namespace_name):
     return jsonify({"code": 200, "message": "Upload token created", "uploadToken": upload_token})
 
 @app.route("/namespace/<namespace_name>/delete", methods=["POST"])
+@swag_from("documentation/delete_namespace.yaml", methods=["POST"])
 def delete_namespace(namespace_name):
     uuid = request.form.get("uuid")
 
@@ -139,6 +141,7 @@ def delete_namespace(namespace_name):
     
 
 @app.route("/namespace/<namespace>", methods=["GET"])
+@swag_from("documentation/get_namespace_packages.yaml", methods=["GET"])
 def namespace_packages(namespace):
     namespace_document = db.namespaces.find_one({"namespace": namespace})
 
@@ -172,7 +175,7 @@ def namespace_packages(namespace):
     return (
         jsonify(
             {
-                "status": 200,
+                "code": 200,
                 "packages": packages,
                 "createdAt": namespace_document["createdAt"],
             }
@@ -181,6 +184,7 @@ def namespace_packages(namespace):
     )
 
 @app.route("/namespace/<namespace>/admins", methods=["GET"])
+@swag_from("documentation/get_namespace_admins.yaml", methods=["GET"])
 def namespace_admins(namespace):
     namespace_doc = db.namespaces.find_one({"namespace": namespace})
 
@@ -199,6 +203,7 @@ def namespace_admins(namespace):
     return jsonify({"code": 200, "users": admins}), 200
 
 @app.route("/namespace/<namespace>/maintainers", methods=["GET"])
+@swag_from("documentation/get_namespace_maintainers.yaml", methods=["GET"])
 def namespace_maintainers(namespace):
     namespace_doc = db.namespaces.find_one({"namespace": namespace})
 

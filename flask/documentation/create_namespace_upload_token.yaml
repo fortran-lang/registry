@@ -1,0 +1,61 @@
+description: Creates namespace upload token.
+parameters:
+  - name: uuid
+    in: formData
+    description: UUID of the user.
+    required: true
+    type: string
+  - name: namespace_name
+    in: path
+    description: Namespace name
+    required: true
+    type: string
+
+responses:
+  200:
+    description: Namespace created successfully
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response status code
+        message:
+          type: string
+          description: Response message
+        uploadToken:
+          type: string
+          description: Upload token for the namespace
+  401:
+    description: Unauthorized
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response status code
+        message:
+          type: string
+          description: Response message
+  404:
+    description: Namespace not found
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response status code
+        message:
+          type: string
+          description: Response message
+  500:
+    description: Internal Server Error
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response status code
+        message:
+          type: string
+          description: Response message

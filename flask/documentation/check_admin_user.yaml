@@ -1,0 +1,45 @@
+description: Checks if user is an admin.
+parameters:
+  - name: uuid
+    in: formData
+    description: The uuid of the user
+    required: true
+    type: string
+
+responses:
+  200:
+    description: User is an admin
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response status code
+        message:
+          type: string
+          description: Response message
+        isAdmin:
+          type: boolean
+          description: Whether the user is an admin
+  404:
+    description: User not found
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response status code
+        message:
+          type: string
+          description: Error message
+  401:
+    description: Unauthorized
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response status code
+        message:
+          type: string
+          description: Error message
