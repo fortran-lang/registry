@@ -9,6 +9,7 @@ from auth import generate_uuid
 from app import swagger
 import zipfile
 import tarfile
+import io
 import toml
 from flasgger.utils import swag_from
 from urllib.parse import unquote
@@ -252,16 +253,27 @@ def upload():
     if tarball.content_type not in ["application/gzip", "application/zip"]:
         return jsonify({"code": 400, "message": "Invalid file type"}), 400
 
-    extn = "tar.gz" if tarball.content_type == "application/gzip" else "zip"
-    tarball_name = "{}-{}.{}".format(package_name, package_version, extn)
+    tarball_name = "{}-{}.tar.gz".format(package_name, package_version)
     # Upload the tarball to the Grid FS storage.
+
+    # try: TODO: Enable this after Validation is Enabled
+    #     zipball, tarball = get_file_object(tarball)
+    # except Exception as e:
+    #     return jsonify({"code": 400, "message": "Invalid package tarball."}), 400
+
+    # zipfile_object_id = file_storage.put(
+    #     zipball, content_type=zipball.content_type, filename=tarball_name + ".zip"
+    # )
+    # tarfile_object_id = file_storage.put(
+    #     tarball, content_type=tarball.content_type, filename=tarball_name + ".tar.gz"
+    # )
     file_object_id = file_storage.put(
         tarball, content_type=tarball.content_type, filename=tarball_name
     )
 
     # Extract the package metadata from the tarball's fpm.toml file.
     try:
-        package_data = extract_fpm_toml(tarball_name, extn)
+        package_data = extract_fpm_toml(zipball)
     except Exception as e:
         return jsonify({"code": 400, "message": "Invalid package tarball."}), 400
 
@@ -306,7 +318,8 @@ def upload():
             "dependencies": "Test dependencies",
             "createdAt": datetime.utcnow(),
             "isDeprecated": False,
-            "download_url": f"/tarballs/{file_object_id}",
+            # "download_url_zip": f"/tarballs/{zipfile_object_id}",  TODO: Uncomment this when the package validation is enabled
+            # "download_url_tar": f"/tarballs/{tarfile_object_id}",
         }
 
         package_obj["versions"] = []
@@ -361,6 +374,8 @@ def upload():
             "isDeprecated": False,
             "createdAt": datetime.utcnow(),
             "download_url": f"/tarballs/{file_object_id}",
+            # "download_url_zip": f"/tarballs/{zipfile_object_id}",
+            # "download_url_tar": f"/tarballs/{tarfile_object_id}",
         }
 
         package_doc["versions"].append(new_version)
@@ -896,19 +911,40 @@ def checkUserUnauthorizedForNamespaceTokenCreation(user_id, namespace_doc):
     return str_user_id not in admins_id_list and str_user_id not in maintainers_id_list
 
 
-def extract_fpm_toml(file_obj, extn):
-    if extn == "zip":
-        with zipfile.ZipFile(file_obj, "r") as zip_ref:
-            zip_ref.extract("fpm.toml")
-            with open("fpm.toml", "r") as file:
-                data = toml.load(file)
-    else:
-        with tarfile.open(file_obj, "r") as tar:
-            for member in tar.getmembers():
-                if member.name == "fpm.toml":
-                    file = tar.extractfile(member)
-                    if file:
-                        content = file.read()
-                        file.close()
-                        data = toml.loads(content.decode())
+def extract_fpm_toml(file_obj):
+    with zipfile.ZipFile(file_obj, "r") as zip_ref:
+        zip_ref.extract("fpm.toml")
+        with open("fpm.toml", "r") as file:
+            data = toml.load(file)
     return data
+
+def convert_zip_to_tar(zip_file):
+    tar_file = io.BytesIO()
+    with zipfile.ZipFile(zip_file, 'r') as zip_ref:
+        with tarfile.open(fileobj=tar_file, mode='w') as tar_ref:
+            for file_name in zip_ref.namelist():
+                file_data = zip_ref.read(file_name)
+                tar_info = tarfile.TarInfo(name=file_name)
+                tar_info.size = len(file_data)
+                tar_ref.addfile(tar_info, fileobj=io.BytesIO(file_data))
+    
+    tar_file.seek(0)  # Reset the file position for reading    
+    return tar_file
+
+
+def convert_to_zip(file_obj):
+    with tarfile.open(file_obj, "r:gz") as tar:
+        tar.extractall()
+        with zipfile.ZipFile("package.zip", "w") as zip_ref:
+            zip_ref.write("fpm.toml")
+            zip_ref.write("package")
+    return zip_ref
+
+
+def get_file_object(file_obj):
+    if file_obj.content_type == "application/zip":
+        return file_obj, convert_zip_to_tar(file_obj)
+    elif file_obj.content_type == "application/gzip":
+        return convert_to_zip(file_obj), file_obj
+    else:
+        raise Exception("Invalid file type")
