@@ -55,6 +55,9 @@ const NavbarComponent = () => {
           <Nav className="ml-auto">
             {!isAuthenticated && (
               <>
+                <Nav.Link onClick={() => navigate("/archives")}>
+                  Archives
+                </Nav.Link>
                 <Nav.Link onClick={() => navigate("/help")}>Help</Nav.Link>
                 <Nav.Link onClick={() => navigate("/account/login")}>
                   Login
@@ -109,6 +112,9 @@ const NavbarComponent = () => {
                 <NavDropdown.Item onClick={signOut}>Logout</NavDropdown.Item>
                 <NavDropdown.Item onClick={() => navigate("/help")}>
                   Help
+                </NavDropdown.Item>
+                <NavDropdown.Item onClick={() => navigate("/archives")}>
+                  Archives
                 </NavDropdown.Item>
               </NavDropdown>
             </Nav>

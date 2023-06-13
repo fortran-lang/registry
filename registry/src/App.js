@@ -15,6 +15,7 @@ import NamespaceForm from "./pages/createNamespace";
 import VerifyEmail from "./pages/verifyEmail";
 import NamespacePage from "./pages/namespace";
 import AdminSection from "./pages/admin";
+import Archives from "./pages/archives";
 import ForgotPassword from "./pages/forgotpassword";
 import ResetPassword from "./pages/resetpassword";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -27,6 +28,7 @@ function App() {
       <NavbarComponent />
       <Routes>
         <Route path="/" exact element={<Home />} />
+        <Route path="/archives" element={<Archives />} />
         <Route path="/account/login" element={<Login />} />
         <Route path="/account/forgot-password" element={<ForgotPassword />} />
         <Route
