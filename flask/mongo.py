@@ -21,7 +21,7 @@ db = client[database_name]
 file_storage = GridFS(db, collection="tarballs")
 
 
-@app.route("/registry/clone", methods=["GET"])
+@app.route("/registry/archives", methods=["GET"])
 def clone():
     folder_path = "static"
     file_list = os.listdir(folder_path)
