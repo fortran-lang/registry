@@ -68,3 +68,27 @@ Stop and remove the containers
 ```
 $ docker compose down
 ```
+
+## Steps to setup mongodump for registry Archives functionality
+fpm - registry archives automatically created at weekly intervals by the mongodump command and stored in a tar archives format in the static directory of flask , to support caching and direct rendering of archives without manually fetching the mongodb for each archive request. to reduce the resource used by mongodb , we will only be installing the `mongodb-org-tools` only. the steps to setup mongodump on a Ubuntu linux 22.04 are:
+
+1. Import the public key used by the package management system.
+
+```
+ wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add -
+ ```
+
+ 2. Create a list file for MongoDB.
+
+ ```
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+ ```
+
+ 3. Reload local package database and install the tools:
+
+ ```
+  sudo apt-get update
+  sudo apt install mongodb-org-tools
+ ```
+
+for more details, please refer: [mongodb tools installation docs](https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-ubuntu/).
