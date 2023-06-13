@@ -6,7 +6,8 @@ import {
 
 const initialState = {
   statuscode: 0,
-    message: "",
+  message: "",
+  isLoading: false,
 };
 
 const verifyEmailReducer = (state = initialState, action) => {
@@ -16,6 +17,7 @@ const verifyEmailReducer = (state = initialState, action) => {
         ...state,
         statuscode: action.payload.statuscode,
         message: action.payload.message,
+        isLoading: false,
       };
 
     case VERIFY_REQUEST_FAILURE:
@@ -23,13 +25,15 @@ const verifyEmailReducer = (state = initialState, action) => {
         ...state,
         statuscode: action.payload.statuscode,
         message: action.payload.message,
+        isLoading: false,
       };
 
-      case VERIFY_REQUEST:
-        return {
-          ...state,
-        };
-        
+    case VERIFY_REQUEST:
+      return {
+        ...state,
+        isLoading: true,
+      };
+
     default:
       return state;
   }

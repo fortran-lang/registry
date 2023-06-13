@@ -10,6 +10,7 @@ const VerifyEmail = () => {
   const dispatch = useDispatch();
   const message = useSelector((state) => state.verifyEmail.message);
   const statuscode = useSelector((state) => state.verifyEmail.statuscode);
+  const isLoading = useSelector((state) => state.verifyEmail.isLoading);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,7 +21,7 @@ const VerifyEmail = () => {
     <Container style={{ paddingTop: 25 }}>
       <form id="login-form" onSubmit={handleSubmit}>
         <h1>Welcome to fpm Registry!</h1>
-        <input type="submit" value="Verify Email" />
+        <input type="submit" value={isLoading ? "Loading..." : "Verify Email"} />
         {message &&
           (statuscode !== 200 ? (
             <p className="error">{message}</p>
