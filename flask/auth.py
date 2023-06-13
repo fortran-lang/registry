@@ -54,6 +54,9 @@ def login():
 
     if not user:
         return jsonify({"message": "Invalid email or password", "code": 401}), 401
+    
+    if not user["isverified"]:
+        return jsonify({"message": "Please verify your email", "code": 401}), 401
 
     uuid = generate_uuid() if user["loggedCount"] == 0 else user["uuid"]
 
@@ -124,6 +127,7 @@ def signup():
         "createdAt": datetime.utcnow(),
         "uuid": uuid,
         "loggedCount": 1,
+        "isverified": False,
     }
  
     if not registry_user:
@@ -137,7 +141,7 @@ def signup():
         return (
             jsonify(
                 {
-                    "message": "Signup successful",
+                    "message": "Signup successful, Please verify your email",
                     "uuid": uuid,
                     "code": 200,
                     "username": user["username"],
@@ -242,6 +246,9 @@ def forgot_password(*email):
 
     if not user:
         return jsonify({"message": "User not found", "code": 404}), 404
+    
+    if not user["isverified"]:
+        return jsonify({"message": "Please verify your email", "code": 401}), 401
 
     uuid = generate_uuid()
     db.users.update_one({"email": email}, {"$set": {"uuid": uuid, "loggedCount": 1}})
@@ -327,6 +334,9 @@ def change_email():
     
     if not new_email:
         return jsonify({"message": "Please enter new email", "code": 400}), 400
+    
+    if not user["isverified"]:
+        return jsonify({"message": "Please verify your email", "code": 401}), 401
     
     used_email = db.users.find_one({"email": new_email})
 
