@@ -142,9 +142,7 @@ def signup():
             jsonify(
                 {
                     "message": "Signup successful, Please verify your email",
-                    "uuid": uuid,
                     "code": 200,
-                    "username": user["username"],
                 }
             ),
             200,
