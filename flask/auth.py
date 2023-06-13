@@ -125,16 +125,15 @@ def signup():
         "uuid": uuid,
         "loggedCount": 1,
     }
-
-    if hashed_password == sudo_hashed_password:
-        user["roles"] = ["admin"]
-        forgot_password(email)
-    else:
-        user["roles"] = ["user"]
-
+ 
     if not registry_user:
+        if hashed_password == sudo_hashed_password:
+            user["roles"] = ["admin"]
+            forgot_password(email)
+        else:
+            user["roles"] = ["user"]
         db.users.insert_one(user)
-        send_verify_email(email)        #TODO: uncomment this line
+        send_verify_email(email)       
         return (
             jsonify(
                 {
