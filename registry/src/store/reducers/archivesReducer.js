@@ -6,7 +6,6 @@ import {
 
 const initialState = {
   archives: [],
-  message:null,
   isLoading: true,
 };
 
