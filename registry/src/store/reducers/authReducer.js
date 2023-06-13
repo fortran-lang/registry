@@ -17,6 +17,7 @@ const initialState = {
   error: null,
   username: null,
   isLoading: false,
+  message: null,
 };
 
 const authReducer = (state = initialState, action) => {
@@ -73,9 +74,7 @@ const authReducer = (state = initialState, action) => {
     case SIGNUP_SUCCESS:
       return {
         ...state,
-        isAuthenticated: true,
-        uuid: action.payload.uuid,
-        username: action.payload.username,
+        message: action.payload.message,
         isLoading: false,
       };
 

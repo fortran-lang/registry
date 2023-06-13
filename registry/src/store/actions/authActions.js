@@ -126,8 +126,7 @@ export const signup = (username, email, password) => async (dispatch) => {
       dispatch({
         type: SIGNUP_SUCCESS,
         payload: {
-          uuid: result.data.uuid,
-          username: result.data.username,
+          message: result.data.message,
         },
       });
     } else {

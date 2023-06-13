@@ -15,6 +15,7 @@ const Register = () => {
 
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const isLoading = useSelector((state) => state.auth.isLoading);
+  const message = useSelector((state) => state.auth.message);
   const errorMessage = useSelector((state) => state.auth.error);
 
   const handleSubmit = async (e) => {
@@ -91,6 +92,7 @@ const Register = () => {
           <p className="error">{fromValidationErrors.password}</p>
         )}
         {errorMessage != null ? <p className="error">{errorMessage}</p> : null}
+        {message != null ? <p className="success">{message}</p> : null}
         <input type="submit" value={!isLoading ? "Sign Up" : "Loading..."} />
         <p>
           Already have an account?<Link to="/account/login"> Log in </Link>
