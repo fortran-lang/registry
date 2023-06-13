@@ -274,7 +274,7 @@ def upload():
 
     # Extract the package metadata from the tarball's fpm.toml file.
     try:
-        package_data = extract_fpm_toml(zipball)
+        package_data = extract_fpm_toml(tarball)
     except Exception as e:
         return jsonify({"code": 400, "message": "Invalid package tarball."}), 400
 
@@ -795,11 +795,22 @@ def checkUserUnauthorizedForNamespaceTokenCreation(user_id, namespace_doc):
 
 
 def extract_fpm_toml(file_obj):
-    with zipfile.ZipFile(file_obj, "r") as zip_ref:
-        zip_ref.extract("fpm.toml")
-        with open("fpm.toml", "r") as file:
-            data = toml.load(file)
-    return data
+    tar = tarfile.open(fileobj=file_obj, mode='r')
+
+    fpm_toml_file = None
+    for file in tar.getmembers():
+        if file.name == 'fpm.toml':
+            fpm_toml_file = file
+            break
+
+    if fpm_toml_file is None:
+        raise ValueError("fpm.toml file not found in the tarball.")
+
+    extracted_file = tar.extractfile(fpm_toml_file)
+    toml_data = extracted_file.read()
+    tar.close()
+    parsed_toml = toml.loads(toml_data)
+    return parsed_toml
 
 def convert_zip_to_tar(zip_file):
     tar_file = io.BytesIO()
