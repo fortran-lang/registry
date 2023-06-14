@@ -343,7 +343,7 @@ def change_email():
     
     db.users.update_one(
         {"uuid": uuid},
-        {"$set": {"email": new_email}},
+        {"$set": {"email": new_email, "isverified": False}},
     )
     send_verify_email(new_email)
     

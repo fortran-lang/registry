@@ -18,7 +18,6 @@ import semantic_version
 from license_expression import get_spdx_licensing
 import validate_package
 
-# from validate_package import validate_package
 
 parameters = {
     "name": "name",
@@ -281,7 +280,7 @@ def upload():
 
     # TODO: Uncomment this when the package validation is enabled
     # validate the package with fpm
-    
+
     # valid_package = validate_package.validate_package(tarball,"{}-{}".format(package_name, package_version))
     # if not valid_package:
     #     return jsonify({"status": "error", "message": "Invalid package", "code": 400}), 400
