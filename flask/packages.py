@@ -16,6 +16,7 @@ from urllib.parse import unquote
 import math
 import semantic_version
 from license_expression import get_spdx_licensing
+import validate_package
 
 # from validate_package import validate_package
 
@@ -279,8 +280,9 @@ def upload():
         return jsonify({"code": 400, "message": "Invalid package tarball."}), 400
 
     # TODO: Uncomment this when the package validation is enabled
-    # validate the package
-    # valid_package = validate_package(tarball_name, tarball_name)
+    # validate the package with fpm
+    
+    # valid_package = validate_package.validate_package(tarball,"{}-{}".format(package_name, package_version))
     # if not valid_package:
     #     return jsonify({"status": "error", "message": "Invalid package", "code": 400}), 400
 
