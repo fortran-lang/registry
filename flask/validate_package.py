@@ -1,9 +1,8 @@
 import os
 import docker
-import tarfile
 from app import app
 
-#package testing container
+# Package testing container
 client = docker.from_env()
 container = client.containers.run(
     "registry",
@@ -13,22 +12,17 @@ container = client.containers.run(
 )
 
 
-# Copying package file to container
-def copy_to(package, dst, container):
+def validate_package(package, packagename):
     data = package.read()
-    container.put_archive(os.path.dirname(dst), data)
-
-
-def validate_package(tarball,packagename):
-    copy_to(tarball, f'/home/registry/{packagename}.zip', container)
-    container.exec_run('unzip package.zip')
-    build_response = container.exec_run('sh -c "/home/registry/fpm build"')
-    # execute_response = container.exec_run('sh -c "timeout 15s fpm run"',demux=True)
-    if build_response.output[0] == None:
-        if '<ERROR>' in build_response.output[1].decode():
-            # package build failed 
-            return False
-        else:
-            # package build success 
-            return True
-
+    container.put_archive(os.path.dirname(f"/home/registry/{packagename}.tar.gz"), data)
+    build_response = container.exec_run(f'sh -c "cd /home/registry/{packagename} &&  /home/registry/fpm build"')
+    container.exec_run(f'sh -c "cd /home/registry/ && rm -rf {packagename}"')
+    if b'<ERROR>' in build_response.output:
+        # Package build failed 
+        # print("build failed")
+        return False
+    if b'[100%] Project compiled successfully.' in build_response.output:
+        # Package build success 
+        # print("build success")
+        # print(build_response.output)
+        return True

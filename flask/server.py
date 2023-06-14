@@ -6,7 +6,7 @@ import auth
 import user
 import packages
 import namespaces
-# import validate_package
+# import validate_package  # TODO: Uncomment this when the package validation is enabled
 
 @app.route("/")
 def index():
