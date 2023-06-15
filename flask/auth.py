@@ -313,7 +313,7 @@ def verify_email():
     if not user:
         return jsonify({"message": "User not found", "code": 404}), 404
     
-    if user['newemail']:
+    if user['newemail']!='':
         db.users.update_one({"uuid": uuid}, {"$set": {"email": user['newemail'], "newemail": ""}})
     
     db.users.update_one({"uuid": uuid}, {"$set": {"isverified": True}})

@@ -8,7 +8,7 @@ export const VERIFY_REQUEST_FAILURE = "VERIFY_REQUEST_FAILURE";
 export const verify = (uuid) => async (dispatch) => {
   // Make an api call to request to verify email
   dispatch({
-    type: VERIFY_REQUEST_SUCCESS,
+    type: VERIFY_REQUEST,
   });
   let formData = new FormData();
 
