@@ -4,7 +4,8 @@ import { useNavigate } from "react-router-dom";
 import {
   reset,
   getUserAccount,
-  resetMessages,change
+  resetMessages,
+  change,
 } from "../store/actions/accountActions";
 
 import Row from "react-bootstrap/Row";
@@ -37,6 +38,7 @@ const Account = () => {
   const username = useSelector((state) => state.auth.username);
   const uuid = useSelector((state) => state.auth.uuid);
   const isLoading = useSelector((state) => state.account.isLoading);
+  const isLoadingEmail = useSelector((state) => state.account.isLoading);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -148,14 +150,20 @@ const Account = () => {
                 src={`https://www.gravatar.com/avatar/${username}`}
                 alt={`Avatar for ${username} from gravatar.com`}
                 title={`Avatar for ${username} from gravatar.com`}
-              /><br/><br/>
-              <a href={`/users/${username}`} style={{textDecoration:"none"}}>@{username}</a>
+              />
+              <br />
+              <br />
+              <a href={`/users/${username}`} style={{ textDecoration: "none" }}>
+                @{username}
+              </a>
             </td>
             <td>
               We use <a href="https://gravatar.com">gravatar.com</a> to generate
               your profile picture based on your primary email address —
-              <code className="break"> {email} </code>.<br/><br/>
-              <Button onClick={handleOpenModal}>Change Password</Button><Button onClick={handleOpenEmailModal}>Change Email</Button>
+              <code className="break"> {email} </code>.<br />
+              <br />
+              <Button onClick={handleOpenModal}>Change Password</Button>
+              <Button onClick={handleOpenEmailModal}>Change Email</Button>
             </td>
           </tr>
           <tr>
@@ -230,7 +238,7 @@ const Account = () => {
             Close
           </Button>
           <Button variant="primary" onClick={handleSubmit}>
-            Submit
+          {isLoadingEmail ? "Loading..." : "Submit"}
           </Button>
         </Modal.Footer>
       </Modal>
@@ -258,9 +266,7 @@ const Account = () => {
             {fromValidationErrors.email && (
               <p className="error">{fromValidationErrors.email}</p>
             )}
-            <p className={`success ${message ? "error" : ""}`}>
-              {message}
-            </p>
+            <p className={`success ${message ? "error" : ""}`}>{message}</p>
           </Form>
         </Modal.Body>
         <Modal.Footer>
@@ -268,7 +274,7 @@ const Account = () => {
             Close
           </Button>
           <Button variant="primary" onClick={handleSubmitEmail}>
-            Submit
+            {isLoadingEmail ? "Loading..." : "Submit"}
           </Button>
         </Modal.Footer>
       </Modal>

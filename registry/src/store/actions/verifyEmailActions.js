@@ -7,6 +7,9 @@ export const VERIFY_REQUEST_FAILURE = "VERIFY_REQUEST_FAILURE";
 
 export const verify = (uuid) => async (dispatch) => {
   // Make an api call to request to verify email
+  dispatch({
+    type: VERIFY_REQUEST_SUCCESS,
+  });
   let formData = new FormData();
 
   formData.append("uuid", uuid);
@@ -33,8 +36,8 @@ export const verify = (uuid) => async (dispatch) => {
       dispatch({
         type: VERIFY_REQUEST_FAILURE,
         payload: {
-            statuscode: result.data.code,
-            message: result.data.message,
+          statuscode: result.data.code,
+          message: result.data.message,
         },
       });
     }
@@ -42,11 +45,11 @@ export const verify = (uuid) => async (dispatch) => {
     //on failure
     // console.log(error);
     dispatch({
-        type: VERIFY_REQUEST_FAILURE,
-        payload: {
-            statuscode: error.response.data.code,
-            message: error.response.data.message,
-        },
+      type: VERIFY_REQUEST_FAILURE,
+      payload: {
+        statuscode: error.response.data.code,
+        message: error.response.data.message,
+      },
     });
   }
 };

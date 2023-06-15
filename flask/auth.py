@@ -313,6 +313,9 @@ def verify_email():
     if not user:
         return jsonify({"message": "User not found", "code": 404}), 404
     
+    if user['newemail']:
+        db.users.update_one({"uuid": uuid}, {"$set": {"email": user['newemail'], "newemail": ""}})
+    
     db.users.update_one({"uuid": uuid}, {"$set": {"isverified": True}})
     
     return jsonify({"message": "Successfully Verified Email", "code": 200}), 200
@@ -333,9 +336,6 @@ def change_email():
     if not new_email:
         return jsonify({"message": "Please enter new email", "code": 400}), 400
     
-    if not user["isverified"]:
-        return jsonify({"message": "Please verify your email", "code": 401}), 401
-    
     used_email = db.users.find_one({"email": new_email})
 
     if used_email:
@@ -343,8 +343,8 @@ def change_email():
     
     db.users.update_one(
         {"uuid": uuid},
-        {"$set": {"email": new_email, "isverified": False}},
+        {"$set": {"newemail": new_email, "isverified": False}},
     )
     send_verify_email(new_email)
     
-    return jsonify({"message": "Email id Successfully changed", "code": 200}), 200
+    return jsonify({"message": "Please verify your new email.", "code": 200}), 200
