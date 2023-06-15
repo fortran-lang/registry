@@ -133,6 +133,7 @@ def signup():
         "uuid": uuid,
         "loggedCount": 1,
         "isverified": False,
+        "newemail":'',
     }
 
     if not registry_user:
@@ -276,7 +277,9 @@ def forgot_password(*email):
 
 
 def send_verify_email(email):
-    user = db.users.find_one({"email": email})
+    query = {"$and": [{"$or": [{"email": email}, {"newemail": email}]}]}
+
+    user = db.users.find_one(query)
 
     if not user:
         return jsonify({"message": "User not found", "code": 404}), 404

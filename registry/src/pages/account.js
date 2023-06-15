@@ -38,7 +38,7 @@ const Account = () => {
   const username = useSelector((state) => state.auth.username);
   const uuid = useSelector((state) => state.auth.uuid);
   const isLoading = useSelector((state) => state.account.isLoading);
-  const isLoadingEmail = useSelector((state) => state.account.isLoading);
+  const isLoadingEmail = useSelector((state) => state.account.isLoadingEmail);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 

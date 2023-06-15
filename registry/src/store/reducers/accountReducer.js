@@ -2,7 +2,10 @@ import {
   GET_USER_ACCOUNT,
   RESET_PASSWORD_ERROR,
   RESET_PASSWORD,
-  RESET_MESSAGES,CHANGE_EMAIL_SUCCESS,CHANGE_EMAIL_FAILURE
+  RESET_MESSAGES,
+  CHANGE_EMAIL_SUCCESS,
+  CHANGE_EMAIL_FAILURE,
+  CHANGE_EMAIL,
 } from "../actions/accountActions";
 
 const initialState = {
@@ -12,6 +15,7 @@ const initialState = {
   email: "",
   dateJoined: "",
   isLoading: true,
+  isLoadingEmail: false,
   message: null,
   resetPasswordSuccessMsg: null,
 };
@@ -34,12 +38,20 @@ const accountReducer = (state = initialState, action) => {
       return {
         ...state,
         message: action.payload,
+        isLoadingEmail: false,
       };
-      case CHANGE_EMAIL_FAILURE:
-        return {
-          ...state,
-          message: action.payload,
-        };
+    case CHANGE_EMAIL:
+      return {
+        ...state,
+        message: action.payload,
+        isLoadingEmail: true,
+      };
+    case CHANGE_EMAIL_FAILURE:
+      return {
+        ...state,
+        message: action.payload,
+        isLoadingEmail: false,
+      };
     case RESET_PASSWORD_ERROR:
       return {
         ...state,

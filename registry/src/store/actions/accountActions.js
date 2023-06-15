@@ -2,6 +2,7 @@ import axios from "axios";
 
 export const RESET_SUCCESS = "RESET_SUCCESS";
 export const RESET_FAILURE = "RESET_FAILURE";
+export const CHANGE_EMAIL = "CHANGE_EMAIL";
 export const CHANGE_EMAIL_FAILURE = "CHANGE_EMAIL_FAILURE";
 export const CHANGE_EMAIL_SUCCESS = "CHANGE_EMAIL_SUCCESS";
 export const GET_USER_ACCOUNT = "GET_USER_ACCOUNT";
@@ -71,6 +72,7 @@ export const change = (newemail, uuid) => async (dispatch) => {
   let formData = new FormData();
   formData.append("newemail", newemail);
   formData.append("uuid", uuid);
+  dispatch({ type: CHANGE_EMAIL });
 
   try {
     const result = await axios({

@@ -16,7 +16,7 @@ from urllib.parse import unquote
 import math
 import semantic_version
 from license_expression import get_spdx_licensing
-import validate_package
+# import validate_package
 
 
 parameters = {
