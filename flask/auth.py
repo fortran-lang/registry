@@ -204,9 +204,6 @@ def reset_password():
     if not uuid:
         return jsonify({"message": "Unauthorized", "code": 401}), 401
 
-    if not oldpassword:
-        return jsonify({"message": "Please enter old password", "code": 400}), 400
-
     if not password:
         return jsonify({"message": "Please enter new password", "code": 400}), 400
 
@@ -323,8 +320,9 @@ def verify_email():
         db.users.update_one(
             {"uuid": uuid}, {"$set": {"email": user["newemail"], "newemail": ""}}
         )
-
-    db.users.update_one({"uuid": uuid}, {"$set": {"isverified": True}})
+    
+    if not user['isverified']:
+        db.users.update_one({"uuid": uuid}, {"$set": {"isverified": True}})
 
     return jsonify({"message": "Successfully Verified Email", "code": 200}), 200
 
@@ -352,7 +350,7 @@ def change_email():
 
     db.users.update_one(
         {"uuid": uuid},
-        {"$set": {"newemail": new_email, "isverified": False}},
+        {"$set": {"newemail": new_email}},
     )
     send_verify_email(new_email)
 
