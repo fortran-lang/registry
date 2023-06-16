@@ -582,9 +582,20 @@ def create_token_upload_token_package(namespace_name, package_name):
     )
      
     return jsonify({"code": 200, "message": "Upload token created successfully", "uploadToken": upload_token}), 200
-@app.route("/packages/<namespace>/<package>/maintainers", methods=["GET"])
-@swag_from("documentation/package_maintainers.yaml", methods=["GET"])
+
+@app.route("/packages/<namespace>/<package>/maintainers", methods=["POST"])
+@swag_from("documentation/package_maintainers.yaml", methods=["POST"])
 def package_maintainers(namespace, package):
+    uuid = request.form.get("uuid")
+
+    if not uuid:
+        return jsonify({"code": 401, "message": "Unauthorized"}), 401
+    
+    user = db.users.find_one({"uuid": uuid})
+
+    if not user:
+        return jsonify({"code": 401, "message": "Unauthorized"}), 401
+
     namespace_doc = db.namespaces.find_one({"namespace": namespace})
 
     if not namespace_doc:
@@ -594,6 +605,9 @@ def package_maintainers(namespace, package):
 
     if not package_doc:
         return jsonify({"message": "Package not found", "code": 404})
+    
+    if str(user["_id"]) not in [str(obj_id) for obj_id in namespace_doc["maintainers"]] and str(user["_id"]) not in [str(obj_id) for obj_id in namespace_doc["admins"]] and str(user["_id"]) not in [str(obj_id) for obj_id in package_doc["maintainers"]]:
+        return jsonify({"code": 401, "message": "Unauthorized"}), 401
     
     maintainers = []
 
