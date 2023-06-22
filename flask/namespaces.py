@@ -183,13 +183,26 @@ def namespace_packages(namespace):
         200,
     )
 
-@app.route("/namespace/<namespace>/admins", methods=["GET"])
-@swag_from("documentation/get_namespace_admins.yaml", methods=["GET"])
+@app.route("/namespaces/<namespace>/admins", methods=["POST"])
+@swag_from("documentation/get_namespace_admins.yaml", methods=["POST"])
 def namespace_admins(namespace):
+    uuid = request.form.get("uuid")
+
+    if not uuid:
+        return jsonify({"code": 401, "message": "Unauthorized"}), 401
+    
+    user = db.users.find_one({"uuid": uuid})
+
+    if not user:
+        return jsonify({"code": 404, "message": "User not found"}), 404
+
     namespace_doc = db.namespaces.find_one({"namespace": namespace})
 
     if not namespace_doc:
         return jsonify({"code": 404, "message": "Namespace not found"}), 404
+    
+    if not user["_id"] in namespace_doc["admins"] and not user["_id"] in namespace_doc["maintainers"]:
+        return jsonify({"code": 401, "message": "Unauthorized"}), 401
     
     admins = []
 
@@ -202,13 +215,26 @@ def namespace_admins(namespace):
     
     return jsonify({"code": 200, "users": admins}), 200
 
-@app.route("/namespace/<namespace>/maintainers", methods=["GET"])
-@swag_from("documentation/get_namespace_maintainers.yaml", methods=["GET"])
+@app.route("/namespaces/<namespace>/maintainers", methods=["POST"])
+@swag_from("documentation/get_namespace_maintainers.yaml", methods=["POST"])
 def namespace_maintainers(namespace):
+    uuid = request.form.get("uuid")
+
+    if not uuid:
+        return jsonify({"code": 401, "message": "Unauthorized"}), 401
+    
+    user = db.users.find_one({"uuid": uuid})
+
+    if not user:
+        return jsonify({"code": 404, "message": "User not found"}), 404
+
     namespace_doc = db.namespaces.find_one({"namespace": namespace})
 
     if not namespace_doc:
         return jsonify({"code": 404, "message": "Namespace not found"}), 404
+    
+    if not user["_id"] in namespace_doc["admins"] and not user["_id"] in namespace_doc["maintainers"]:
+        return jsonify({"code": 401, "message": "Unauthorized"}), 401    
     
     maintainers = []
 

@@ -1,4 +1,4 @@
-description: Gets package maintainers of a package.
+description: Verifies by uuid and gets the package maintainers.
 
 parameters:
   - name: namespace
@@ -12,6 +12,12 @@ parameters:
     in: path
     required: true
     type: string
+
+  - name: uuid
+    in: formData
+    required: true
+    type: string
+    description: UUID of the user
 
 responses:
   200:
@@ -46,3 +52,15 @@ responses:
         message:
           type: string
           description: Package or Namespace not found.
+
+  401:
+    description: Unauthorized access
+    schema:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: response status code
+        message:
+          type: string
+          description: Unauthorized access

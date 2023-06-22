@@ -1,10 +1,18 @@
-description: Get maintainers of a namespace.
+description: Verifies using uuid of the user and gets the namespace maintainers.
+
 parameters:
   - name: namespace
     in: path
     description: Namespace name
     required: true
     type: string
+
+  - name: uuid
+    in: formData
+    description: UUID of the user
+    required: true
+    type: string
+
 responses:
   200:
     description: Maintainers found
@@ -32,8 +40,20 @@ responses:
       type: object
       properties:
         code:
-          type: string
+          type: integer
           description: Response status code
         message:
           type: string
           description: Error message
+
+  401:
+    description: Unauthorized access
+    schema:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: Response status code
+        message:
+          type: string
+          description: Unauthorized access

@@ -740,10 +740,19 @@ def create_token_upload_token_package(namespace_name, package_name):
         200,
     )
 
-
 @app.route("/packages/<namespace>/<package>/maintainers", methods=["GET"])
 @swag_from("documentation/package_maintainers.yaml", methods=["GET"])
 def package_maintainers(namespace, package):
+    uuid = request.form.get("uuid")
+
+    if not uuid:
+        return jsonify({"code": 401, "message": "Unauthorized"}), 401
+    
+    user = db.users.find_one({"uuid": uuid})
+
+    if not user:
+        return jsonify({"code": 401, "message": "Unauthorized"}), 401
+
     namespace_doc = db.namespaces.find_one({"namespace": namespace})
 
     if not namespace_doc:

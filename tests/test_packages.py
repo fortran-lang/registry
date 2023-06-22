@@ -521,5 +521,5 @@ class TestPackages(BaseTestClass):
         response = self.client.post("/packages", data=TestPackages.test_package_data)
         self.assertEqual(200, response.json["code"])
 
-        response = self.client.get(f"/packages/{TestPackages.test_namespace_data['namespace']}/{TestPackages.test_package_data['package_name']}/maintainers")
+        response = self.client.post(f"/packages/{TestPackages.test_namespace_data['namespace']}/{TestPackages.test_package_data['package_name']}/maintainers", data={"uuid": uuid})
         self.assertEqual(200, response.json["code"])
