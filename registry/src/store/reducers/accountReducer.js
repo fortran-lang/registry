@@ -6,6 +6,7 @@ import {
   CHANGE_EMAIL_SUCCESS,
   CHANGE_EMAIL_FAILURE,
   CHANGE_EMAIL,
+  RESET_PASSWORD_SUCCESS,
 } from "../actions/accountActions";
 
 const initialState = {
@@ -51,6 +52,11 @@ const accountReducer = (state = initialState, action) => {
         ...state,
         message: action.payload,
         isLoadingEmail: false,
+      };
+    case RESET_PASSWORD_SUCCESS:
+      return {
+        ...state,
+        message: action.payload,
       };
     case RESET_PASSWORD_ERROR:
       return {

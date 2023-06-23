@@ -39,6 +39,7 @@ const Account = () => {
   const uuid = useSelector((state) => state.auth.uuid);
   const isLoading = useSelector((state) => state.account.isLoading);
   const isLoadingEmail = useSelector((state) => state.account.isLoadingEmail);
+  const messageEmail = useSelector((state) => state.account.message);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -229,7 +230,7 @@ const Account = () => {
               <p className="error">{fromValidationErrors.password}</p>
             )}
             <p className={`success ${error ? "error" : ""}`}>
-              {error ? error : successMsg}
+              {error ? error : messageEmail}
             </p>
           </Form>
         </Modal.Body>
