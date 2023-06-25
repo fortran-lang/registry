@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Image from "react-bootstrap/Image";
@@ -8,6 +8,7 @@ import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import { logout } from "../store/actions/authActions";
 import { searchPackage, setQuery } from "../store/actions/searchActions";
+import { adminAuth } from "../store/actions/adminActions";
 
 const NavbarComponent = () => {
   const dispatch = useDispatch();
@@ -18,6 +19,10 @@ const NavbarComponent = () => {
   const isAdmin = useSelector((state) => state.admin.isAdmin);
   const username = useSelector((state) => state.auth.username);
   const uuid = useSelector((state) => state.auth.uuid);
+
+  useEffect(() => {
+    dispatch(adminAuth(uuid));
+  }, [isAuthenticated, uuid]);
 
   const signOut = () => {
     dispatch(logout(uuid));
@@ -37,6 +42,7 @@ const NavbarComponent = () => {
             fluid
             width={60}
             height={60}
+            alt="Fortran-logo"
           />
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
@@ -49,6 +55,9 @@ const NavbarComponent = () => {
           <Nav className="ml-auto">
             {!isAuthenticated && (
               <>
+                <Nav.Link onClick={() => navigate("/archives")}>
+                  Archives
+                </Nav.Link>
                 <Nav.Link onClick={() => navigate("/help")}>Help</Nav.Link>
                 <Nav.Link onClick={() => navigate("/account/login")}>
                   Login
@@ -104,6 +113,9 @@ const NavbarComponent = () => {
                 <NavDropdown.Item onClick={() => navigate("/help")}>
                   Help
                 </NavDropdown.Item>
+                <NavDropdown.Item onClick={() => navigate("/archives")}>
+                  Archives
+                </NavDropdown.Item>
               </NavDropdown>
             </Nav>
           )}
@@ -127,8 +139,8 @@ const SearchBar = () => {
     }
   };
 
-  const handleKeyDown = event => { 
-    if (event.key === 'Enter') {
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
       search();
     }
   };

@@ -10,7 +10,7 @@ const Home = () => {
   return (
     <Container id="home-container">
       <div id="fpm-logo">
-        <img src="https://raw.githubusercontent.com/fortran-lang/assets/main/fpm/logo/2-color-alt/png/full-color-alt.png" />
+        <img src="https://raw.githubusercontent.com/fortran-lang/assets/main/fpm/logo/2-color-alt/png/full-color-alt.png" alt="Fortran-logo" />
       </div>
 
       <HomeSearchField type="text" placeholder="Search package" />

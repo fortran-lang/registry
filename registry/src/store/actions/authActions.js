@@ -1,12 +1,16 @@
 import axios from "axios";
 
 export const RESET_ERROR_MESSAGE = "RESET_ERROR_MESSAGE";
+export const LOGIN_REQUEST = "LOGIN_REQUEST";
 
 export const LOGIN_SUCCESS = "LOGIN_SUCCESS";
 export const LOGIN_FAILURE = "LOGIN_FAILURE";
 
 export const login = (user_identifier, password) => async (dispatch) => {
   // Make an api call to login
+  dispatch({
+    type: LOGIN_REQUEST,
+  });
   let formData = new FormData();
 
   formData.append("user_identifier", user_identifier);
@@ -51,8 +55,12 @@ export const login = (user_identifier, password) => async (dispatch) => {
 
 export const LOGOUT_SUCCESS = "LOGOUT_SUCCESS";
 export const LOGOUT_FAILURE = "LOGOUT_FAILURE";
+export const LOGOUT_REQUEST = "LOGOUT_REQUEST";
 
 export const logout = (uuid) => async (dispatch) => {
+  dispatch({
+    type: LOGOUT_REQUEST,
+  });
   let formData = new FormData();
 
   formData.append("uuid", uuid);
@@ -91,8 +99,12 @@ export const logout = (uuid) => async (dispatch) => {
 
 export const SIGNUP_SUCCESS = "SIGNUP_SUCCESS";
 export const SIGNUP_FAILURE = "SIGNUP_FAILURE";
+export const SIGNUP_REQUEST = "SIGNUP_REQUEST";
 
 export const signup = (username, email, password) => async (dispatch) => {
+  dispatch({
+    type: SIGNUP_REQUEST,
+  });
   let formData = new FormData();
 
   formData.append("username", username);
@@ -114,8 +126,7 @@ export const signup = (username, email, password) => async (dispatch) => {
       dispatch({
         type: SIGNUP_SUCCESS,
         payload: {
-          uuid: result.data.uuid,
-          username: result.data.username,
+          message: result.data.message,
         },
       });
     } else {

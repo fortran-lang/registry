@@ -8,11 +8,10 @@ RUN apk add --no-cache \
     gfortran \
     git \
     musl-dev \
+    tar \
     wget
 
-# Create a non-root user
-RUN adduser -D registry
-USER registry
+USER root
 WORKDIR /home/registry
 
 # Set up fpm

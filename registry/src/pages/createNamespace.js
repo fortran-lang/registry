@@ -57,6 +57,7 @@ const NamespaceForm = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
     dispatch(createNamespace(data));
+    setData({ ...data, namespace: "", namespace_description: "" });
   };
 
   return !isLoading ? (

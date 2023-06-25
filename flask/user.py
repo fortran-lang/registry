@@ -215,47 +215,49 @@ def admin():
         )
 
 
+
 @app.route("/users/admin/transfer", methods=["POST"])
 @swag_from("documentation/transfer_account.yaml", methods=["POST"])
 def transfer_account():
-    uuid = request.form.get("uuid")
-    if not uuid:
-        return jsonify({"message": "Unauthorized", "code": 401}), 401
-    else:
-        user = db.users.find_one({"uuid": uuid})
+    return jsonify({"message": "This Functionality has been disabled.", "code": 501}), 501
+    # uuid = request.form.get("uuid")
+    # if not uuid:
+    #     return jsonify({"message": "Unauthorized", "code": 401}), 401
+    # else:
+    #     user = db.users.find_one({"uuid": uuid})
 
-    if not user:
-        return jsonify({"message": "User not found", "code": 404}), 404
+    # if not user:
+    #     return jsonify({"message": "User not found", "code": 404}), 404
 
-    if "admin" not in user["roles"]:
-        return jsonify({"message": "Unauthorized", "code": 401}), 401
-    else:
-        old_user = request.form.get("old_username")
-        new_user = request.form.get("new_username")
-        new_email = request.form.get("new_email")
-        db.users.update_one(
-            {"username": old_user},
-            {
-                "$set": {
-                    "email": new_email,
-                    "username": new_user,
-                    "uuid": "",
-                    "loggedCount": 0,
-                    "loginAt": None,
-                    "lastLogout": None,
-                }
-            },
-        )
-        forgot_password(new_email)
-        return (
-            jsonify(
-                {
-                    "message": "Account Transfer Successful and Password reset request sent.",
-                    "code": 200,
-                }
-            ),
-            200,
-        )
+    # if "admin" not in user["roles"]:
+    #     return jsonify({"message": "Unauthorized", "code": 401}), 401
+    # else:
+    #     old_user = request.form.get("old_username")
+    #     new_user = request.form.get("new_username")
+    #     new_email = request.form.get("new_email")
+    #     db.users.update_one(
+    #         {"username": old_user},
+    #         {
+    #             "$set": {
+    #                 "email": new_email,
+    #                 "username": new_user,
+    #                 "uuid": "",
+    #                 "loggedCount": 0,
+    #                 "loginAt": None,
+    #                 "lastLogout": None,
+    #             }
+    #         },
+    #     )
+    #     forgot_password(new_email)
+    #     return (
+    #         jsonify(
+    #             {
+    #                 "message": "Account Transfer Successful and Password reset request sent.",
+    #                 "code": 200,
+    #             }
+    #         ),
+    #         200,
+    #     )
 
 
 @app.route("/<username>/maintainer", methods=["POST"])

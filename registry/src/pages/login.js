@@ -14,6 +14,7 @@ const Login = () => {
 
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const errorMessage = useSelector((state) => state.auth.error);
+  const isLoading = useSelector((state) => state.auth.isLoading);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -57,7 +58,7 @@ const Login = () => {
         <input
           type="user_identifier"
           name="user_identifier"
-          placeholder="Email"
+          placeholder="Email or Username"
           value={user_identifier}
           onChange={(e) => setUser_identifier(e.target.value)}
         />
@@ -75,7 +76,7 @@ const Login = () => {
           <p className="error">{fromValidationErrors.password}</p>
         )}
         {errorMessage != null ? <p className="error">{errorMessage}</p> : null}
-        <input type="submit" value="Log In" />
+        <input type="submit" value={!isLoading ? "Log In" : "Loading..."} />
         <p>
           Don't have an account?<Link to="/account/register"> Sign up </Link>
         </p>

@@ -7,6 +7,7 @@ import searchReducer from "./searchReducer";
 import namespaceReducer from "./namespaceReducer";
 import resetPasswordReducer from "./resetPasswordReducer";
 import createNamespaceReducer from "./createNamespaceReducer";
+import archivesReducer from "./archivesReducer";
 import adminReducer from "./adminReducer";
 import { combineReducers } from "redux";
 import addRemoveMaintainerReducer from "./addRemoveMaintainerReducer";
@@ -14,6 +15,7 @@ import generateNamespaceTokenReducer from "./generateNamespaceTokenReducer";
 import generatePackageTokenReducer from "./generatePackageTokenReducer";
 import addRemoveNamespaceMaintainerReducer from "./namespaceMaintainersReducer";
 import addRemoveNamespaceAdminReducer from "./namespaceAdminReducer";
+import verifyEmailReducer from "./verifyEmailReducer";
 import userListReducer from "./userListReducer";
 
 const rootReducer = combineReducers({
@@ -32,7 +34,9 @@ const rootReducer = combineReducers({
   createNamespace: createNamespaceReducer,
   addRemoveNamespaceMaintainer: addRemoveNamespaceMaintainerReducer,
   addRemoveNamespaceAdmin: addRemoveNamespaceAdminReducer,
+  verifyEmail: verifyEmailReducer,
   userList: userListReducer,
+  archives: archivesReducer,
 });
 
 export default rootReducer;

@@ -6,6 +6,9 @@ import {
   LOGOUT_SUCCESS,
   LOGOUT_FAILURE,
   RESET_ERROR_MESSAGE,
+  LOGIN_REQUEST,
+  SIGNUP_REQUEST,
+  LOGOUT_REQUEST
 } from "../actions/authActions";
 
 const initialState = {
@@ -13,16 +16,34 @@ const initialState = {
   uuid: null,
   error: null,
   username: null,
+  isLoading: false,
+  message: null,
 };
 
 const authReducer = (state = initialState, action) => {
   switch (action.type) {
+    case LOGIN_REQUEST:
+      return {
+        ...state,
+        isLoading: true,
+      };
+      case LOGOUT_REQUEST:
+        return {
+          ...state,
+          isLoading: true,
+        };
+      case SIGNUP_REQUEST:
+      return {
+        ...state,
+        isLoading: true,
+      };
     case LOGIN_SUCCESS:
       return {
         ...state,
         isAuthenticated: true,
         uuid: action.payload.uuid,
         username: action.payload.username,
+        isLoading: false,
       };
 
     case LOGIN_FAILURE:
@@ -30,6 +51,7 @@ const authReducer = (state = initialState, action) => {
         ...state,
         isAuthenticated: false,
         error: action.payload.error,
+        isLoading: false,
       };
 
     case LOGOUT_SUCCESS:
@@ -39,20 +61,21 @@ const authReducer = (state = initialState, action) => {
         uuid: null,
         username: null,
         error: null,
+        isLoading: false,
       };
 
     case LOGOUT_FAILURE:
       return {
         ...state,
         error: action.payload.error,
+        isLoading: false,
       };
 
     case SIGNUP_SUCCESS:
       return {
         ...state,
-        isAuthenticated: true,
-        uuid: action.payload.uuid,
-        username: action.payload.username,
+        message: action.payload.message,
+        isLoading: false,
       };
 
     case SIGNUP_FAILURE:
@@ -60,6 +83,7 @@ const authReducer = (state = initialState, action) => {
         ...state,
         isAuthenticated: false,
         error: action.payload.error,
+        isLoading: false,
       };
     case RESET_ERROR_MESSAGE:
       return {
