@@ -17,6 +17,7 @@ const initialState = {
   dateJoined: "",
   isLoading: true,
   isLoadingEmail: false,
+  isLoadingPassword: false,
   message: null,
   resetPasswordSuccessMsg: null,
 };
@@ -34,6 +35,7 @@ const accountReducer = (state = initialState, action) => {
       return {
         ...state,
         resetPasswordSuccessMsg: action.payload,
+        isLoadingPassword: true,
       };
     case CHANGE_EMAIL_SUCCESS:
       return {
@@ -57,11 +59,13 @@ const accountReducer = (state = initialState, action) => {
       return {
         ...state,
         message: action.payload,
+        isLoadingPassword: false,
       };
     case RESET_PASSWORD_ERROR:
       return {
         ...state,
         error: action.payload,
+        isLoadingPassword: false,
       };
     case RESET_MESSAGES:
       return {

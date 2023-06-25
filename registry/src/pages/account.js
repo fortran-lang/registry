@@ -40,6 +40,9 @@ const Account = () => {
   const isLoading = useSelector((state) => state.account.isLoading);
   const isLoadingEmail = useSelector((state) => state.account.isLoadingEmail);
   const messageEmail = useSelector((state) => state.account.message);
+  const isLoadingPassword = useSelector(
+    (state) => state.account.isLoadingPassword
+  );
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -48,10 +51,6 @@ const Account = () => {
       navigate("/");
     } else {
       dispatch(getUserAccount(uuid));
-    }
-
-    if (error !== null || successMsg !== null) {
-      dispatch(resetMessages());
     }
   });
 
@@ -229,9 +228,8 @@ const Account = () => {
             {fromValidationErrors.password && (
               <p className="error">{fromValidationErrors.password}</p>
             )}
-            <p className={`success ${error ? "error" : ""}`}>
-              {error ? error : messageEmail}
-            </p>
+            <p className="error">{error}</p>
+            <p className="success">{messageEmail}</p>
           </Form>
         </Modal.Body>
         <Modal.Footer>
@@ -239,7 +237,7 @@ const Account = () => {
             Close
           </Button>
           <Button variant="primary" onClick={handleSubmit}>
-          {isLoadingEmail ? "Loading..." : "Submit"}
+            {isLoadingPassword ? "Loading..." : "Submit"}
           </Button>
         </Modal.Footer>
       </Modal>

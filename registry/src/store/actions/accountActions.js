@@ -45,6 +45,7 @@ export const getUserAccount = (uuid) => async (dispatch) => {
 
 export const reset = (oldpassword, password, uuid) => async (dispatch) => {
   let formData = new FormData();
+  dispatch({ type: RESET_PASSWORD });
   formData.append("oldpassword", oldpassword);
   formData.append("password", password);
   formData.append("uuid", uuid);
