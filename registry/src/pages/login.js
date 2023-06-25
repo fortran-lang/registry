@@ -58,7 +58,7 @@ const Login = () => {
         <input
           type="user_identifier"
           name="user_identifier"
-          placeholder="Email"
+          placeholder="Email or Username"
           value={user_identifier}
           onChange={(e) => setUser_identifier(e.target.value)}
         />
