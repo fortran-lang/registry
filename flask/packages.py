@@ -16,6 +16,7 @@ from urllib.parse import unquote
 import math
 import semantic_version
 from license_expression import get_spdx_licensing
+from io import BytesIO
 # import validate_package
 
 
@@ -805,8 +806,10 @@ def checkUserUnauthorizedForNamespaceTokenCreation(user_id, namespace_doc):
 
 
 def extract_fpm_toml(file_obj):
-    tar = tarfile.open(fileobj=file_obj, mode='r')
-
+    binary_stream = BytesIO()
+    binary_stream.write(file_obj.getbuffer())
+    binary_stream.seek(0)
+    tar = tarfile.open(fileobj=binary_stream, mode='r')
     fpm_toml_file = None
     for file in tar.getmembers():
         if file.name == 'fpm.toml':
@@ -819,7 +822,7 @@ def extract_fpm_toml(file_obj):
     extracted_file = tar.extractfile(fpm_toml_file)
     toml_data = extracted_file.read()
     tar.close()
-    parsed_toml = toml.loads(toml_data)
+    parsed_toml = toml.loads(str(toml_data, 'utf-8'))
     return parsed_toml
 
 def convert_zip_to_tar(zip_file):
