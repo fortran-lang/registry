@@ -251,7 +251,7 @@ def upload():
         {"name": package_name, "namespace": namespace_doc["_id"]}
     )
 
-    if tarball.content_type not in ["application/gzip", "application/zip"]:
+    if tarball.content_type not in ["application/gzip", "application/zip","application/octet-stream"]:
         return jsonify({"code": 400, "message": "Invalid file type"}), 400
 
     tarball_name = "{}-{}.tar.gz".format(package_name, package_version)
