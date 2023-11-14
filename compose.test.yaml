@@ -1,13 +1,13 @@
 services:
   test_ci:
     build:
-      context: flask
+      context: backend
       target: builder
-      dockerfile: backend.Dockerfile
+      dockerfile: docker/backend.Dockerfile
     command: python -m unittest discover -s tests
     volumes:
       - ./tests:/src/tests
-      - ./flask:/src
+      - ./backend:/src
     depends_on:
       - tests_db
     environment: # these are the test environment variables.
@@ -26,9 +26,9 @@ services:
   
   backend:
     build:
-      context: flask
+      context: backend
       target: builder
-      dockerfile: backend.Dockerfile
+      dockerfile: docker/backend.Dockerfile
     # flask requires SIGINT to stop gracefully
     # (default stop signal from Compose is SIGTERM)
     stop_signal: SIGINT
@@ -38,7 +38,7 @@ services:
       - MONGO_URI=mongodb://mongo:27017/fpmregistry
 
     volumes:
-      - ./flask:/src
+      - ./backend:/src
     depends_on:
       - mongo
 
