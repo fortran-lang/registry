@@ -3,7 +3,6 @@ from uuid import uuid4
 
 class TestLogin(BaseTestClass):
 
-
     email = "testemail@gmail.com"
     password = "123456"
     username = "testuser"
