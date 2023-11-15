@@ -60,8 +60,8 @@ def login():
     if not user:
         return jsonify({"message": "Invalid email or password", "code": 401}), 401
 
-    if not user["isverified"]:
-        return jsonify({"message": "Please verify your email", "code": 401}), 401
+    # if not user["isverified"]:    # TODO: Uncomment this line to enable email verification
+    #     return jsonify({"message": "Please verify your email", "code": 401}), 401
 
     uuid = generate_uuid() if user["loggedCount"] == 0 else user["uuid"]
 
@@ -143,7 +143,7 @@ def signup():
         else:
             user["roles"] = ["user"]
         db.users.insert_one(user)
-        send_verify_email(email)
+        # send_verify_email(email) # TODO: Uncomment this line to enable email verification
         return (
             jsonify(
                 {

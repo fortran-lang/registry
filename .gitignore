@@ -31,7 +31,6 @@ tests/__pycache__/
 /frontend/.env.development.local
 /frontend/.env.test.local
 /frontend/.env.production.local
-/frontend/package-lock.json
 
 /frontend/npm-debug.log*
 /frontend/yarn-debug.log*

@@ -9,7 +9,7 @@ services:
       - ./tests:/src/tests
       - ./backend:/src
     depends_on:
-      - tests_db
+      - mongo
     environment: # these are the test environment variables.
       - MONGO_DB_NAME=testregistry
       - MONGO_URI=mongodb://mongo:27017/testregistry
@@ -21,26 +21,6 @@ services:
       - RESET_PASSWORD=reset
       - SUDO_PASSWORD=fortran
 
-  tests_db:
-    image: mongo
-  
-  backend:
-    build:
-      context: backend
-      target: builder
-      dockerfile: docker/backend.Dockerfile
-    # flask requires SIGINT to stop gracefully
-    # (default stop signal from Compose is SIGTERM)
-    stop_signal: SIGINT
-    environment:
-      - FLASK_SERVER_PORT=9091
-      - MONGO_DB_NAME=registry
-      - MONGO_URI=mongodb://mongo:27017/fpmregistry
-
-    volumes:
-      - ./backend:/src
-    depends_on:
-      - mongo
-
   mongo:
     image: mongo
+
