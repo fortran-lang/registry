@@ -3,6 +3,11 @@ from uuid import uuid4
 
 class TestLogin(BaseTestClass):
 
+
+    email = "testemail@gmail.com"
+    password = "123456"
+    username = "testuser"
+
     def test_successful_login(self):
         """
         Test case to verify the behavior of the system when a user provides the correct login credentials and is able to successfully login to the system.
@@ -11,19 +16,16 @@ class TestLogin(BaseTestClass):
         None
 
         Returns:
-        None
+        uuid (str): The UUID of the user who successfully logged in.
 
         Raises:
         AssertionError: If the response code received from the server is not as expected.
         """
-        email = "testemail@gmail.com"
-        password = "123456"
-        username = "testuser"
 
         signup_data = {
-            "email": email,
-            "password": password,
-            "username": username
+            "email": self.email,
+            "password": self.password,
+            "username": self.username
         }
 
         # Create a user first.
@@ -31,13 +33,15 @@ class TestLogin(BaseTestClass):
         self.assertEqual(200, response_for_signup.json["code"])
 
         login_data = {
-            "user_identifier": email,
-            "password": password
+            "user_identifier": self.email,
+            "password": self.password
         }
 
         # Login with the same user.
         response_for_login = self.client.post("/auth/login", data=login_data)
         self.assertEqual(200, response_for_login.json["code"])
+        print("test_successful_login passed")
+        return response_for_login.json["uuid"]
     
     def test_unsuccessful_login(self):
         """
@@ -52,27 +56,17 @@ class TestLogin(BaseTestClass):
         Raises:
         AssertionError: If the response code received from the server is not as expected.
         """
-        email = "testemail@gmail.com"
-        password = "123456"
-        username = "testuser"
 
-        signup_data = {
-            "email": email,
-            "password": password,
-            "username": username
-        }
-
-        response_for_signup = self.client.post("/auth/signup", data=signup_data)
-        self.assertEqual(200, response_for_signup.json["code"])
+        self.test_successful_login()
 
         login_data_incorrect_password = {
-            "user_identifier": email,
-            "password": password+'123',
+            "user_identifier": self.email,
+            "password": self.password+'123',
         }
 
         login_data_incorrect_email = {
-            "user_identifier": "hello"+email,
-            "password": password,
+            "user_identifier": "hello"+self.email,
+            "password": self.password,
         }
 
         # Login with incorrect password for the same user.
@@ -82,6 +76,7 @@ class TestLogin(BaseTestClass):
         # Login with incorrect email for the same user.
         response_for_login = self.client.post("/auth/login", data=login_data_incorrect_email)
         self.assertEqual(401, response_for_login.json["code"])
+        print("test_unsuccessful_login passed")
 
 
     def test_successful_logout(self):
@@ -97,25 +92,14 @@ class TestLogin(BaseTestClass):
         Raises:
         AssertionError: If the response code received from the server is not as expected.
         """
-        email = "testuser@gmail.com"
-        password = "123456"
-        username = "testuser"
-
-        data_for_signup = {
-            "email": email,
-            "password": password,
-            "username": username
-        }
-
-        response_from_signup = self.client.post("/auth/signup", data=data_for_signup)
-        self.assertEqual(200, response_from_signup.json["code"])
 
         data_for_logout = {
-            "uuid": response_from_signup.json["uuid"],
+            "uuid": self.test_successful_login()
         }
 
         response_from_logout = self.client.post('/auth/logout', data=data_for_logout)
         self.assertEqual(200, response_from_logout.json["code"])
+        print("test_successful_logout passed")
     
     def test_unsuccessful_logout(self):
         """
@@ -138,3 +122,4 @@ class TestLogin(BaseTestClass):
 
         response = self.client.post('/auth/logout', data=data)
         self.assertEqual(404, response.json["code"])
+        print("test_unsuccessful_logout passed")
