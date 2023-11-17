@@ -7,17 +7,16 @@ from gridfs.errors import NoFile
 from datetime import datetime, timedelta
 from auth import generate_uuid
 from app import swagger
-import zipfile
 import tarfile
-import io
+import os
 import toml
+import shutil
 from flasgger.utils import swag_from
 from urllib.parse import unquote
 import math
 import semantic_version
 from license_expression import get_spdx_licensing
-from io import BytesIO
-# import validate_package
+# from validate_package import validate
 
 
 parameters = {
@@ -252,39 +251,21 @@ def upload():
         {"name": package_name, "namespace": namespace_doc["_id"]}
     )
 
-    if tarball.content_type not in ["application/gzip", "application/zip","application/octet-stream"]:
+    if tarball.content_type not in ["application/gzip", "application/zip","application/octet-stream","application/x-tar"]:
         return jsonify({"code": 400, "message": "Invalid file type"}), 400
 
     tarball_name = "{}-{}.tar.gz".format(package_name, package_version)
-    # Upload the tarball to the Grid FS storage.
 
-    # try: TODO: Enable this after Validation is Enabled
-    #     zipball, tarball = get_file_object(tarball)
-    # except Exception as e:
-    #     return jsonify({"code": 400, "message": "Invalid package tarball."}), 400
 
-    # zipfile_object_id = file_storage.put(
-    #     zipball, content_type=zipball.content_type, filename=tarball_name + ".zip"
-    # )
-    # tarfile_object_id = file_storage.put(
-    #     tarball, content_type=tarball.content_type, filename=tarball_name + ".tar.gz"
-    # )
-    file_object_id = file_storage.put(
-        tarball, content_type=tarball.content_type, filename=tarball_name
-    )
-
-    # Extract the package metadata from the tarball's fpm.toml file.
-    try:
-        package_data = extract_fpm_toml(tarball)
-    except Exception as e:
-        return jsonify({"code": 400, "message": "Invalid package tarball."}), 400
-
-    # TODO: Uncomment this when the package validation is enabled
+    package_data = extract_toml(tarball)
     # validate the package with fpm
+    # valid_package, package_data = validate(tarball,"{}-{}".format(package_name, package_version))  # TODO: Enable this after Validation is Enabled
+    
 
-    # valid_package = validate_package.validate_package(tarball,"{}-{}".format(package_name, package_version))
-    # if not valid_package:
-    #     return jsonify({"status": "error", "message": "Invalid package", "code": 400}), 400
+    # if not valid_package: # TODO: Enable this after Validation is Enabled
+    #     return jsonify({"code": 400, "message": "Invalid package"}), 400    
+
+    file_object_id = file_storage.put(tarball, content_type=tarball.content_type, filename=tarball_name)
 
     # No previous recorded versions of the package found.
     if not package_doc:
@@ -295,12 +276,12 @@ def upload():
                 "description": package_data["description"],
                 "homepage": package_data["homepage"],
                 "repository": package_data["repository"],
+                "copyright": package_data["copyright"],
                 "license": package_license,
                 "createdAt": datetime.utcnow(),
                 "updatedAt": datetime.utcnow(),
                 "author": user["_id"],
                 "maintainers": [user["_id"]],
-                "copyright": package_data["copyright"],
                 "tags": ["fortran", "fpm"],
                 "isDeprecated": False,
             }
@@ -321,8 +302,7 @@ def upload():
             "dependencies": "Test dependencies",
             "createdAt": datetime.utcnow(),
             "isDeprecated": False,
-            # "download_url_zip": f"/tarballs/{zipfile_object_id}",  TODO: Uncomment this when the package validation is enabled
-            # "download_url_tar": f"/tarballs/{tarfile_object_id}",
+            "download_url": f"/tarballs/{file_object_id}"
         }
 
         package_obj["versions"] = []
@@ -331,7 +311,7 @@ def upload():
         package_obj["versions"].append(version_obj)
 
         if dry_run:
-            return jsonify({"message": "Dry run Successful.", "code": 200})
+            return jsonify({"message": "Dry run Successful.", "code": 200}), 200
 
         db.packages.insert_one(package_obj)
 
@@ -805,53 +785,19 @@ def checkUserUnauthorizedForNamespaceTokenCreation(user_id, namespace_doc):
     return str_user_id not in admins_id_list and str_user_id not in maintainers_id_list
 
 
-def extract_fpm_toml(file_obj):
-    binary_stream = BytesIO()
-    binary_stream.write(file_obj.getbuffer())
-    binary_stream.seek(0)
-    tar = tarfile.open(fileobj=binary_stream, mode='r')
-    fpm_toml_file = None
-    for file in tar.getmembers():
-        if file.name == 'fpm.toml':
-            fpm_toml_file = file
-            break
+def extract_toml(file):
+    with open('static/temp/temp.tar.gz', 'wb') as f:
+        f.write(file.read())
+    with tarfile.open('static/temp/temp.tar.gz', "r") as tar:
+        tar.extractall("static/temp")
 
-    if fpm_toml_file is None:
-        raise ValueError("fpm.toml file not found in the tarball.")
-
-    extracted_file = tar.extractfile(fpm_toml_file)
-    toml_data = extracted_file.read()
-    tar.close()
-    parsed_toml = toml.loads(str(toml_data, 'utf-8'))
-    return parsed_toml
-
-def convert_zip_to_tar(zip_file):
-    tar_file = io.BytesIO()
-    with zipfile.ZipFile(zip_file, 'r') as zip_ref:
-        with tarfile.open(fileobj=tar_file, mode='w') as tar_ref:
-            for file_name in zip_ref.namelist():
-                file_data = zip_ref.read(file_name)
-                tar_info = tarfile.TarInfo(name=file_name)
-                tar_info.size = len(file_data)
-                tar_ref.addfile(tar_info, fileobj=io.BytesIO(file_data))
-    
-    tar_file.seek(0)  # Reset the file position for reading    
-    return tar_file
-
-
-def convert_to_zip(file_obj):
-    with tarfile.open(file_obj, "r:gz") as tar:
-        tar.extractall()
-        with zipfile.ZipFile("package.zip", "w") as zip_ref:
-            zip_ref.write("fpm.toml")
-            zip_ref.write("package")
-    return zip_ref
-
-
-def get_file_object(file_obj):
-    if file_obj.content_type == "application/zip":
-        return file_obj, convert_zip_to_tar(file_obj)
-    elif file_obj.content_type == "application/gzip":
-        return convert_to_zip(file_obj), file_obj
-    else:
-        raise Exception("Invalid file type")
+    for root, dirs, files in os.walk('static/temp'):
+        file_name = 'fpm.toml'
+        if file_name in files:
+            file_path = os.path.join(root, file_name)
+            with open(file_path, 'r') as file:
+                file_content = file.read()
+            shutil.rmtree('static/temp')
+            os.makedirs('static/temp', exist_ok=True)
+            parsed_toml = toml.loads(file_content)
+            return parsed_toml
