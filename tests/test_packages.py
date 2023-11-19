@@ -5,10 +5,10 @@ from packages import check_token_expiry
 from datetime import datetime
 import random
 
-class TestPackages(BaseTestClass):    
 
+class TestPackages(BaseTestClass):
     def setUp(self):
-        app.config['SERVER_NAME'] = 'localhost:9090' # set server to localhost
+        app.config["SERVER_NAME"] = "localhost:9090"  # set server to localhost
         self.client = app.test_client()
 
         # This method is called before each test method
@@ -27,9 +27,8 @@ class TestPackages(BaseTestClass):
 
         self.test_namespace_data = {
             "namespace": f"test_namespace{random.randint(1,100)}",
-            "namespace_description": "Test namespace description"
+            "namespace_description": "Test namespace description",
         }
-
 
     def login(self):
         """
@@ -44,21 +43,18 @@ class TestPackages(BaseTestClass):
         Raises:
         AssertionError: If the response code received from the server is not as expected.
         """
-        
+
         signup_data = {
             "email": self.email,
             "password": self.password,
-            "username": self.username
+            "username": self.username,
         }
         if self.is_created:
             return self.uuid
         response_for_signup = self.client.post("/auth/signup", data=signup_data)
         self.assertEqual(200, response_for_signup.json["code"])
 
-        login_data = {
-            "user_identifier": self.email,
-            "password": self.password
-        }
+        login_data = {"user_identifier": self.email, "password": self.password}
 
         # Login with the same user.
         response_for_login = self.client.post("/auth/login", data=login_data)
@@ -66,11 +62,11 @@ class TestPackages(BaseTestClass):
         self.is_created = True
         self.uuid = response_for_login.json["uuid"]
         return response_for_login.json["uuid"]
-    
+
     def upload(self):
         """
         Helper function to upload a package.
-        
+
         Parameters:
         None
 
@@ -89,27 +85,30 @@ class TestPackages(BaseTestClass):
             self.assertEqual(200, response.json["code"])
             self.is_namespace_created = True
 
-
         # Create an upload token for the namespace.
-        response = self.client.post(f"/namespaces/{self.test_namespace_data['namespace']}/uploadToken", 
-            data={
-            "uuid": uuid
-            }
+        response = self.client.post(
+            f"/namespaces/{self.test_namespace_data['namespace']}/uploadToken",
+            data={"uuid": uuid},
         )
         self.assertEqual(200, response.json["code"])
 
         upload_token = response.json["uploadToken"]
 
         # Upload the package.
-        response = self.client.post("/packages",content_type='multipart/form-data', data={
-            "upload_token": upload_token,
-            **self.test_package_data,
-            "dry_run": "false",
-            "tarball": ("static/registry.tar.gz", "package.tar.gz")})
-        
+        response = self.client.post(
+            "/packages",
+            content_type="multipart/form-data",
+            data={
+                "upload_token": upload_token,
+                **self.test_package_data,
+                "dry_run": "false",
+                "tarball": ("static/registry.tar.gz", "package.tar.gz"),
+            },
+        )
+
         response.json["uploadToken"] = upload_token
         return response.json
-   
+
     def test_successful_package_upload(self):
         """
         Test case to verify the behaviour of the system when a user tries to upload a package successfully.
@@ -129,7 +128,7 @@ class TestPackages(BaseTestClass):
 
     def test_upload_existing_package(self):
         """
-        Test case to verify the behaviour of the system when a user tries to upload already existing 
+        Test case to verify the behaviour of the system when a user tries to upload already existing
         package in the registry.
 
         Parameters:
@@ -167,7 +166,7 @@ class TestPackages(BaseTestClass):
         response = self.upload()
         self.assertEqual(200, response["code"])
 
-        self.test_package_data["package_version"] = 'somerandomstring'
+        self.test_package_data["package_version"] = "somerandomstring"
         # Upload the package again with version change.
 
         response = self.upload()
@@ -189,9 +188,9 @@ class TestPackages(BaseTestClass):
         """
 
         self.test_package_data["upload_token"] = "somerandomtoken123"
-        self.test_package_data['package_version'] = "0.0.1"
+        self.test_package_data["package_version"] = "0.0.1"
         response = self.upload()
-        self.assertEqual(401, response['code'])
+        self.assertEqual(401, response["code"])
         print("test_invalid_token_upload passed")
 
     def test_search_package(self):
@@ -211,15 +210,15 @@ class TestPackages(BaseTestClass):
         response = self.upload()
         self.assertEqual(200, response["code"])
 
-        response = self.client.get("/packages", query_string={
-            "query": self.test_package_data["package_name"]
-        })
+        response = self.client.get(
+            "/packages", query_string={"query": self.test_package_data["package_name"]}
+        )
 
         self.assertEqual(200, response.json["code"])
 
-        response = self.client.get("/packages", query_string={
-            "query": "somerandompackage"
-        })
+        response = self.client.get(
+            "/packages", query_string={"query": "somerandompackage"}
+        )
         self.assertEqual(200, response.json["code"])
         self.assertEqual([], response.json["packages"])
         print("test_search_package passed")
@@ -237,10 +236,12 @@ class TestPackages(BaseTestClass):
         Raises:
         AssertionError: If the response received from the server is not as expected.
         """
-        
+
         self.upload()
         # Get the package.
-        response = self.client.get(f"/packages/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}")
+        response = self.client.get(
+            f"/packages/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}"
+        )
         self.assertEqual(200, response.json["code"])
         print("test_get_exisiting_package passed")
 
@@ -261,7 +262,9 @@ class TestPackages(BaseTestClass):
         response = self.upload()
         self.assertEqual(200, response["code"])
 
-        response = self.client.get(f"/packages/{self.test_namespace_data['namespace']}/test_package_hello_world")
+        response = self.client.get(
+            f"/packages/{self.test_namespace_data['namespace']}/test_package_hello_world"
+        )
         self.assertEqual(404, response.json["code"])
         print("test_get_nonexisting_package passed")
 
@@ -282,7 +285,9 @@ class TestPackages(BaseTestClass):
         response = self.upload()
         self.assertEqual(200, response["code"])
 
-        response = self.client.get(f"/packages/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}/2.0.0")
+        response = self.client.get(
+            f"/packages/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}/2.0.0"
+        )
         self.assertEqual(404, response.json["code"])
         print("test_get_nonexisting_package_version passed")
 
@@ -298,12 +303,14 @@ class TestPackages(BaseTestClass):
 
         Raises:
         AssertionError: If the response received from the server is not as expected.
-        """     
+        """
 
         response = self.upload()
         self.assertEqual(200, response["code"])
 
-        response = self.client.get(f"/packages/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}/0.0.1")
+        response = self.client.get(
+            f"/packages/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}/0.0.1"
+        )
         self.assertEqual(200, response.json["code"])
         print("test_get_existing_package_version passed")
 
@@ -322,7 +329,7 @@ class TestPackages(BaseTestClass):
         """
 
         self.test_package_data["package_license"] = "ABC"
-        response =  self.upload()
+        response = self.upload()
 
         # Upload the package.
         self.assertEqual(400, response["code"])
@@ -363,14 +370,17 @@ class TestPackages(BaseTestClass):
         Raises:
         AssertionError: If the response received from the server is not as expected.
         """
-        
+
         # create a user
-        uuid = self.login()   
+        uuid = self.login()
 
         # Upload the package.
         response = self.upload()
         self.assertEqual(200, response["code"])
 
-        response = self.client.get(f"/packages/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}/maintainers", data={"uuid": uuid})
+        response = self.client.get(
+            f"/packages/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}/maintainers",
+            data={"uuid": uuid},
+        )
         self.assertEqual(200, response.json["code"])
         print("test_package_maintainers passed")
