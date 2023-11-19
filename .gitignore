@@ -6,7 +6,7 @@
 # backend
 /backend/.env
 /backend/vercel.json
-/backend/static/
+/backend/static/*.tar.gz
 /backend/__pycache__/
 /backend/.vercel
 /.DS_Store

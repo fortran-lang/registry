@@ -10,7 +10,8 @@ services:
       - ./backend:/src
     depends_on:
       - mongo
-    environment: # these are the test environment variables.
+    environment:
+      # these are the test environment variables.
       - MONGO_DB_NAME=testregistry
       - MONGO_URI=mongodb://mongo:27017/testregistry
       - MONGO_USER_NAME=testuser
@@ -19,7 +20,13 @@ services:
       - HOST=localhost
       - RESET_EMAIL=reset@localhost.com
       - RESET_PASSWORD=reset
-      - SUDO_PASSWORD=fortran
+      - SUDO_PASSWORD=SUDO_PASSWORD
+      - IS_CI=true
+
+  validate_package:
+    build:
+      dockerfile: backend/docker/validate_package.Dockerfile
+    stop_signal: SIGINT
 
   mongo:
     image: mongo
