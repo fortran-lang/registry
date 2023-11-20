@@ -1,12 +1,21 @@
 import os
-from flask import render_template,jsonify
+from flask import render_template, jsonify
 from app import app
 from mongo import db
+from auth import is_ci
+import logging
 import auth
 import user
 import packages
 import namespaces
 # import validate_package  # TODO: Uncomment this when the package validation is enabled
+
+logging.basicConfig(
+    filename="app.log",
+    level=logging.ERROR,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+)
+
 
 @app.route("/")
 def index():
@@ -18,7 +27,20 @@ def page_not_found(e):
 
 @app.errorhandler(500)
 def internal_server_error(e):
+    logging.error("Server Error: %s", str(e))
     return render_template("500.html")
 
+
+# Log all unhandled exceptions
+def log_exception(sender, exception, **extra):
+    sender.logger.error(
+        "An exception occurred: %s", str(exception), exc_info=(exception)
+    )
+
+
+app.register_error_handler(Exception, log_exception)
+
+debug = True if is_ci != "true" else False
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=os.environ.get("FLASK_SERVER_PORT", 9090), debug=True)
+    app.run(host="0.0.0.0", port=os.environ.get("FLASK_SERVER_PORT", 9090), debug=debug)
