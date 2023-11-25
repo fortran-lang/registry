@@ -29,7 +29,7 @@ services:
       - MONGO_USER_NAME=fortran
       - MONGO_PASSWORD=fortran
       - HOST=localhost
-      - RESET_EMAIL=reset@localhost.com
+      - RESET_EMAIL=reset@localhost.com   # set to registry email
       - RESET_PASSWORD=reset
 
     volumes:

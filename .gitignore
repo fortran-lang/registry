@@ -9,6 +9,7 @@
 /backend/static/*.tar.gz
 /backend/__pycache__/
 /backend/.vercel
+/backend/app.log
 /.DS_Store
 /backend/.DS_Store
 
