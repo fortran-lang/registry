@@ -28,9 +28,9 @@ services:
       - SUDO_PASSWORD=fortran
       - MONGO_USER_NAME=fortran
       - MONGO_PASSWORD=fortran
-      - HOST=localhost
-      - RESET_EMAIL=reset@localhost.com   # set to registry email
-      - RESET_PASSWORD=reset
+      - HOST=localhost:3000
+      # - RESET_EMAIL=reset@localhost.com   # set to registry email
+      # - RESET_PASSWORD=reset
 
     volumes:
       - ./backend:/src
