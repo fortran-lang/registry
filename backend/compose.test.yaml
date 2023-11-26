@@ -6,7 +6,6 @@ services:
       dockerfile: docker/backend.Dockerfile
     command: python -m unittest discover -s tests
     volumes:
-      - ./tests:/src/tests
       - ./backend:/src
     depends_on:
       - mongo
