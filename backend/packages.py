@@ -5,7 +5,7 @@ from bson.objectid import ObjectId
 from flask import request, jsonify, abort, send_file
 from gridfs.errors import NoFile
 from datetime import datetime, timedelta
-from auth import generate_uuid
+from auth import generate_uuid,IS_VERCEL
 from app import swagger
 import tarfile
 import os
@@ -256,8 +256,10 @@ def upload():
 
     tarball_name = "{}-{}.tar.gz".format(package_name, package_version)
 
-
-    package_data = extract_toml(tarball)
+    if not IS_VERCEL:  # TODO: Disable this after Validation is Enabled
+        package_data = extract_toml(tarball)
+    else:
+        package_data = {"homepage": "homepage", "repository": "repository", "description": "description","copyright":"copyright"}
     # validate the package with fpm
     # valid_package, package_data = validate(tarball,"{}-{}".format(package_name, package_version))  # TODO: Enable this after Validation is Enabled
     
