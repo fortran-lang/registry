@@ -23,12 +23,12 @@ def index():
 
 @app.errorhandler(404)
 def page_not_found(e):
-    return render_template("404.html")
+    return jsonify({"message": "Page not found", "code": 404})
 
 @app.errorhandler(500)
 def internal_server_error(e):
     logging.error("Server Error: %s", str(e))
-    return render_template("500.html")
+    return jsonify({"message": "Internal server error", "code": 500})
 
 
 # Log all unhandled exceptions
