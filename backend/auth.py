@@ -21,6 +21,7 @@ try:
     fortran_password = os.getenv("RESET_PASSWORD")
     is_ci = os.getenv("IS_CI", "false")
     host = os.getenv("HOST")
+    IS_VERCEL = os.getenv("IS_VERCEL")
     env_var["host"] = host
     env_var["salt"] = salt
     env_var["sudo_password"] = sudo_password
