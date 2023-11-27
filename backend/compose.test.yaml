@@ -1,12 +1,12 @@
 services:
   test_ci:
     build:
-      context: backend
+      context: .
       target: builder
       dockerfile: docker/backend.Dockerfile
     command: python -m unittest discover -s tests
     volumes:
-      - ./backend:/src
+      - .:/src
     depends_on:
       - mongo
     environment:
@@ -24,7 +24,7 @@ services:
 
   validate_package:
     build:
-      dockerfile: backend/docker/validate_package.Dockerfile
+      dockerfile: docker/validate_package.Dockerfile
     stop_signal: SIGINT
 
   mongo:

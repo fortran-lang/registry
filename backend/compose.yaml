@@ -13,7 +13,7 @@ services:
 
   backend:
     build:
-      context: backend
+      context: .
       target: builder
       dockerfile: docker/backend.Dockerfile
     # flask requires SIGINT to stop gracefully
@@ -33,17 +33,17 @@ services:
       # - RESET_PASSWORD=reset
 
     volumes:
-      - ./backend:/src
+      - .:/src
     depends_on:
       - mongo
 
   validate_package:
     build:
-      context: backend
+      context: .
       dockerfile: docker/validate_package.Dockerfile
     stop_signal: SIGINT
     volumes:
-      - ./backend:/src
+      - .:/src
 
   mongo:
     image: mongo
