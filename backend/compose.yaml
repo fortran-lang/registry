@@ -13,9 +13,9 @@ services:
 
   backend:
     build:
-      context: flask
+      context: .
       target: builder
-      dockerfile: backend.Dockerfile
+      dockerfile: docker/backend.Dockerfile
     # flask requires SIGINT to stop gracefully
     # (default stop signal from Compose is SIGTERM)
     stop_signal: SIGINT
@@ -28,22 +28,22 @@ services:
       - SUDO_PASSWORD=fortran
       - MONGO_USER_NAME=fortran
       - MONGO_PASSWORD=fortran
-      - HOST=localhost
-      - RESET_EMAIL=reset@localhost.com
-      - RESET_PASSWORD=reset
+      - HOST=localhost:3000
+      # - RESET_EMAIL=reset@localhost.com   # set to registry email
+      # - RESET_PASSWORD=reset
 
     volumes:
-      - ./flask:/src
+      - .:/src
     depends_on:
       - mongo
 
   validate_package:
     build:
-      context: flask
-      dockerfile: validate_package.Dockerfile
+      context: .
+      dockerfile: docker/validate_package.Dockerfile
     stop_signal: SIGINT
     volumes:
-      - ./flask:/src
+      - .:/src
 
   mongo:
     image: mongo

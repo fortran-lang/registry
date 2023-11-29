@@ -19,13 +19,16 @@ try:
     sudo_password = os.getenv("SUDO_PASSWORD")
     fortran_email = os.getenv("RESET_EMAIL")
     fortran_password = os.getenv("RESET_PASSWORD")
+    is_ci = os.getenv("IS_CI", "false")
     host = os.getenv("HOST")
+    IS_VERCEL = os.getenv("IS_VERCEL")
     env_var["host"] = host
     env_var["salt"] = salt
     env_var["sudo_password"] = sudo_password
-    smtp = smtplib.SMTP("smtp.gmail.com", 587)
-    smtp.starttls()
-    smtp.login(fortran_email, fortran_password)
+    if is_ci!="true":
+        smtp = smtplib.SMTP("smtp.gmail.com", 587)
+        smtp.starttls()
+        smtp.login(fortran_email, fortran_password)
 
 except KeyError as err:
     print("Add SALT to .env file")
@@ -60,7 +63,7 @@ def login():
     if not user:
         return jsonify({"message": "Invalid email or password", "code": 401}), 401
 
-    if not user["isverified"]:
+    if not user["isverified"] and is_ci!='true':    # TODO: Uncomment this line to enable email verification
         return jsonify({"message": "Please verify your email", "code": 401}), 401
 
     uuid = generate_uuid() if user["loggedCount"] == 0 else user["uuid"]
@@ -143,7 +146,7 @@ def signup():
         else:
             user["roles"] = ["user"]
         db.users.insert_one(user)
-        send_verify_email(email)
+        send_verify_email(email) if is_ci != 'true' else None
         return (
             jsonify(
                 {
