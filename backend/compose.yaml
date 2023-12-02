@@ -10,6 +10,9 @@ services:
       - 80:80
     depends_on:
       - backend
+    networks:
+      - my_network
+    
 
   backend:
     build:
@@ -31,6 +34,8 @@ services:
       - HOST=localhost:3000
       # - RESET_EMAIL=reset@localhost.com   # set to registry email
       # - RESET_PASSWORD=reset
+    networks:
+      - my_network
 
     volumes:
       - .:/src
@@ -44,6 +49,15 @@ services:
     stop_signal: SIGINT
     volumes:
       - .:/src
+    ports:
+      - "5000:5000"
+    networks:
+      - my_network
 
   mongo:
     image: mongo
+
+  
+networks:
+  my_network:
+    driver: bridge

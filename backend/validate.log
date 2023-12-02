@@ -1,0 +1,212 @@
+2023-12-02 07:45:58,853 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.20.0.3:5000
+2023-12-02 07:45:58,853 [INFO] [33mPress CTRL+C to quit[0m
+2023-12-02 07:45:58,855 [INFO]  * Restarting with stat
+2023-12-02 07:46:00,915 [WARNING]  * Debugger is active!
+2023-12-02 07:46:00,916 [INFO]  * Debugger PIN: 100-036-130
+2023-12-02 07:46:22,374 [INFO] 172.20.0.1 - - [02/Dec/2023 07:46:22] "[35m[1mGET / HTTP/1.1[0m" 500 -
+2023-12-02 07:46:22,399 [INFO] 172.20.0.1 - - [02/Dec/2023 07:46:22] "GET /?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+2023-12-02 07:46:22,399 [INFO] 172.20.0.1 - - [02/Dec/2023 07:46:22] "GET /?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+2023-12-02 07:46:22,521 [INFO] 172.20.0.1 - - [02/Dec/2023 07:46:22] "GET /?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+2023-12-02 07:46:22,534 [INFO] 172.20.0.1 - - [02/Dec/2023 07:46:22] "[36mGET /?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2023-12-02 07:46:26,596 [INFO] 172.20.0.1 - - [02/Dec/2023 07:46:26] "[35m[1mGET / HTTP/1.1[0m" 500 -
+2023-12-02 07:46:26,607 [INFO] 172.20.0.1 - - [02/Dec/2023 07:46:26] "[36mGET /?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2023-12-02 07:46:26,609 [INFO] 172.20.0.1 - - [02/Dec/2023 07:46:26] "[36mGET /?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2023-12-02 07:46:26,650 [INFO] 172.20.0.1 - - [02/Dec/2023 07:46:26] "[36mGET /?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2023-12-02 07:46:26,657 [INFO] 172.20.0.1 - - [02/Dec/2023 07:46:26] "[36mGET /?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2023-12-02 07:47:14,709 [INFO]  * Detected change in '/src/validate.py', reloading
+2023-12-02 07:47:15,253 [INFO]  * Restarting with stat
+2023-12-02 07:47:18,479 [WARNING]  * Debugger is active!
+2023-12-02 07:47:18,480 [INFO]  * Debugger PIN: 100-036-130
+2023-12-02 07:47:55,180 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.22.0.2:5000
+2023-12-02 07:47:55,180 [INFO] [33mPress CTRL+C to quit[0m
+2023-12-02 07:47:55,194 [INFO]  * Restarting with stat
+2023-12-02 07:47:57,810 [WARNING]  * Debugger is active!
+2023-12-02 07:47:57,811 [INFO]  * Debugger PIN: 557-734-704
+2023-12-02 07:49:40,403 [INFO]  * Detected change in '/src/validate.py', reloading
+2023-12-02 07:49:40,964 [INFO]  * Restarting with stat
+2023-12-02 07:49:43,220 [WARNING]  * Debugger is active!
+2023-12-02 07:49:43,221 [INFO]  * Debugger PIN: 557-734-704
+2023-12-02 07:50:05,358 [INFO]  * Detected change in '/src/val_test.py', reloading
+2023-12-02 07:50:05,902 [INFO]  * Restarting with stat
+2023-12-02 07:50:08,038 [WARNING]  * Debugger is active!
+2023-12-02 07:50:08,040 [INFO]  * Debugger PIN: 557-734-704
+2023-12-02 07:50:08,066 [INFO] 172.22.0.3 - - [02/Dec/2023 07:50:08] "[35m[1mPOST / HTTP/1.1[0m" 500 -
+2023-12-02 07:50:19,311 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.22.0.3:5000
+2023-12-02 07:50:19,311 [INFO] [33mPress CTRL+C to quit[0m
+2023-12-02 07:50:19,312 [INFO]  * Restarting with stat
+2023-12-02 07:50:21,198 [WARNING]  * Debugger is active!
+2023-12-02 07:50:21,199 [INFO]  * Debugger PIN: 456-448-626
+2023-12-02 07:50:21,220 [INFO] 172.22.0.2 - - [02/Dec/2023 07:50:21] "[35m[1mPOST / HTTP/1.1[0m" 500 -
+2023-12-02 07:50:44,342 [INFO]  * Detected change in '/src/validate.py', reloading
+2023-12-02 07:50:44,879 [INFO]  * Restarting with stat
+2023-12-02 07:50:48,312 [WARNING]  * Debugger is active!
+2023-12-02 07:50:48,312 [INFO]  * Debugger PIN: 456-448-626
+2023-12-02 07:50:48,329 [INFO] 172.22.0.2 - - [02/Dec/2023 07:50:48] "[35m[1mPOST / HTTP/1.1[0m" 500 -
+2023-12-02 07:50:58,072 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.22.0.3:5000
+2023-12-02 07:50:58,072 [INFO] [33mPress CTRL+C to quit[0m
+2023-12-02 07:50:58,073 [INFO]  * Restarting with stat
+2023-12-02 07:50:59,989 [WARNING]  * Debugger is active!
+2023-12-02 07:50:59,990 [INFO]  * Debugger PIN: 456-448-626
+2023-12-02 07:51:00,039 [INFO] 172.22.0.2 - - [02/Dec/2023 07:51:00] "[35m[1mPOST / HTTP/1.1[0m" 500 -
+2023-12-02 07:51:02,608 [INFO] 172.22.0.2 - - [02/Dec/2023 07:51:02] "[35m[1mPOST / HTTP/1.1[0m" 500 -
+2023-12-02 07:51:52,331 [INFO]  * Detected change in '/src/validate.py', reloading
+2023-12-02 07:51:52,708 [INFO]  * Restarting with stat
+2023-12-02 07:52:00,664 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.22.0.3:5000
+2023-12-02 07:52:00,665 [INFO] [33mPress CTRL+C to quit[0m
+2023-12-02 07:52:00,679 [INFO]  * Restarting with stat
+2023-12-02 07:52:04,180 [WARNING]  * Debugger is active!
+2023-12-02 07:52:04,182 [INFO]  * Debugger PIN: 456-448-626
+2023-12-02 07:52:04,216 [INFO] 172.22.0.2 - - [02/Dec/2023 07:52:04] "[35m[1mPOST / HTTP/1.1[0m" 500 -
+2023-12-02 07:52:08,241 [INFO] 172.22.0.2 - - [02/Dec/2023 07:52:08] "[35m[1mPOST / HTTP/1.1[0m" 500 -
+2023-12-02 07:52:48,456 [INFO]  * Detected change in '/src/validate.py', reloading
+2023-12-02 07:52:49,024 [INFO]  * Restarting with stat
+2023-12-02 07:52:54,515 [WARNING]  * Debugger is active!
+2023-12-02 07:52:54,516 [INFO]  * Debugger PIN: 456-448-626
+2023-12-02 07:52:54,538 [INFO] 172.22.0.2 - - [02/Dec/2023 07:52:54] "[35m[1mPOST / HTTP/1.1[0m" 500 -
+2023-12-02 07:53:02,586 [INFO]  * Detected change in '/src/validate.py', reloading
+2023-12-02 07:53:03,164 [INFO]  * Restarting with stat
+2023-12-02 07:53:08,910 [WARNING]  * Debugger is active!
+2023-12-02 07:53:08,911 [INFO]  * Debugger PIN: 456-448-626
+2023-12-02 07:53:08,951 [INFO] 172.22.0.2 - - [02/Dec/2023 07:53:08] "[35m[1mPOST / HTTP/1.1[0m" 500 -
+2023-12-02 07:53:17,753 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.22.0.3:5000
+2023-12-02 07:53:17,753 [INFO] [33mPress CTRL+C to quit[0m
+2023-12-02 07:53:17,755 [INFO]  * Restarting with stat
+2023-12-02 07:53:19,824 [WARNING]  * Debugger is active!
+2023-12-02 07:53:19,825 [INFO]  * Debugger PIN: 456-448-626
+2023-12-02 07:53:19,883 [INFO] 172.22.0.2 - - [02/Dec/2023 07:53:19] "[35m[1mPOST / HTTP/1.1[0m" 500 -
+2023-12-02 07:56:33,116 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.23.0.2:5000
+2023-12-02 07:56:33,116 [INFO] [33mPress CTRL+C to quit[0m
+2023-12-02 07:56:33,117 [INFO]  * Restarting with stat
+2023-12-02 07:56:36,079 [WARNING]  * Debugger is active!
+2023-12-02 07:56:36,080 [INFO]  * Debugger PIN: 111-524-899
+2023-12-02 07:56:36,121 [INFO] 172.23.0.3 - - [02/Dec/2023 07:56:36] "[35m[1mPOST / HTTP/1.1[0m" 500 -
+2023-12-02 07:56:39,421 [INFO] 172.23.0.3 - - [02/Dec/2023 07:56:39] "[35m[1mPOST / HTTP/1.1[0m" 500 -
+2023-12-02 07:56:57,246 [INFO]  * Detected change in '/src/validate.py', reloading
+2023-12-02 07:56:57,779 [INFO]  * Restarting with stat
+2023-12-02 07:57:00,804 [WARNING]  * Debugger is active!
+2023-12-02 07:57:00,805 [INFO]  * Debugger PIN: 111-524-899
+2023-12-02 07:57:01,159 [INFO] 172.23.0.3 - - [02/Dec/2023 07:57:01] "[35m[1mPOST / HTTP/1.1[0m" 500 -
+2023-12-02 07:57:09,871 [INFO]  * Detected change in '/src/validate.py', reloading
+2023-12-02 07:57:10,384 [INFO]  * Restarting with stat
+2023-12-02 07:57:13,053 [WARNING]  * Debugger is active!
+2023-12-02 07:57:13,054 [INFO]  * Debugger PIN: 111-524-899
+2023-12-02 07:57:13,187 [INFO] 172.23.0.3 - - [02/Dec/2023 07:57:13] "[35m[1mPOST / HTTP/1.1[0m" 500 -
+2023-12-02 07:57:29,202 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.23.0.3:5000
+2023-12-02 07:57:29,203 [INFO] [33mPress CTRL+C to quit[0m
+2023-12-02 07:57:29,229 [INFO]  * Restarting with stat
+2023-12-02 07:57:31,935 [WARNING]  * Debugger is active!
+2023-12-02 07:57:31,938 [INFO]  * Debugger PIN: 133-117-384
+2023-12-02 07:57:32,097 [INFO] 172.23.0.2 - - [02/Dec/2023 07:57:32] "[35m[1mPOST / HTTP/1.1[0m" 500 -
+2023-12-02 07:57:34,959 [INFO] 172.23.0.2 - - [02/Dec/2023 07:57:34] "[35m[1mPOST / HTTP/1.1[0m" 500 -
+2023-12-02 07:58:04,175 [INFO]  * Detected change in '/src/val_test.py', reloading
+2023-12-02 07:58:04,528 [INFO]  * Restarting with stat
+2023-12-02 07:58:07,009 [WARNING]  * Debugger is active!
+2023-12-02 07:58:07,010 [INFO]  * Debugger PIN: 133-117-384
+2023-12-02 07:58:07,131 [INFO] 172.23.0.2 - - [02/Dec/2023 07:58:07] "[35m[1mPOST / HTTP/1.1[0m" 500 -
+2023-12-02 07:58:16,644 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.23.0.3:5000
+2023-12-02 07:58:16,645 [INFO] [33mPress CTRL+C to quit[0m
+2023-12-02 07:58:16,647 [INFO]  * Restarting with stat
+2023-12-02 07:58:19,928 [WARNING]  * Debugger is active!
+2023-12-02 07:58:19,928 [INFO]  * Debugger PIN: 133-117-384
+2023-12-02 07:58:20,060 [INFO] 172.23.0.2 - - [02/Dec/2023 07:58:20] "[35m[1mPOST / HTTP/1.1[0m" 500 -
+2023-12-02 07:59:26,404 [INFO]  * Detected change in '/src/validate.py', reloading
+2023-12-02 07:59:26,903 [INFO]  * Restarting with stat
+2023-12-02 07:59:31,760 [WARNING]  * Debugger is active!
+2023-12-02 07:59:31,761 [INFO]  * Debugger PIN: 133-117-384
+2023-12-02 07:59:31,816 [INFO] 172.23.0.2 - - [02/Dec/2023 07:59:31] "[35m[1mPOST / HTTP/1.1[0m" 500 -
+2023-12-02 07:59:46,873 [INFO]  * Detected change in '/src/validate.py', reloading
+2023-12-02 07:59:47,404 [INFO]  * Restarting with stat
+2023-12-02 08:00:32,481 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.23.0.3:5000
+2023-12-02 08:00:32,482 [INFO] [33mPress CTRL+C to quit[0m
+2023-12-02 08:00:32,483 [INFO]  * Restarting with stat
+2023-12-02 08:00:35,012 [WARNING]  * Debugger is active!
+2023-12-02 08:00:35,013 [INFO]  * Debugger PIN: 133-117-384
+2023-12-02 08:00:35,302 [INFO] 172.23.0.2 - - [02/Dec/2023 08:00:35] "[35m[1mPOST / HTTP/1.1[0m" 500 -
+2023-12-02 08:02:00,664 [INFO]  * Detected change in '/src/validate.py', reloading
+2023-12-02 08:02:01,199 [INFO]  * Restarting with stat
+2023-12-02 08:02:03,688 [WARNING]  * Debugger is active!
+2023-12-02 08:02:03,689 [INFO]  * Debugger PIN: 133-117-384
+2023-12-02 08:02:05,034 [INFO] 172.23.0.2 - - [02/Dec/2023 08:02:05] "[35m[1mPOST / HTTP/1.1[0m" 500 -
+2023-12-02 08:02:17,967 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.23.0.3:5000
+2023-12-02 08:02:17,967 [INFO] [33mPress CTRL+C to quit[0m
+2023-12-02 08:02:17,990 [INFO]  * Restarting with stat
+2023-12-02 08:02:21,926 [WARNING]  * Debugger is active!
+2023-12-02 08:02:21,927 [INFO]  * Debugger PIN: 133-117-384
+2023-12-02 08:02:22,336 [INFO] 172.23.0.2 - - [02/Dec/2023 08:02:22] "[35m[1mPOST / HTTP/1.1[0m" 500 -
+2023-12-02 08:02:46,123 [INFO]  * Detected change in '/src/validate.py', reloading
+2023-12-02 08:02:46,626 [INFO]  * Restarting with stat
+2023-12-02 08:02:48,716 [WARNING]  * Debugger is active!
+2023-12-02 08:02:48,717 [INFO]  * Debugger PIN: 133-117-384
+2023-12-02 08:02:48,774 [INFO] 172.23.0.2 - - [02/Dec/2023 08:02:48] "[35m[1mPOST / HTTP/1.1[0m" 500 -
+2023-12-02 08:02:57,916 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.23.0.3:5000
+2023-12-02 08:02:57,917 [INFO] [33mPress CTRL+C to quit[0m
+2023-12-02 08:02:57,918 [INFO]  * Restarting with stat
+2023-12-02 08:03:01,508 [WARNING]  * Debugger is active!
+2023-12-02 08:03:01,510 [INFO]  * Debugger PIN: 133-117-384
+2023-12-02 08:03:01,680 [INFO] 172.23.0.2 - - [02/Dec/2023 08:03:01] "[35m[1mPOST / HTTP/1.1[0m" 500 -
+2023-12-02 08:03:04,132 [INFO] 172.23.0.2 - - [02/Dec/2023 08:03:04] "[35m[1mPOST / HTTP/1.1[0m" 500 -
+2023-12-02 08:03:29,761 [INFO]  * Detected change in '/src/validate.py', reloading
+2023-12-02 08:03:30,260 [INFO]  * Restarting with stat
+2023-12-02 08:03:32,749 [WARNING]  * Debugger is active!
+2023-12-02 08:03:32,750 [INFO]  * Debugger PIN: 133-117-384
+2023-12-02 08:03:33,003 [INFO] 172.23.0.2 - - [02/Dec/2023 08:03:33] "[35m[1mPOST / HTTP/1.1[0m" 500 -
+2023-12-02 08:03:55,747 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.23.0.3:5000
+2023-12-02 08:03:55,747 [INFO] [33mPress CTRL+C to quit[0m
+2023-12-02 08:03:55,761 [INFO]  * Restarting with stat
+2023-12-02 08:03:57,763 [WARNING]  * Debugger is active!
+2023-12-02 08:03:57,764 [INFO]  * Debugger PIN: 133-117-384
+2023-12-02 08:03:57,834 [INFO] 172.23.0.2 - - [02/Dec/2023 08:03:57] "[35m[1mPOST / HTTP/1.1[0m" 500 -
+2023-12-02 08:03:59,969 [INFO] 172.23.0.2 - - [02/Dec/2023 08:03:59] "[35m[1mPOST / HTTP/1.1[0m" 500 -
+2023-12-02 08:04:19,943 [INFO]  * Detected change in '/src/validate.py', reloading
+2023-12-02 08:04:20,494 [INFO]  * Restarting with stat
+2023-12-02 08:04:22,520 [WARNING]  * Debugger is active!
+2023-12-02 08:04:22,521 [INFO]  * Debugger PIN: 133-117-384
+2023-12-02 08:04:23,025 [INFO] 172.23.0.2 - - [02/Dec/2023 08:04:23] "[35m[1mPOST / HTTP/1.1[0m" 500 -
+2023-12-02 08:04:35,707 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.23.0.3:5000
+2023-12-02 08:04:35,707 [INFO] [33mPress CTRL+C to quit[0m
+2023-12-02 08:04:35,708 [INFO]  * Restarting with stat
+2023-12-02 08:04:37,902 [WARNING]  * Debugger is active!
+2023-12-02 08:04:37,903 [INFO]  * Debugger PIN: 133-117-384
+2023-12-02 08:04:38,081 [INFO] 172.23.0.2 - - [02/Dec/2023 08:04:38] "[35m[1mPOST / HTTP/1.1[0m" 500 -

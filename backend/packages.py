@@ -286,6 +286,10 @@ def upload():
                 "maintainers": [user["_id"]],
                 "tags": ["fortran", "fpm"],
                 "isDeprecated": False,
+                "downloadData": {"2023-01-01":{"downloadCountLinux": 100,"downloadCountWindows":100,"downloadCountWebsite":100,"downloadCountMac":100}},
+                "ratings": {"5star":100,"4star":100, "3star":100,"2star":100,"1star":100},
+                "isMalicious": False,
+                "SecurityReport": "No security issues found",
             }
         except KeyError as e:
             return (
