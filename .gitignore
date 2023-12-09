@@ -5,6 +5,7 @@
 
 # backend
 /backend/.env
+/backend/.venv
 /backend/vercel.json
 /backend/static/*.tar.gz
 /backend/__pycache__/
