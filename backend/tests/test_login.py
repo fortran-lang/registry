@@ -15,7 +15,7 @@ class TestLogin(BaseTestClass):
         None
 
         Returns:
-        uuid (str): The UUID of the user who successfully logged in.
+        access_token (str): The access_token of the user who successfully logged in.
 
         Raises:
         AssertionError: If the response code received from the server is not as expected.
@@ -38,9 +38,8 @@ class TestLogin(BaseTestClass):
 
         # Login with the same user.
         response_for_login = self.client.post("/auth/login", data=login_data)
-        self.assertEqual(200, response_for_login.json["code"])
-        print("test_successful_login passed")
-        return response_for_login.json["uuid"]
+        self.assertEqual(200, response_for_login.json["code"]) 
+        return response_for_login.json["access_token"]
     
     def test_unsuccessful_login(self):
         """
@@ -75,7 +74,6 @@ class TestLogin(BaseTestClass):
         # Login with incorrect email for the same user.
         response_for_login = self.client.post("/auth/login", data=login_data_incorrect_email)
         self.assertEqual(401, response_for_login.json["code"])
-        print("test_unsuccessful_login passed")
 
 
     def test_successful_logout(self):
@@ -92,33 +90,9 @@ class TestLogin(BaseTestClass):
         AssertionError: If the response code received from the server is not as expected.
         """
 
-        data_for_logout = {
-            "uuid": self.test_successful_login()
+        access_token = self.test_successful_login()
+        headers = {
+            "Authorization": f"Bearer {access_token}"
         }
-
-        response_from_logout = self.client.post('/auth/logout', data=data_for_logout)
+        response_from_logout = self.client.post('/auth/logout', headers=headers)
         self.assertEqual(200, response_from_logout.json["code"])
-        print("test_successful_logout passed")
-    
-    def test_unsuccessful_logout(self):
-        """
-        Test case to verify the behavior of the system when a user tries to log out with an invalid UUID.
-
-        Parameters:
-        None
-
-        Returns:
-        None
-
-        Raises:
-        AssertionError: If the response code received from the server is not as expected.
-        """
-        uuid = uuid4().hex
-
-        data = {
-            "uuid": uuid,
-        }
-
-        response = self.client.post('/auth/logout', data=data)
-        self.assertEqual(404, response.json["code"])
-        print("test_unsuccessful_logout passed")
