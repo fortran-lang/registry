@@ -4,6 +4,7 @@ from flasgger import Swagger
 from flask_jwt_extended import JWTManager
 
 app = Flask(__name__)
+app.config["JWT_SECRET_KEY"] = "fpm-registry-secret-key"  #TODO: Please change this.
 CORS(app)
 JWTManager(app)
 
