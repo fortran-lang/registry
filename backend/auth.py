@@ -66,8 +66,6 @@ def login():
     if not user["isverified"] and is_ci!='true':    # TODO: Uncomment this line to enable email verification
         return jsonify({"message": "Please verify your email", "code": 401}), 401
 
-    user["loggedCount"] += 1
-
     access_token = create_access_token(identity=user["uuid"])
     refresh_token = create_refresh_token(identity=user["uuid"])
 
@@ -76,7 +74,6 @@ def login():
         {
             "$set": {
                 "loginAt": datetime.utcnow(),
-                "loggedCount": user["loggedCount"],
             }
         },
     )
@@ -132,7 +129,6 @@ def signup():
         "loginAt": datetime.utcnow(),
         "createdAt": datetime.utcnow(),
         "uuid": uuid,
-        "loggedCount": 1,
         "isverified": False,
         "newemail":'',
     }
@@ -176,14 +172,11 @@ def logout():
     if not user:
         return jsonify({"message": "User not found", "code": 404})
 
-    user["loggedCount"] -= 1
-
     db.users.update_one(
         {"_id": user["_id"]},
         {
             "$set": {
                 "lastLogout": datetime.utcnow(),
-                "loggedCount": user["loggedCount"],
             }
         },
     )
@@ -244,7 +237,7 @@ def forgot_password(*email):
         return jsonify({"message": "Please verify your email", "code": 401}), 401
 
     uuid = generate_uuid()
-    db.users.update_one({"email": email}, {"$set": {"uuid": uuid, "loggedCount": 1}})
+    db.users.update_one({"email": email}, {"$set": {"uuid": uuid}})
 
     message = f"""\n
     Dear {user['username']},
