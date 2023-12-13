@@ -7,6 +7,7 @@ class BaseTestClass(unittest.TestCase):
     def setUp(self):
         # set up any variables or configurations needed for your tests
         app.config["SERVER_NAME"] = "localhost:9090"  # set server to localhost
+        app.config["JWT_SECRET_KEY"] = "fpm-registry-test-secret-key"
         self.client = app.test_client()
 
     def tearDown(self):
