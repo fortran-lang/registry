@@ -230,6 +230,7 @@ def reset_password():
 
 @app.route("/auth/forgot-password", methods=["POST"])
 @swag_from("documentation/forgot_password.yaml", methods=["POST"])
+@jwt_required()
 def forgot_password(*email):
     try:
         email = request.form.get("email") if request.form.get("email") else email[0]
@@ -240,19 +241,18 @@ def forgot_password(*email):
 
     if not user:
         return jsonify({"message": "User not found", "code": 404}), 404
+    
+    user = User.from_json(user)
 
-    if not user["isverified"]:
+    if not user.isVerified:
         return jsonify({"message": "Please verify your email", "code": 401}), 401
 
-    uuid = generate_uuid()
-    db.users.update_one({"email": email}, {"$set": {"uuid": uuid}})
-
     message = f"""\n
-    Dear {user['username']},
+    Dear {user.username},
 
     We received a request to reset your password. To reset your password, please copy paste the link below in a new browser window:
 
-    {env_var['host']}/account/reset-password/{uuid}
+    {env_var['host']}/account/reset-password/{user.uuid}
 
     Thank you,
     The Fortran-lang Team"""
@@ -269,7 +269,7 @@ def forgot_password(*email):
 
 
 def send_verify_email(email):
-    query = {"$and": [{"$or": [{"email": email}, {"newemail": email}]}]}
+    query = {"$and": [{"$or": [{"email": email}, {"newEmail": email}]}]}
 
     user = db.users.find_one(query)
 
