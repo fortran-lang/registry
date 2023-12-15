@@ -20,5 +20,15 @@ jobs:
 
       - name: Print Logs for Container
         run: |
-          export CONTAINER_ID=$(docker ps -aqf "name=test_ci-1") 
-          `docker logs -f $CONTAINER_ID` | grep -i "FAILED" && exit 1 || exit 0
+          export CONTAINER_ID=$(docker ps -aqf "name=your-container-name")
+          docker exec $CONTAINER_ID python -m unittest discover backend/tests
+
+          TEST_EXIT_STATUS=$?
+
+          if [ $TEST_EXIT_STATUS -ne 0 ]; then
+            echo "Tests failed. Exiting with status code $TEST_EXIT_STATUS."
+            exit 1
+          else
+            echo "Tests passed."
+            exit 0
+          fi
