@@ -140,7 +140,6 @@ def signup():
     if not registry_user:
         if hashed_password == sudo_hashed_password:
             user.roles = ["admin"]
-            forgot_password(email)
         else:
             user.roles = ["user"]
         db.users.insert_one(user.to_json())
