@@ -21,7 +21,7 @@ jobs:
       - name: Print Logs for Container
         run: |
           export CONTAINER_ID=$(docker ps -aqf "name=ci")
-          docker logs -f $CONTAINER_ID | grep -i "FAILED" && exit 1 || exit 0
+          docker logs -f $CONTAINER_ID | exit 1
 
       - name: Stop and remove the Docker container
         run: docker compose -f "backend/compose.test.yaml" down
