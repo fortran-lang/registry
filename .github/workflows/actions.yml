@@ -21,7 +21,7 @@ jobs:
       - name: Print Logs for Container
         run: |
           export CONTAINER_ID=$(docker ps -aqf "name=test_ci-1")
-          docker exec $CONTAINER_ID python -m unittest discover backend/tests
+          docker exec $CONTAINER_ID python -m unittest -s discover backend/tests
 
           TEST_EXIT_STATUS=$?
 
