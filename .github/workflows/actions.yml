@@ -20,7 +20,8 @@ jobs:
 
       - name: Print Logs for Container
         run: |
-          errors=$(docker logs test_ci 2>&1 | grep "FAILED" -c)
+          export CONTAINER_ID=$(docker ps -aqf "name=test_ci")
+          errors=$(docker logs -f $CONTAINER_ID 2>&1 | grep "FAILED" -c)
           if [ $errors -gt 0 ]; then
             echo -e "unittest tests failed"
             exit 1
