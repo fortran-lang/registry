@@ -21,4 +21,4 @@ jobs:
       - name: Print Logs for Container
         run: |
           export CONTAINER_ID=$(docker ps -aqf "name=backend-test_ci-1") 
-          `docker logs -f $CONTAINER_ID 2>&1` | grep -i "FAILED" && exit 1 || exit 0
+          docker logs -f $CONTAINER_ID 2>&1 | grep -i "FAILED" && exit 1 || exit 0
