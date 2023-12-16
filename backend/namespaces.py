@@ -5,6 +5,7 @@ from flask import request, jsonify
 from app import swagger
 from flasgger.utils import swag_from
 from packages import checkUserUnauthorizedForNamespaceTokenCreation
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from datetime import datetime
 from auth import generate_uuid
@@ -14,11 +15,9 @@ NAMESPACE_NAME_PATTERN = r'^[a-zA-Z0-9_-]+$'
 
 @app.route("/namespaces", methods=["POST"])
 @swag_from("documentation/create_namespace.yaml", methods=["POST"])
+@jwt_required()
 def create_namespace():
-    uuid = request.form.get("uuid")
-    
-    if not uuid:
-        return jsonify({"code": 401, "message": "Unauthorized"}), 401
+    uuid = get_jwt_identity()
     
     # Get the user document from the uuid.
     user_doc = db.users.find_one({"uuid": uuid})
@@ -63,8 +62,9 @@ def create_namespace():
 
 @app.route("/namespaces/<namespace_name>/uploadToken", methods=["POST"])
 @swag_from("documentation/create_namespace_upload_token.yaml", methods=["POST"])
+@jwt_required()
 def create_upload_token(namespace_name):
-    uuid = request.form.get("uuid")
+    uuid = get_jwt_identity()
 
     if not uuid:
         return jsonify({"code": 401, "message": "Unauthorized"}), 401
@@ -102,8 +102,9 @@ def create_upload_token(namespace_name):
 
 @app.route("/namespace/<namespace_name>/delete", methods=["POST"])
 @swag_from("documentation/delete_namespace.yaml", methods=["POST"])
+@jwt_required()
 def delete_namespace(namespace_name):
-    uuid = request.form.get("uuid")
+    uuid = get_jwt_identity()
 
     if not uuid:
         return jsonify({"code": 401, "message": "Unauthorized"}), 401
@@ -185,8 +186,9 @@ def namespace_packages(namespace):
 
 @app.route("/namespaces/<namespace>/admins", methods=["POST"])
 @swag_from("documentation/get_namespace_admins.yaml", methods=["POST"])
+@jwt_required()
 def namespace_admins(namespace):
-    uuid = request.form.get("uuid")
+    uuid = get_jwt_identity()
 
     if not uuid:
         return jsonify({"code": 401, "message": "Unauthorized"}), 401
@@ -217,8 +219,9 @@ def namespace_admins(namespace):
 
 @app.route("/namespaces/<namespace>/maintainers", methods=["POST"])
 @swag_from("documentation/get_namespace_maintainers.yaml", methods=["POST"])
+@jwt_required()
 def namespace_maintainers(namespace):
-    uuid = request.form.get("uuid")
+    uuid = get_jwt_identity()
 
     if not uuid:
         return jsonify({"code": 401, "message": "Unauthorized"}), 401
