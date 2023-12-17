@@ -6,6 +6,7 @@ from app import swagger
 from flasgger.utils import swag_from
 from packages import checkUserUnauthorizedForNamespaceTokenCreation
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from models.namespace import Namespace
 
 from datetime import datetime
 from auth import generate_uuid
@@ -45,16 +46,15 @@ def create_namespace():
     # Check if namespace already exists.
     if namespace_doc:
         return jsonify({"code": 400, "message": "Namespace already exists"}), 400
-
-    namespace_obj = {
-        "namespace": namespace_name,
-        "description": namespace_description,
-        "createdAt": datetime.utcnow(),
-        "author": user_doc["_id"],
-        "maintainers": [user_doc["_id"]],
-        "admins": [user_doc["_id"]],
-        "packages": []
-    }
+    
+    namespace_obj = Namespace(
+        namespace=namespace_name,
+        description=namespace_description,
+        author=user_doc["_id"],
+        maintainers=[user_doc["_id"]],
+        admins=[user_doc["_id"]],
+        packages=[],
+    ).to_json()
 
     db.namespaces.insert_one(namespace_obj)
 
@@ -80,8 +80,10 @@ def create_upload_token(namespace_name):
     if not namespace_doc:
         return jsonify({"code": 404, "message": "Namespace not found"}), 404
     
+    namespace_obj = Namespace.from_json(namespace_doc)
+    
     # Only namespace maintainers or admins can generate an upload token for now.
-    if checkUserUnauthorizedForNamespaceTokenCreation(user_id=user_doc["_id"], namespace_doc=namespace_doc):
+    if checkUserUnauthorizedForNamespaceTokenCreation(user_id=user_doc["_id"], namespace_obj=namespace_obj):
         return jsonify({"code": 401, "message": "Unauthorized"}), 401
     
     # Generate an upload token for upload packages to the namespace.
@@ -149,8 +151,10 @@ def namespace_packages(namespace):
     if not namespace_document:
         return jsonify({"code": 404, "message": "Namespace not found"}), 404
 
+    namespace_obj = Namespace.from_json(namespace_document)
+
     packages = []
-    for i in namespace_document["packages"]:
+    for i in namespace_obj.packages:
         package = db.packages.find_one(
             {"_id": i},
             {
@@ -178,7 +182,7 @@ def namespace_packages(namespace):
             {
                 "code": 200,
                 "packages": packages,
-                "createdAt": namespace_document["createdAt"],
+                "createdAt": namespace_obj.createdAt,
             }
         ),
         200,
@@ -203,12 +207,15 @@ def namespace_admins(namespace):
     if not namespace_doc:
         return jsonify({"code": 404, "message": "Namespace not found"}), 404
     
-    if not user["_id"] in namespace_doc["admins"] and not user["_id"] in namespace_doc["maintainers"]:
+
+    namespace_obj = Namespace.from_json(namespace_doc)
+    
+    if not user["_id"] in namespace_obj.admins and not user["_id"] in namespace_obj.maintainers:
         return jsonify({"code": 401, "message": "Unauthorized"}), 401
     
     admins = []
 
-    for i in namespace_doc["admins"]:
+    for i in namespace_obj.admins:
         admin = db.users.find_one({"_id": i}, {"_id": 1, "username": 1})
         admins.append({
             "id": str(admin["_id"]),
@@ -236,12 +243,14 @@ def namespace_maintainers(namespace):
     if not namespace_doc:
         return jsonify({"code": 404, "message": "Namespace not found"}), 404
     
-    if not user["_id"] in namespace_doc["admins"] and not user["_id"] in namespace_doc["maintainers"]:
+    namespace_obj = Namespace.from_json(namespace_doc)
+    
+    if not user["_id"] in namespace_obj.admins and not user["_id"] in namespace_obj.maintainers:
         return jsonify({"code": 401, "message": "Unauthorized"}), 401    
     
     maintainers = []
 
-    for i in namespace_doc["maintainers"]:
+    for i in namespace_obj.maintainers:
         maintainer = db.users.find_one({"_id": i}, {"_id": 1, "username": 1})
         maintainers.append({
             "id": str(maintainer["_id"]),
