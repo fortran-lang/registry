@@ -42,7 +42,7 @@ class TestNamespaces(BaseTestClass):
         # Login with the same user.
         response_for_login = self.client.post("/auth/login", data=login_data)
         self.assertEqual(200, response_for_login.json["code"])
-        return response_for_login.json["uuid"]    
+        return response_for_login.json["access_token"]    
 
     def test_successful_namespace_creation(self):
         """
@@ -58,11 +58,13 @@ class TestNamespaces(BaseTestClass):
         AssertionError: If the response code received from the server is not as expected.
         """
 
-        TestNamespaces.test_namespace_data["uuid"] = self.login()
+        access_token = self.login()
+        headers = {
+            "Authorization": f"Bearer {access_token}"
+        }
 
-        response = self.client.post("/namespaces", data=TestNamespaces.test_namespace_data)
+        response = self.client.post("/namespaces", data=TestNamespaces.test_namespace_data, headers=headers)
         self.assertEqual(200, response.json["code"])
-        print("test_successful_namespace_creation passed")
 
     def test_creating_existing_namespace(self):
         """
@@ -78,14 +80,18 @@ class TestNamespaces(BaseTestClass):
         AssertionError: If the response code received from the server is not as expected.
         """
 
-        TestNamespaces.test_namespace_data["uuid"] = self.login()
+        access_token = self.login()
+
+        headers = {
+            "Authorization": f"Bearer {access_token}"
+        }
 
         # Create a namespace entry in the database.
-        response = self.client.post("/namespaces", data=TestNamespaces.test_namespace_data)
+        response = self.client.post("/namespaces", data=TestNamespaces.test_namespace_data, headers=headers)
         self.assertEqual(200, response.json["code"])
 
         # Try to create the namespace entry with same namespace.
-        response = self.client.post("/namespaces", data=TestNamespaces.test_namespace_data)
+        response = self.client.post("/namespaces", data=TestNamespaces.test_namespace_data, headers=headers)
         self.assertEqual(400, response.json["code"])
     
     def test_create_upload_token_success(self):
@@ -103,19 +109,20 @@ class TestNamespaces(BaseTestClass):
         AssertionError: If the response code received from the server is not as expected.
         """
 
-        uuid = self.login()
-        TestNamespaces.test_namespace_data["uuid"] = uuid
+        access_token = self.login()
+        headers = {
+            "Authorization": f"Bearer {access_token}"
+        }
 
         # Create a namespace.
-        response = self.client.post("/namespaces", data=TestNamespaces.test_namespace_data)
+        response = self.client.post("/namespaces", data=TestNamespaces.test_namespace_data, headers=headers)
         self.assertEqual(200, response.json["code"])
 
         namespace_name = TestNamespaces.test_namespace_data['namespace']
 
         # Generate a token.
-        response = self.client.post(f"/namespaces/{namespace_name}/uploadToken", data={"uuid": uuid})
+        response = self.client.post(f"/namespaces/{namespace_name}/uploadToken", headers=headers)
         self.assertEqual(200, response.json["code"])
-        print("test_create_upload_token_success passed")
 
     def test_create_upload_token_unauthorized(self):
         """
@@ -132,17 +139,19 @@ class TestNamespaces(BaseTestClass):
         AssertionError: If the response code received from the server is not as expected.
         """
 
-        uuid = self.login()
-        TestNamespaces.test_namespace_data["uuid"] = uuid
+        access_token = self.login()
+        headers = {
+            "Authorization": f"Bearer {access_token}"
+        }
 
         # Create a namespace.
-        response = self.client.post("/namespaces", data=TestNamespaces.test_namespace_data)
+        response = self.client.post("/namespaces", data=TestNamespaces.test_namespace_data, headers=headers)
         self.assertEqual(200, response.json["code"])
 
         namespace_name = TestNamespaces.test_namespace_data['namespace']
         
         # Generate a token.
-        response = self.client.post(f"/namespaces/{namespace_name}/uploadToken", data={"uuid": uuid})
+        response = self.client.post(f"/namespaces/{namespace_name}/uploadToken", headers=headers)
         self.assertEqual(200, response.json["code"])
 
         # Sign up using a new user.
@@ -155,15 +164,19 @@ class TestNamespaces(BaseTestClass):
 
         response = self.client.post("/auth/signup", data=new_user_obj)
         self.assertEqual(200, response.json["code"])  
+
         response_for_login = self.client.post("/auth/login", data=new_user_obj)
         self.assertEqual(200, response_for_login.json["code"]) 
-        new_uuid = response_for_login.json["uuid"]  
+        access_token = response_for_login.json["access_token"]  
+
+        headers = {
+            "Authorization": f"Bearer {access_token}"
+        }
 
         # Try to generate a token using a new user.
         # This user is not a maintainer nor an admin of the namespace.
-        response = self.client.post(f"/namespaces/{namespace_name}/uploadToken", data={"uuid": new_uuid})
+        response = self.client.post(f"/namespaces/{namespace_name}/uploadToken", headers=headers)
         self.assertEqual(401, response.json["code"])
-        print("test_create_upload_token_unauthorized passed")
 
     def test_namespace_maintainers_list(self):
         """
@@ -179,20 +192,21 @@ class TestNamespaces(BaseTestClass):
         AssertionError: If the response code received from the server is not as expected.
         """
 
-        uuid = self.login()
-        TestNamespaces.test_namespace_data["uuid"] = uuid
+        access_token = self.login()
+        headers = {
+            "Authorization": f"Bearer {access_token}"
+        }
 
         # Create a namespace.
-        response = self.client.post("/namespaces", data=TestNamespaces.test_namespace_data)
+        response = self.client.post("/namespaces", data=TestNamespaces.test_namespace_data, headers=headers)
         self.assertEqual(200, response.json["code"])
 
         namespace_name = TestNamespaces.test_namespace_data['namespace']
 
         # Get the list of maintainers.
-        response = self.client.post(f"/namespaces/{namespace_name}/maintainers", data={"uuid": uuid})
+        response = self.client.post(f"/namespaces/{namespace_name}/maintainers", headers=headers)
         self.assertEqual(200, response.json["code"])
         self.assertEqual(1, len(response.json["users"]))
-        print("test_namespace_maintainers_list passed")
 
     def test_namespace_admins_list(self):
         """
@@ -208,17 +222,18 @@ class TestNamespaces(BaseTestClass):
         AssertionError: If the response code received from the server is not as expected.
         """
 
-        uuid = self.login()
-        TestNamespaces.test_namespace_data["uuid"] = uuid
+        access_token = self.login()
+        headers = {
+            "Authorization": f"Bearer {access_token}"
+        }
 
         # Create a namespace.
-        response = self.client.post("/namespaces", data=TestNamespaces.test_namespace_data)
+        response = self.client.post("/namespaces", data=TestNamespaces.test_namespace_data, headers=headers)
         self.assertEqual(200, response.json["code"])
 
         namespace_name = TestNamespaces.test_namespace_data['namespace']
 
         # Get the list of admins.
-        response = self.client.post(f"/namespaces/{namespace_name}/admins", data={"uuid": uuid})
+        response = self.client.post(f"/namespaces/{namespace_name}/admins", headers=headers)
         self.assertEqual(200, response.json["code"])
         self.assertEqual(1, len(response.json["users"]))
-        print("test_namespace_admins_list passed")
