@@ -16,6 +16,8 @@ from urllib.parse import unquote
 import math
 import semantic_version
 from license_expression import get_spdx_licensing
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from models.namespace import Namespace
 # from validate_package import validate
 
 
@@ -142,6 +144,7 @@ def search_packages():
 
 @app.route("/packages", methods=["POST"])
 @swag_from("documentation/package_upload.yaml", methods=["POST"])
+@jwt_required()
 def upload():
     upload_token = request.form.get("upload_token")
     package_name = request.form.get("package_name")
@@ -212,6 +215,8 @@ def upload():
         )
         namespace_doc = db.namespaces.find_one({"_id": package_doc["namespace"]})
 
+    namespace_obj = Namespace.from_json(namespace_doc)
+
     # Check if the token is expired.
     # Expire the token after one week of it's creation.
     if check_token_expiry(upload_token_created_at=upload_token_doc["createdAt"]):
@@ -235,7 +240,7 @@ def upload():
     if not package_doc:
         # User should be either namespace maintainer or namespace admin to upload a package.
         if checkUserUnauthorizedForNamespaceTokenCreation(
-            user_id=user["_id"], namespace_doc=namespace_doc
+            user_id=user["_id"], namespace_obj=namespace_obj
         ):
             return jsonify({"code": 401, "message": "Unauthorized"}), 401
     else:
@@ -467,11 +472,9 @@ def get_package(namespace_name, package_name):
  
 @app.route("/packages/<namespace_name>/<package_name>/verify", methods=["POST"])
 @swag_from("documentation/verify_user_role.yaml", methods=["POST"])
+@jwt_required()
 def verify_user_role(namespace_name, package_name):
-    uuid = request.form.get("uuid")
-
-    if not uuid:
-        return jsonify({"status": "error", "message": "Unauthorized", "code": 401}), 401
+    uuid = get_jwt_identity()
 
     user = db.users.find_one({"uuid": uuid})
 
@@ -557,11 +560,9 @@ def get_package_from_version(namespace_name, package_name, version):
 
 @app.route("/packages/<namespace_name>/<package_name>/delete", methods=["POST"])
 @swag_from("documentation/delete_package.yaml", methods=["POST"])
+@jwt_required()
 def delete_package(namespace_name, package_name):
-    uuid = request.form.get("uuid")
-
-    if not uuid:
-        return jsonify({"status": "error", "message": "Unauthorized"}), 401
+    uuid = get_jwt_identity()
 
     user = db.users.find_one({"uuid": uuid})
 
@@ -610,11 +611,9 @@ def delete_package(namespace_name, package_name):
     "/packages/<namespace_name>/<package_name>/<version>/delete", methods=["POST"]
 )
 @swag_from("documentation/delete_package_version.yaml", methods=["POST"])
+@jwt_required()
 def delete_package_version(namespace_name, package_name, version):
-    uuid = request.form.get("uuid")
-
-    if not uuid:
-        return jsonify({"status": "error", "message": "Unauthorized", "code": 401}), 401
+    uuid = get_jwt_identity()
 
     user = db.users.find_one({"uuid": uuid})
 
@@ -660,12 +659,9 @@ def delete_package_version(namespace_name, package_name, version):
 
 @app.route("/packages/<namespace_name>/<package_name>/uploadToken", methods=["POST"])
 @swag_from("documentation/create_package_upload_token.yaml", methods=["POST"])
+@jwt_required()
 def create_token_upload_token_package(namespace_name, package_name):
-    # Verify the uuid.
-    uuid = request.form.get("uuid")
-
-    if not uuid:
-        return jsonify({"code": 401, "message": "Unauthorized"}), 401
+    uuid = get_jwt_identity()
 
     # Get the user from uuid.
     user_doc = db.users.find_one({"uuid": uuid})
@@ -725,11 +721,9 @@ def create_token_upload_token_package(namespace_name, package_name):
 
 @app.route("/packages/<namespace>/<package>/maintainers", methods=["GET"])
 @swag_from("documentation/package_maintainers.yaml", methods=["GET"])
+@jwt_required()
 def package_maintainers(namespace, package):
-    uuid = request.form.get("uuid")
-
-    if not uuid:
-        return jsonify({"code": 401, "message": "Unauthorized"}), 401
+    uuid = get_jwt_identity()
     
     user = db.users.find_one({"uuid": uuid})
 
