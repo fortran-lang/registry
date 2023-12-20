@@ -18,6 +18,9 @@ import semantic_version
 from license_expression import get_spdx_licensing
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from models.namespace import Namespace
+from models.user import User
+from models.package import Package
+from models.package import Version
 # from validate_package import validate
 
 
@@ -195,17 +198,19 @@ def upload():
         return jsonify({"code": 401, "message": "Invalid upload token"}), 401
 
     if namespace_doc:
+        namespace_obj = Namespace.from_json(namespace_doc)
         upload_token_doc = next(
             item
             for item in namespace_doc["upload_tokens"]
             if item["token"] == upload_token
         )
         package_doc = db.packages.find_one(
-            {"name": package_name, "namespace": namespace_doc["_id"]}
+            {"name": package_name, "namespace": namespace_obj.id}
         )
 
     elif package_doc:
-        if package_doc["name"] != package_name:
+        package_obj = Package.from_json(package_doc)
+        if package_obj.name != package_name:
             return jsonify({"code": 401, "message": "Invalid upload token"}), 401
 
         upload_token_doc = next(
@@ -213,9 +218,7 @@ def upload():
             for item in package_doc["upload_tokens"]
             if item["token"] == upload_token
         )
-        namespace_doc = db.namespaces.find_one({"_id": package_doc["namespace"]})
-
-    namespace_obj = Namespace.from_json(namespace_doc)
+        namespace_doc = db.namespaces.find_one({"_id": package_doc["namespace"]})    
 
     # Check if the token is expired.
     # Expire the token after one week of it's creation.
@@ -236,24 +239,27 @@ def upload():
 
     if not user:
         return jsonify({"code": 404, "message": "User not found"}), 404
+    
+    user_obj = User.from_json(user)
 
     if not package_doc:
         # User should be either namespace maintainer or namespace admin to upload a package.
         if checkUserUnauthorizedForNamespaceTokenCreation(
-            user_id=user["_id"], namespace_obj=namespace_obj
+            user_id=user_obj.id, namespace_obj=namespace_obj
         ):
             return jsonify({"code": 401, "message": "Unauthorized"}), 401
     else:
         # User should be either namespace maintainer or namespace admin or package maintainer to upload a package.
+        package_obj = Package.from_json(package_doc)
         if checkUserUnauthorized(
-            user_id=user["_id"],
-            package_namespace=namespace_doc,
-            package_doc=package_doc,
+            user_id=user_obj.id,
+            package_namespace=namespace_obj,
+            package_obj=package_obj,
         ):
             return jsonify({"message": "Unauthorized", "code": 401}), 401
 
     package_doc = db.packages.find_one(
-        {"name": package_name, "namespace": namespace_doc["_id"]}
+        {"name": package_name, "namespace": namespace_obj.id}
     )
 
     if tarball.content_type not in ["application/gzip", "application/zip","application/octet-stream","application/x-tar"]:
@@ -277,21 +283,22 @@ def upload():
     # No previous recorded versions of the package found.
     if not package_doc:
         try:
-            package_obj = {
-                "name": package_name,
-                "namespace": namespace_doc["_id"],
-                "description": package_data["description"],
-                "homepage": package_data["homepage"],
-                "repository": package_data["repository"],
-                "copyright": package_data["copyright"],
-                "license": package_license,
-                "createdAt": datetime.utcnow(),
-                "updatedAt": datetime.utcnow(),
-                "author": user["_id"],
-                "maintainers": [user["_id"]],
-                "tags": ["fortran", "fpm"],
-                "isDeprecated": False,
-            }
+            package_obj = Package(
+                name=package_name,
+                namespace=namespace_obj.id,
+                description=package_data["description"],
+                homepage=package_data["homepage"],
+                repository=package_data["repository"],
+                copyright=package_data["copyright"],
+                license=package_license,
+                createdAt=datetime.utcnow(),
+                updatedAt=datetime.utcnow(),
+                author=user_obj.id,
+                maintainers=[user_obj.id],
+                tags=["fortran", "fpm"],
+                isDeprecated=False,
+                versions=[],
+            )
         except KeyError as e:
             return (
                 jsonify(
@@ -302,46 +309,36 @@ def upload():
                 ),
                 400,
             )
-
-        version_obj = {
-            "version": package_version,
-            "tarball": tarball_name,
-            "dependencies": "Test dependencies",
-            "createdAt": datetime.utcnow(),
-            "isDeprecated": False,
-            "download_url": f"/tarballs/{file_object_id}"
-        }
-
-        package_obj["versions"] = []
+        
+        version_obj = Version(
+            version=package_version,
+            tarball=tarball_name,
+            dependencies="Test dependencies",
+            createdAt=datetime.utcnow(),
+            isDeprecated=False,
+            download_url=f"/tarballs/{file_object_id}",
+        )
 
         # Append the first version document.
-        package_obj["versions"].append(version_obj)
+        package_obj.versions.append(version_obj)
 
         if dry_run:
             return jsonify({"message": "Dry run Successful.", "code": 200}), 200
 
-        db.packages.insert_one(package_obj)
+        db.packages.insert_one(package_obj.to_json())
 
         package = db.packages.find_one(
             {
                 "name": package_name,
                 "versions.version": package_version,
-                "namespace": namespace_doc["_id"],
+                "namespace": namespace_obj.id,
             }
         )
 
         # Add the package id to the namespace.
-        namespace_doc["packages"].append(package["_id"])
-        namespace_doc["updatedAt"] = datetime.utcnow()
-        db.namespaces.update_one({"_id": namespace_doc["_id"]}, {"$set": namespace_doc})
+        update_namespace_obj_with_package_id(namespace_obj=namespace_obj, package=package)
 
-        if "authorOf" not in user:
-            user["authorOf"] = []
-
-        # Current user is the author of the package.
-        user["authorOf"].append(package["_id"])
-
-        db.users.update_one({"_id": user["_id"]}, {"$set": user})
+        update_user_obj_with_package_id(user_obj, package["_id"])
 
         return jsonify({"message": "Package Uploaded Successfully.", "code": 200})
     else:
@@ -349,41 +346,55 @@ def upload():
         package_version_doc = db.packages.find_one(
             {
                 "name": package_name,
-                "namespace": namespace_doc["_id"],
+                "namespace": namespace_obj.id,
                 "versions.version": package_version,
             }
         )
 
         if package_version_doc:
-            return jsonify({"message": "Version already exists", "code": 400}), 400
+            return jsonify({"message": "Version already exists", "code": 400}), 400  
 
-        new_version = {
-            "tarball": tarball_name,
-            "version": package_version,
-            "dependencies": "Test dependencies",
-            "isDeprecated": False,
-            "createdAt": datetime.utcnow(),
-            "download_url": f"/tarballs/{file_object_id}",
+        package_obj = Package.from_json(package_doc)
+
+        new_version = Version(
+            version=package_version,
+            tarball=tarball_name,
+            dependencies="Test dependencies",
+            createdAt=datetime.utcnow(),
+            isDeprecated=False,
+            download_url=f"/tarballs/{file_object_id}",
             # "download_url_zip": f"/tarballs/{zipfile_object_id}",
             # "download_url_tar": f"/tarballs/{tarfile_object_id}",
-        }
-
-        package_doc["versions"].append(new_version)
-        package_doc["versions"] = sorted(
-            package_doc["versions"], key=lambda x: x["version"]
         )
-        package_doc["updatedAt"] = datetime.utcnow()
+
+        package_obj.versions.append(new_version)
+        
+        package_obj.versions = sorted(
+            package_obj.versions, key=lambda x: x.version
+        )
+        package_obj.updatedAt = datetime.utcnow()
 
         if dry_run:
             return jsonify({"message": "Dry run Successful.", "code": 200}), 200
 
         db.packages.update_one(
-            {"_id": package_doc["_id"]},
-            {"$set": package_doc},
+            {"_id": package_obj.id},
+            {"$set": package_obj.to_json()},
         )
 
         return jsonify({"message": "Package Uploaded Successfully.", "code": 200}), 200
 
+def update_namespace_obj_with_package_id(namespace_obj, package):
+    namespace_obj.packages.append(package["_id"])
+    namespace_obj.updatedAt = datetime.utcnow()
+    
+    db.namespaces.update_one({"_id": namespace_obj.id}, {"$set": namespace_obj.to_json()})
+
+def update_user_obj_with_package_id(user_obj, package_id):
+    # Current user is the author of the package.
+    user_obj.authorOf.append(package_id)
+
+    db.users.update_one({"_id": user_obj.id}, {"$set": user_obj.to_json()})
 
 def check_token_expiry(upload_token_created_at):
     """
@@ -762,10 +773,10 @@ def sort_versions(versions):
 
 
 # This function checks if user is authorized to upload/update a package in a namespace.
-def checkUserUnauthorized(user_id, package_namespace, package_doc):
-    admins_id_list = [str(obj_id) for obj_id in package_namespace["admins"]]
-    maintainers_id_list = [str(obj_id) for obj_id in package_namespace["maintainers"]]
-    pkg_maintainers_id_list = [str(obj_id) for obj_id in package_doc["maintainers"]]
+def checkUserUnauthorized(user_id, package_namespace, package_obj):
+    admins_id_list = [str(obj_id) for obj_id in package_namespace.admins]
+    maintainers_id_list = [str(obj_id) for obj_id in package_namespace.maintainers]
+    pkg_maintainers_id_list = [str(obj_id) for obj_id in package_obj.maintainers]
     str_user_id = str(user_id)
     return (
         str_user_id not in admins_id_list
