@@ -784,9 +784,9 @@ def checkUserUnauthorized(user_id, package_namespace, package_doc):
     )
 
 
-def checkUserUnauthorizedForNamespaceTokenCreation(user_id, namespace_doc):
-    admins_id_list = [str(obj_id) for obj_id in namespace_doc["admins"]]
-    maintainers_id_list = [str(obj_id) for obj_id in namespace_doc["maintainers"]]
+def checkUserUnauthorizedForNamespaceTokenCreation(user_id, namespace_obj):
+    admins_id_list = [str(obj_id) for obj_id in namespace_obj.admins]
+    maintainers_id_list = [str(obj_id) for obj_id in namespace_obj.maintainers]
     str_user_id = str(user_id)
     return str_user_id not in admins_id_list and str_user_id not in maintainers_id_list
 

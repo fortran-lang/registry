@@ -19,7 +19,7 @@ services:
       - HOST=localhost
       - RESET_EMAIL=reset@localhost.com
       - RESET_PASSWORD=reset
-      - SUDO_PASSWORD=SUDO_PASSWORD
+      - SUDO_PASSWORD=fortran
       - IS_CI=true
 
   validate_package:
@@ -29,4 +29,3 @@ services:
 
   mongo:
     image: mongo
-

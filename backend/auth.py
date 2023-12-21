@@ -9,6 +9,8 @@ import hashlib
 from app import swagger
 import smtplib
 from flasgger.utils import swag_from
+from flask_jwt_extended import jwt_required, create_access_token, create_refresh_token, get_jwt_identity
+from models.user import User
 
 load_dotenv()
 
@@ -41,7 +43,6 @@ def generate_uuid():
         if not user:
             return uuid
 
-
 @app.route("/auth/login", methods=["POST"])
 @swag_from("documentation/login.yaml", methods=["POST"])
 def login():
@@ -62,21 +63,20 @@ def login():
 
     if not user:
         return jsonify({"message": "Invalid email or password", "code": 401}), 401
+    
+    user = User.from_json(user)
 
-    if not user["isverified"] and is_ci!='true':    # TODO: Uncomment this line to enable email verification
+    if not user.isVerified and is_ci!='true':    # TODO: Uncomment this line to enable email verification
         return jsonify({"message": "Please verify your email", "code": 401}), 401
 
-    uuid = generate_uuid() if user["loggedCount"] == 0 else user["uuid"]
-
-    user["loggedCount"] += 1
+    access_token = create_access_token(identity=user.uuid)
+    refresh_token = create_refresh_token(identity=user.uuid)
 
     db.users.update_one(
-        {"_id": user["_id"]},
+        {"_id": user.id},
         {
             "$set": {
                 "loginAt": datetime.utcnow(),
-                "uuid": uuid,
-                "loggedCount": user["loggedCount"],
             }
         },
     )
@@ -85,9 +85,10 @@ def login():
         jsonify(
             {
                 "message": "Login successful",
-                "uuid": uuid,
+                "access_token": access_token,
+                "refresh_token": refresh_token,
+                "username": user.username,
                 "code": 200,
-                "username": user["username"],
             }
         ),
         200,
@@ -97,12 +98,9 @@ def login():
 @app.route("/auth/signup", methods=["POST"])
 @swag_from("documentation/signup.yaml", methods=["POST"])
 def signup():
-    uuid = request.form.get("uuid")
     sudo_password = env_var["sudo_password"]
     salt = env_var["salt"]
-
-    if not uuid:
-        uuid = generate_uuid()
+    uuid = generate_uuid()
 
     username = request.form.get("username")
     email = request.form.get("email")
@@ -126,26 +124,25 @@ def signup():
         {"$or": [{"username": username}, {"email": email}]}
     )
 
-    user = {
-        "username": username,
-        "email": email,
-        "password": hashed_password,
-        "lastLogout": None,
-        "loginAt": datetime.utcnow(),
-        "createdAt": datetime.utcnow(),
-        "uuid": uuid,
-        "loggedCount": 1,
-        "isverified": False,
-        "newemail":'',
-    }
+    user = User(
+        id=None,
+        username=username,
+        email=email,
+        password=hashed_password,
+        lastLogout=None,
+        login_at=datetime.utcnow(),
+        created_at=datetime.utcnow(),
+        uuid=uuid,
+        is_verified=False,
+        new_email='',
+    )
 
     if not registry_user:
         if hashed_password == sudo_hashed_password:
-            user["roles"] = ["admin"]
-            forgot_password(email)
+            user.roles = ["admin"]
         else:
-            user["roles"] = ["user"]
-        db.users.insert_one(user)
+            user.roles = ["user"]
+        db.users.insert_one(user.to_json())
         send_verify_email(email) if is_ci != 'true' else None
         return (
             jsonify(
@@ -170,26 +167,21 @@ def signup():
 
 @app.route("/auth/logout", methods=["POST"])
 @swag_from("documentation/logout.yaml", methods=["POST"])
+@jwt_required()
 def logout():
-    uuid = request.form.get("uuid")
-    if not uuid:
-        return jsonify({"message": "User not found", "code": 404})
+    uuid = get_jwt_identity()
 
     user = db.users.find_one({"uuid": uuid})
     if not user:
         return jsonify({"message": "User not found", "code": 404})
-
-    user["loggedCount"] -= 1
-
-    uuid = "" if user["loggedCount"] == 0 else uuid
+    
+    user = User.from_json(user)
 
     db.users.update_one(
-        {"_id": user["_id"]},
+        {"_id": user.id},
         {
             "$set": {
                 "lastLogout": datetime.utcnow(),
-                "uuid": uuid,
-                "loggedCount": user["loggedCount"],
             }
         },
     )
@@ -199,16 +191,18 @@ def logout():
 
 @app.route("/auth/reset-password", methods=["POST"])
 @swag_from("documentation/reset_password.yaml", methods=["POST"])
+@jwt_required()
 def reset_password():
-    password = request.form.get("password")
-    oldpassword = request.form.get("oldpassword")
-    uuid = request.form.get("uuid")
+    uuid = get_jwt_identity()
 
-    if not uuid:
-        return jsonify({"message": "Unauthorized", "code": 401}), 401
+    new_password = request.form.get("password")
+    old_password = request.form.get("oldpassword")
 
-    if not password:
+    if not new_password:
         return jsonify({"message": "Please enter new password", "code": 400}), 400
+    
+    if not old_password:
+        return jsonify({"message": "Please enter old password", "code": 400}), 400
 
     user = db.users.find_one({"uuid": uuid})
     salt = env_var["salt"]
@@ -216,14 +210,16 @@ def reset_password():
     if not user:
         return jsonify({"message": "User not found", "code": 404}), 404
     
-    if oldpassword:
-        oldpassword += salt
-        hashed_password = hashlib.sha256(oldpassword.encode()).hexdigest()
-        if hashed_password != user["password"]:
+    user = User.from_json(user)
+    
+    if old_password:
+        old_password += salt
+        hashed_password = hashlib.sha256(old_password.encode()).hexdigest()
+        if hashed_password != user.password:
             return jsonify({"message": "Invalid old password", "code": 401}), 401
 
-    password += salt
-    hashed_password = hashlib.sha256(password.encode()).hexdigest()
+    new_password += salt
+    hashed_password = hashlib.sha256(new_password.encode()).hexdigest()
     db.users.update_one(
         {"uuid": uuid},
         {"$set": {"password": hashed_password}},
@@ -233,6 +229,7 @@ def reset_password():
 
 @app.route("/auth/forgot-password", methods=["POST"])
 @swag_from("documentation/forgot_password.yaml", methods=["POST"])
+@jwt_required()
 def forgot_password(*email):
     try:
         email = request.form.get("email") if request.form.get("email") else email[0]
@@ -243,19 +240,18 @@ def forgot_password(*email):
 
     if not user:
         return jsonify({"message": "User not found", "code": 404}), 404
+    
+    user = User.from_json(user)
 
-    if not user["isverified"]:
+    if not user.isVerified:
         return jsonify({"message": "Please verify your email", "code": 401}), 401
 
-    uuid = generate_uuid()
-    db.users.update_one({"email": email}, {"$set": {"uuid": uuid, "loggedCount": 1}})
-
     message = f"""\n
-    Dear {user['username']},
+    Dear {user.username},
 
     We received a request to reset your password. To reset your password, please copy paste the link below in a new browser window:
 
-    {env_var['host']}/account/reset-password/{uuid}
+    {env_var['host']}/account/reset-password/{user.uuid}
 
     Thank you,
     The Fortran-lang Team"""
@@ -272,7 +268,7 @@ def forgot_password(*email):
 
 
 def send_verify_email(email):
-    query = {"$and": [{"$or": [{"email": email}, {"newemail": email}]}]}
+    query = {"$and": [{"$or": [{"email": email}, {"newEmail": email}]}]}
 
     user = db.users.find_one(query)
 
@@ -313,22 +309,28 @@ def verify_email():
 
     if not user:
         return jsonify({"message": "User not found", "code": 404}), 404
+    
+    user = User.from_json(user)
 
-    if user["newemail"] != "":
+    if user.newEmail != "":
         db.users.update_one(
-            {"uuid": uuid}, {"$set": {"email": user["newemail"], "newemail": ""}}
+            {"uuid": uuid}, {"$set": {"email": user.newEmail, "newEmail": ""}}
         )
     
-    if not user['isverified']:
-        db.users.update_one({"uuid": uuid}, {"$set": {"isverified": True}})
+    if not user.isVerified:
+        db.users.update_one({"uuid": uuid}, {"$set": {"isVerified": True}})
 
-    return jsonify({"message": "Successfully Verified Email", "code": 200}), 200
+    access_token = create_access_token(identity=user.uuid)
+    refresh_token = create_refresh_token(identity=user.uuid)
+
+    return jsonify({"message": "Successfully Verified Email", "access_token": access_token, "refresh_token": refresh_token, "code": 200}), 200
 
 
 @app.route("/auth/change-email", methods=["POST"])
+@jwt_required()
 def change_email():
-    uuid = request.form.get("uuid")
-    new_email = request.form.get("newemail")
+    uuid = get_jwt_identity()
+    new_email = request.form.get("new_email")
 
     if not uuid:
         return jsonify({"message": "Unauthorized", "code": 401}), 401
@@ -337,6 +339,8 @@ def change_email():
 
     if not user:
         return jsonify({"message": "User not found", "code": 404}), 404
+    
+    user = User.from_json(user)
 
     if not new_email:
         return jsonify({"message": "Please enter new email", "code": 400}), 400
@@ -348,7 +352,7 @@ def change_email():
 
     db.users.update_one(
         {"uuid": uuid},
-        {"$set": {"newemail": new_email}},
+        {"$set": {"newEmail": new_email}},
     )
     send_verify_email(new_email)
 
