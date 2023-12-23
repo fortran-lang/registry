@@ -262,20 +262,11 @@ def upload():
 
     tarball_name = "{}-{}.tar.gz".format(package_name, package_version)
 
-    if not IS_VERCEL:  # TODO: Disable this after Validation is Enabled
-        package_data = extract_toml(tarball)
-    else:
-        package_data = {
-            "homepage": "homepage",
-            "repository": "repository",
-            "description": "description",
-            "copyright": "copyright",
-        }
-    # validate the package with fpm
-    # valid_package, package_data = validate(tarball,"{}-{}".format(package_name, package_version))  # TODO: Enable this after Validation is Enabled
-
-    # if not valid_package: # TODO: Enable this after Validation is Enabled
-    #     return jsonify({"code": 400, "message": "Invalid package"}), 400
+    package_data = {
+        "repository": "Package Under Verification",
+        "description": "Package Under Verification",
+        "copyright": "Package Under Verification",
+    }
 
     file_object_id = file_storage.put(
         tarball, content_type=tarball.content_type, filename=tarball_name
@@ -288,7 +279,6 @@ def upload():
                 "name": package_name,
                 "namespace": namespace_doc["_id"],
                 "description": package_data["description"],
-                "homepage": package_data["homepage"],
                 "repository": package_data["repository"],
                 "copyright": package_data["copyright"],
                 "license": package_license,
@@ -459,7 +449,7 @@ def check_version(current_version, new_version):
     return new_list > current_list
 
 
-@app.route("/packages/<namespace_name>/<package_name>", methods=["GET", "POST"])
+@app.route("/packages/<namespace_name>/<package_name>", methods=["GET"])
 @swag_from("documentation/get_package.yaml", methods=["GET"])
 def get_package(namespace_name, package_name):
     # Get namespace from namespace name.
@@ -496,6 +486,8 @@ def get_package(namespace_name, package_name):
         "version_history": package["versions"],
         "updatedAt": package["updatedAt"],
         "description": package["description"],
+        "ratings": round(sum(package["ratings"]['users'].values())/len(package["ratings"]['users']),3),
+        "downloads": package["downloads_stats"],
     }
 
     return jsonify({"data": package_response_data, "code": 200})
@@ -822,24 +814,6 @@ def checkUserUnauthorizedForNamespaceTokenCreation(user_id, namespace_obj):
     maintainers_id_list = [str(obj_id) for obj_id in namespace_obj.maintainers]
     str_user_id = str(user_id)
     return str_user_id not in admins_id_list and str_user_id not in maintainers_id_list
-
-
-def extract_toml(file):
-    with open("static/temp/temp.tar.gz", "wb") as f:
-        f.write(file.read())
-    with tarfile.open("static/temp/temp.tar.gz", "r") as tar:
-        tar.extractall("static/temp")
-
-    for root, dirs, files in os.walk("static/temp"):
-        file_name = "fpm.toml"
-        if file_name in files:
-            file_path = os.path.join(root, file_name)
-            with open(file_path, "r") as file:
-                file_content = file.read()
-            shutil.rmtree("static/temp")
-            os.makedirs("static/temp", exist_ok=True)
-            parsed_toml = toml.loads(file_content)
-            return parsed_toml
 
 
 @app.route("/ratings/<namespace>/<package>", methods=["POST"])
