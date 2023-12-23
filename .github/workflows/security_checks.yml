@@ -1,0 +1,30 @@
+# Github action to build and verify the fortran packages
+#
+
+name: Fortran Package Verification
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 2 * * *"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout source
+        uses: actions/checkout@v4
+      
+      - uses: fortran-lang/setup-fpm@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+
+      - name: Install python libraries
+        run: pip3 install --user -r backend/requirements.txt
+
+      - name: fortran_package
+        run: cd backend && python validate.py

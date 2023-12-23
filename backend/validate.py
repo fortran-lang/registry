@@ -1,26 +1,11 @@
-import os
-from flask import request, jsonify
-from auth import is_ci
 from app import app
-import logging
 import subprocess
 import toml
-
-
-logging.basicConfig(
-    filename="validate.log",
-    level=logging.ERROR,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-)
-
-@app.errorhandler(404)
-def page_not_found(e):
-    return jsonify({"message": "Page not found", "code": 404})
-
-@app.errorhandler(500)
-def internal_server_error(e):
-    logging.error("Server Error: %s", str(e))
-    return jsonify({"message": "Internal server error", "code": 500})
+from mongo import db
+from mongo import file_storage
+from bson.objectid import ObjectId
+from gridfs.errors import NoFile
+import toml
 
 
 def run_command(command):
@@ -31,12 +16,15 @@ def run_command(command):
     return result.stdout if result.stdout else result.stderr
 
 def process_package(packagename):
+    # Create a temp directory
+    create_dir_command = f'mkdir -p static/temp/{packagename}'
+    run_command(create_dir_command)
     # Extract the archive
-    extract_command = f'tar -xzf static/temp/{packagename}.tar.gz -C static/temp/'
+    extract_command = f'tar -xzf static/temp/{packagename}.tar.gz -C static/temp/{packagename}/'
     run_command(extract_command)
 
     # Build the package
-    build_command = f'cd static/temp/{packagename} && home/registry/fpm build'
+    build_command = f'cd static/temp/{packagename} && fpm build'
     result = run_command(build_command)
 
     # Read fpm.toml
@@ -46,7 +34,7 @@ def process_package(packagename):
     parsed_toml = toml.loads(file_content)
 
     # Clean up
-    cleanup_command = f'rm -rf static/temp/{packagename}'
+    cleanup_command = f'rm -rf static/temp/{packagename} static/temp/{packagename}.tar.gz'
     run_command(cleanup_command)
 
     if '<ERROR>' in result:
@@ -57,30 +45,32 @@ def process_package(packagename):
         return True, parsed_toml
 
 
-
-@app.route("/", methods=['POST'])
 def validate():
-    print("request received")
-    package = request.files['package']
-    packagename = request.form['packagename']
-    with open(f"static/temp/{packagename}.tar.gz", "wb") as f:
-        f.write(package.read())
-    # package.save(f"tmp/{packagename}.tar.gz")
-    result = process_package(packagename)
-    print(result)
-    return result
+    packages = db.packages.find({"versions": {"$elemMatch": {"isVerified": False}}})
+    packages = list(packages)
+    for  package in packages:
+        for i in package['versions']:
+            if 'isVerified' in i.keys() and i['isVerified'] == False:
+                tarball = file_storage.get(ObjectId(i['oid']))
+                packagename = package['name'] + '-' + i['version']
+                with open(f"static/temp/{packagename}.tar.gz", "wb") as f:
+                    f.write(tarball.read())
+                result = process_package(packagename)
+                if result[0] == False:
+                    db.packages.update_one({"name": packages['name'],"namespace":package['namespace']}, {"$set": {"versions.$[elem].isVerified": False}}, array_filters=[{"elem.version": i['version']}])
+                    print("Package build failed for " + packagename)
+                else:
+                    print("Package build success for " + packagename)
+                    db.packages.update_one({"name": package['name'],"namespace":package['namespace']}, {"$set": {"versions.$[elem].isVerified": True}}, array_filters=[{"elem.version": i['version']}])
 
+                    update_data = {}
 
-# Log all unhandled exceptions
-def log_exception(sender, exception, **extra):
-    sender.logger.error(
-        "An exception occurred: %s", str(exception), exc_info=(exception)
-    )
+                    for key in ['repository', 'copyright', 'description']:
+                        if key in result[1] and package[key] == "Package Under Verification":
+                            update_data[key] = result[1][key]
 
+                    if update_data:
+                        db.packages.update_one({"name": package['name'],"namespace":package['namespace']}, {"$set": update_data})
+    return 0
 
-app.register_error_handler(Exception, log_exception)
-
-debug = True if is_ci != "true" else False
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=os.environ.get("FLASK_SERVER_PORT", 5000), debug=debug)
+validate()
