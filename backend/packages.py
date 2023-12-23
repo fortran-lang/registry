@@ -5,7 +5,7 @@ from bson.objectid import ObjectId
 from flask import request, jsonify, abort, send_file
 from gridfs.errors import NoFile
 from datetime import datetime, timedelta
-from auth import generate_uuid,IS_VERCEL
+from auth import generate_uuid, IS_VERCEL
 from app import swagger
 import tarfile
 import os
@@ -16,6 +16,7 @@ from urllib.parse import unquote
 import math
 import semantic_version
 from license_expression import get_spdx_licensing
+
 # from validate_package import validate
 
 
@@ -251,7 +252,12 @@ def upload():
         {"name": package_name, "namespace": namespace_doc["_id"]}
     )
 
-    if tarball.content_type not in ["application/gzip", "application/zip","application/octet-stream","application/x-tar"]:
+    if tarball.content_type not in [
+        "application/gzip",
+        "application/zip",
+        "application/octet-stream",
+        "application/x-tar",
+    ]:
         return jsonify({"code": 400, "message": "Invalid file type"}), 400
 
     tarball_name = "{}-{}.tar.gz".format(package_name, package_version)
@@ -259,15 +265,21 @@ def upload():
     if not IS_VERCEL:  # TODO: Disable this after Validation is Enabled
         package_data = extract_toml(tarball)
     else:
-        package_data = {"homepage": "homepage", "repository": "repository", "description": "description","copyright":"copyright"}
+        package_data = {
+            "homepage": "homepage",
+            "repository": "repository",
+            "description": "description",
+            "copyright": "copyright",
+        }
     # validate the package with fpm
     # valid_package, package_data = validate(tarball,"{}-{}".format(package_name, package_version))  # TODO: Enable this after Validation is Enabled
-    
 
     # if not valid_package: # TODO: Enable this after Validation is Enabled
-    #     return jsonify({"code": 400, "message": "Invalid package"}), 400    
+    #     return jsonify({"code": 400, "message": "Invalid package"}), 400
 
-    file_object_id = file_storage.put(tarball, content_type=tarball.content_type, filename=tarball_name)
+    file_object_id = file_storage.put(
+        tarball, content_type=tarball.content_type, filename=tarball_name
+    )
 
     # No previous recorded versions of the package found.
     if not package_doc:
@@ -286,10 +298,6 @@ def upload():
                 "maintainers": [user["_id"]],
                 "tags": ["fortran", "fpm"],
                 "isDeprecated": False,
-                "downloadData": {"2023-01-01":{"downloadCountLinux": 100,"downloadCountWindows":100,"downloadCountWebsite":100,"downloadCountMac":100}},
-                "ratings": {"5star":100,"4star":100, "3star":100,"2star":100,"1star":100},
-                "isMalicious": False,
-                "SecurityReport": "No security issues found",
             }
         except KeyError as e:
             return (
@@ -303,12 +311,14 @@ def upload():
             )
 
         version_obj = {
+            "_id": file_object_id,
             "version": package_version,
             "tarball": tarball_name,
             "dependencies": "Test dependencies",
             "createdAt": datetime.utcnow(),
             "isDeprecated": False,
-            "download_url": f"/tarballs/{file_object_id}"
+            "download_url": f"/tarballs/{file_object_id}",
+            "isVerified": False,
         }
 
         package_obj["versions"] = []
@@ -363,8 +373,8 @@ def upload():
             "isDeprecated": False,
             "createdAt": datetime.utcnow(),
             "download_url": f"/tarballs/{file_object_id}",
-            # "download_url_zip": f"/tarballs/{zipfile_object_id}",
-            # "download_url_tar": f"/tarballs/{tarfile_object_id}",
+            "_id": file_object_id,
+            "isVerified": False,
         }
 
         package_doc["versions"].append(new_version)
@@ -405,19 +415,36 @@ def check_token_expiry(upload_token_created_at):
 
     return False
 
-@app.route('/tarballs/<oid>', methods=["GET"])
+
+@app.route("/tarballs/<oid>", methods=["GET"])
 @swag_from("documentation/get_tarball.yaml", methods=["GET"])
 def serve_gridfs_file(oid):
     try:
         file = file_storage.get(ObjectId(oid))
 
-        # Return the file data as a Flask response object
-        return send_file(
-            file,
-            download_name=file.filename,
-            as_attachment=True,
-            mimetype=file.content_type,
+        package_version_doc = db.packages.update_one(
+            {
+                "versions._id": oid,
+            },
+            {
+                "$inc": {
+                    f"downloads_stats.versions.{oid}": 1,
+                    "downloads_stats.total_downloads": 1,
+                    f"downloads_stats.dates.{str(datetime.now())[:10]}.{oid}": 1,
+                    f"downloads_stats.dates.{str(datetime.now())[:10]}.total_downloads": 1,
+                }
+            },
         )
+        if package_version_doc.modified_count > 0:
+            # Return the file data as a Flask response object
+            return send_file(
+                file,
+                download_name=file.filename,
+                as_attachment=True,
+                mimetype=file.content_type,
+            )
+        return jsonify({"message": "Package version not found", "code": 404}), 404
+
     except NoFile:
         abort(404)
 
@@ -727,6 +754,7 @@ def create_token_upload_token_package(namespace_name, package_name):
         200,
     )
 
+
 @app.route("/packages/<namespace>/<package>/maintainers", methods=["GET"])
 @swag_from("documentation/package_maintainers.yaml", methods=["GET"])
 def package_maintainers(namespace, package):
@@ -734,7 +762,7 @@ def package_maintainers(namespace, package):
 
     if not uuid:
         return jsonify({"code": 401, "message": "Unauthorized"}), 401
-    
+
     user = db.users.find_one({"uuid": uuid})
 
     if not user:
@@ -792,18 +820,18 @@ def checkUserUnauthorizedForNamespaceTokenCreation(user_id, namespace_obj):
 
 
 def extract_toml(file):
-    with open('static/temp/temp.tar.gz', 'wb') as f:
+    with open("static/temp/temp.tar.gz", "wb") as f:
         f.write(file.read())
-    with tarfile.open('static/temp/temp.tar.gz', "r") as tar:
+    with tarfile.open("static/temp/temp.tar.gz", "r") as tar:
         tar.extractall("static/temp")
 
-    for root, dirs, files in os.walk('static/temp'):
-        file_name = 'fpm.toml'
+    for root, dirs, files in os.walk("static/temp"):
+        file_name = "fpm.toml"
         if file_name in files:
             file_path = os.path.join(root, file_name)
-            with open(file_path, 'r') as file:
+            with open(file_path, "r") as file:
                 file_content = file.read()
-            shutil.rmtree('static/temp')
-            os.makedirs('static/temp', exist_ok=True)
+            shutil.rmtree("static/temp")
+            os.makedirs("static/temp", exist_ok=True)
             parsed_toml = toml.loads(file_content)
             return parsed_toml
