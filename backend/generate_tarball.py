@@ -17,14 +17,9 @@ try:
 except KeyError as err:
     print("Add MONGO_URI to .env file")
 
-db = client[database_name]
-file_storage = GridFS(db, collection="tarballs")
-
-
-@app.route("/registry/archives", methods=["GET"])
-def clone():
-    folder_path = "static"
-    file_list = os.listdir(folder_path)
-    return jsonify(
-        {"message": "Successfully Fetched Archives", "archives": file_list, "code": 200}
-    )
+def generate_latest_tarball():
+    # Execute the mongodump command
+    archive_date = datetime.datetime.now().strftime("%Y-%m-%d")
+    command = f"mongodump --uri={mongo_uri}--archive=static/registry-{archive_date}.tar.gz --db={database_name} --gzip --excludeCollection=users"
+    subprocess.call(command, shell=True)
+    print("Database backup created successfully")
