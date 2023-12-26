@@ -23,3 +23,5 @@ def generate_latest_tarball():
     command = f"mongodump --uri={mongo_uri}--archive=static/registry-{archive_date}.tar.gz --db={database_name} --gzip --excludeCollection=users"
     subprocess.call(command, shell=True)
     print("Database backup created successfully")
+
+generate_latest_tarball()
