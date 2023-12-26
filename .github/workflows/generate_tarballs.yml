@@ -28,6 +28,10 @@ jobs:
       - name: Install python libraries
         run: pip3 install --user -r backend/requirements.txt
 
+      - name: load env file
+        run: |
+          echo "${{ secrets.ENV_FILE }}" > backend/.env
+
       - name: generate tarball
         run: cd backend && python generate_tarball.py
 
