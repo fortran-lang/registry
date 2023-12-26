@@ -19,9 +19,14 @@ except KeyError as err:
 
 def generate_latest_tarball():
     # Execute the mongodump command
-    archive_date = datetime.now().strftime("%Y-%m-%d")
-    command = f"mongodump --uri={mongo_uri} --archive=static/registry-{archive_date}.tar.gz --db={database_name} --gzip --excludeCollection=users"
-    subprocess.call(command, shell=True)
+    archive_date = datetime.now().strftime("%d-%m-%Y")
+    archive_path = os.path.abspath(f"static/registry-{archive_date}.tar.gz")
+    command = f"mongodump --uri={mongo_uri} --archive={archive_path} --db={database_name} --gzi p --excludeCollection=users".split()
+    try:
+        subprocess.call(command, text=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Failed: {e}")
+        exit(1)
     print("Database backup created successfully")
 
 generate_latest_tarball()
