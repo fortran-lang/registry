@@ -57,20 +57,20 @@ def validate():
                     f.write(tarball.read())
                 result = process_package(packagename)
                 if result[0] == False:
-                    db.packages.update_one({"name": packages['name'],"namespace":package['namespace']}, {"$set": {"versions.$[elem].isVerified": False}}, array_filters=[{"elem.version": i['version']}])
+                    db.packages.update_one({"name": packages['name'],"namespace":package['namespace']}, {"$set": {"versions.$[elem].unabletoVerify": True}}, array_filters=[{"elem.version": i['version']}])
                     print("Package build failed for " + packagename)
                 else:
                     print("Package build success for " + packagename)
                     db.packages.update_one({"name": package['name'],"namespace":package['namespace']}, {"$set": {"versions.$[elem].isVerified": True}}, array_filters=[{"elem.version": i['version']}])
 
-                    update_data = {}
+                update_data = {}
 
-                    for key in ['repository', 'copyright', 'description']:
-                        if key in result[1] and package[key] == "Package Under Verification":
-                            update_data[key] = result[1][key]
+                for key in ['repository', 'copyright', 'description']:
+                    if key in result[1] and package[key] == "Package Under Verification":
+                        update_data[key] = result[1][key]
 
-                    if update_data:
-                        db.packages.update_one({"name": package['name'],"namespace":package['namespace']}, {"$set": update_data})
+                if update_data:
+                    db.packages.update_one({"name": package['name'],"namespace":package['namespace']}, {"$set": update_data})
     return 0
 
 validate()

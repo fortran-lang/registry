@@ -924,17 +924,19 @@ def post_malicious(namespace, package):
 
     if user["_id"] in package_doc["malicious_report"]["users"] and package_doc["malicious_report"][
         "users"
-    ][user["_id"]] == str(reason):
+    ][user["_id"]]['reason'] == str(reason):
         return jsonify({"message": "Malicious Report Submitted Successfully", "code": 200}), 200
 
     if user["_id"] in package_doc["malicious_report"]["users"] and package_doc["malicious_report"][
         "users"
-    ][user["_id"]] != str(reason):
+    ][user["_id"]]['reason'] != str(reason):
         package_version_doc = db.packages.update_one(
             {"name": package, "namespace": namespace_doc["_id"]},
             {
                 "$set": {
-                    f"malicious_report.users.{user['_id']}": str(reason),
+                    f"malicious_report.users.{user['_id']}": { 'reason': str(reason), 'isViewed': False },
+                    "malicious_report.isViewed": False,
+
                 },
             },
         )
@@ -944,11 +946,35 @@ def post_malicious(namespace, package):
         {"name": package, "namespace": namespace_doc["_id"]},
         {
             "$set": {
-                f"malicious_report.users.{user['_id']}": str(reason),
-            },
-            "$inc": {
-                "malicious_report.total_count": 1,
-            },
+                f"malicious_report.users.{user['_id']}": { 'reason': str(reason), 'isViewed': False },
+                "malicious_report.isViewed": False,
+            }
         },
     )
     return jsonify({"message": "Malicious Report Submitted Successfully", "code": 200}), 200
+
+@app.route("/report/view", methods=["GET"])
+@swag_from("documentation/view_report.yaml", methods=["GET"])
+def view_report():
+    uuid = request.form.get("uuid")
+
+    if not uuid:
+        return jsonify({"message": "Unauthorized", "code": 401}), 401
+    else:
+        user = db.users.find_one({"uuid": uuid})
+
+    if "admin" in user["roles"]:
+        non_viewed_reports = list()
+        malicious_reports = db.packages.find({"malicious_reports.isViewed": False})
+        for package in list(malicious_reports):
+            for user_id, report in package.get("malicious_report", {}).get("users", {}).items():
+                if not report.get("isViewed", False):
+                    report['name'] = db.users.find_one({"_id": ObjectId(user_id)}, {"username": 1})["username"]
+                    del report["isViewed"]
+                    non_viewed_reports.append(report)
+
+        return jsonify({"message": "Malicious Reports", "code": 200, "reports": non_viewed_reports}), 200
+
+
+    return jsonify({"message": "Unauthorized", "code": 401}), 401
+
