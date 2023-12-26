@@ -26,5 +26,5 @@ jobs:
       - name: Install python libraries
         run: pip3 install --user -r backend/requirements.txt
 
-      - name: fortran_package
+      - name: validate fortran packages
         run: cd backend && python validate.py

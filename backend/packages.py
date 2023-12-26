@@ -281,6 +281,11 @@ def upload():
                 "description": package_data["description"],
                 "repository": package_data["repository"],
                 "copyright": package_data["copyright"],
+                "size": tarball.content_length,
+                "long_description": package_data["description"],
+                "isMalicious": False,
+                "security_status": "No security issues found",
+                "malicious_report": {},
                 "license": package_license,
                 "createdAt": datetime.utcnow(),
                 "updatedAt": datetime.utcnow(),
@@ -486,6 +491,7 @@ def get_package(namespace_name, package_name):
         "version_history": package["versions"],
         "updatedAt": package["updatedAt"],
         "description": package["description"],
+        "long_description": package["long_description"],
         "ratings": round(sum(package["ratings"]['users'].values())/len(package["ratings"]['users']),3),
         "downloads": package["downloads_stats"],
     }
@@ -879,3 +885,70 @@ def post_ratings(namespace, package):
         },
     )
     return jsonify({"message": "Ratings Submitted Successfully", "code": 200}), 200
+
+
+@app.route("/report/<namespace>/<package>", methods=["POST"])
+@swag_from("documentation/post_malicious.yaml", methods=["POST"])
+def post_malicious(namespace, package):
+    uuid = request.form.get("uuid")
+    reason = request.form.get("reason")
+
+    if not uuid:
+        return jsonify({"code": 401, "message": "Unauthorized"}), 401
+
+    if not reason:
+        return jsonify({"code": 400, "message": "Reason is missing"}), 400
+    
+    reason = reason.strip()
+
+    if len(reason) < 10:
+        return (
+            jsonify({"code": 400, "message": "Reason should atleast be 10 characters"}),
+            400,
+        )
+
+    user = db.users.find_one({"uuid": uuid})
+    namespace_doc = db.namespaces.find_one({"namespace": namespace})
+    package_doc = db.packages.find_one(
+        {"name": package, "namespace": namespace_doc["_id"]}
+    )
+
+    if not user or not namespace_doc or not package_doc:
+        error_message = {
+            "user": "User not found" if not user else None,
+            "namespace": "Namespace not found" if not namespace_doc else None,
+            "package": "Package not found" if not package_doc else None,
+            "code": 404
+        }
+        return jsonify({"message": error_message}), 404
+
+    if user["_id"] in package_doc["malicious_report"]["users"] and package_doc["malicious_report"][
+        "users"
+    ][user["_id"]] == str(reason):
+        return jsonify({"message": "Malicious Report Submitted Successfully", "code": 200}), 200
+
+    if user["_id"] in package_doc["malicious_report"]["users"] and package_doc["malicious_report"][
+        "users"
+    ][user["_id"]] != str(reason):
+        package_version_doc = db.packages.update_one(
+            {"name": package, "namespace": namespace_doc["_id"]},
+            {
+                "$set": {
+                    f"malicious_report.users.{user['_id']}": str(reason),
+                },
+            },
+        )
+        return jsonify({"message": "Malicious Report Updated Successfully", "code": 200}), 200
+
+    package_version_doc = db.packages.update_one(
+        {"name": package, "namespace": namespace_doc["_id"]},
+        {
+            "$set": {
+                f"malicious_report.users.{user['_id']}": str(reason),
+            },
+            "$inc": {
+                "malicious_report.total_count": 1,
+            },
+        },
+    )
+    return jsonify({"message": "Malicious Report Submitted Successfully", "code": 200}), 200

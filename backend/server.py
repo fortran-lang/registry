@@ -8,7 +8,6 @@ import auth
 import user
 import packages
 import namespaces
-import val_test
 # import validate_package  # TODO: Uncomment this when the package validation is enabled
 
 logging.basicConfig(
