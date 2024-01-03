@@ -97,7 +97,7 @@ def search_packages():
                     {"description": {"$regex": query}},
                 ]
             },
-            {"isDeprecated": False},
+            {"is_deprecated": False},
         ]
     }
 
@@ -111,7 +111,7 @@ def search_packages():
                 "author": 1,
                 "description": 1,
                 "tags": 1,
-                "updatedAt": 1,
+                "updated_at": 1,
             },
         )
         .sort(sorted_by, -1)
@@ -127,11 +127,25 @@ def search_packages():
 
         search_packages = []
         for i in packages:
-            namespace = db.namespaces.find_one({"_id": i["namespace"]})
-            author = db.users.find_one({"_id": i["author"]})
-            i["namespace"] = namespace["namespace"]
-            i["author"] = author["username"]
-            search_packages.append(i)
+            package_obj = Package.from_json(i)
+
+            namespace = db.namespaces.find_one({"_id": package_obj.namespace})
+            namespace_obj = Namespace.from_json(namespace)
+
+            author = db.users.find_one({"_id": package_obj.author})
+            author_obj = User.from_json(author)
+            
+            package_obj.namespace = namespace_obj.namespace
+            package_obj.author = author_obj.username
+            search_packages.append({
+                "name": package_obj.name,
+                "namespace": package_obj.namespace,
+                "author": package_obj.author,
+                "description": package_obj.description,
+                "tags": package_obj.tags,
+                "updated_at": package_obj.updated_at,
+            })
+
         return (
             jsonify(
                 {"code": 200, "packages": search_packages, "total_pages": total_pages}
@@ -291,12 +305,12 @@ def upload():
                 repository=package_data["repository"],
                 copyright=package_data["copyright"],
                 license=package_license,
-                createdAt=datetime.utcnow(),
-                updatedAt=datetime.utcnow(),
+                created_at=datetime.utcnow(),
+                updated_at=datetime.utcnow(),
                 author=user_obj.id,
                 maintainers=[user_obj.id],
                 tags=["fortran", "fpm"],
-                isDeprecated=False,
+                is_deprecated=False,
                 versions=[],
             )
         except KeyError as e:
@@ -314,8 +328,8 @@ def upload():
             version=package_version,
             tarball=tarball_name,
             dependencies="Test dependencies",
-            createdAt=datetime.utcnow(),
-            isDeprecated=False,
+            created_at=datetime.utcnow(),
+            is_deprecated=False,
             download_url=f"/tarballs/{file_object_id}",
         )
 
@@ -360,8 +374,8 @@ def upload():
             version=package_version,
             tarball=tarball_name,
             dependencies="Test dependencies",
-            createdAt=datetime.utcnow(),
-            isDeprecated=False,
+            created_at=datetime.utcnow(),
+            is_deprecated=False,
             download_url=f"/tarballs/{file_object_id}",
             # "download_url_zip": f"/tarballs/{zipfile_object_id}",
             # "download_url_tar": f"/tarballs/{tarfile_object_id}",
@@ -439,11 +453,12 @@ def check_version(current_version, new_version):
     return new_list > current_list
 
 
-@app.route("/packages/<namespace_name>/<package_name>", methods=["GET", "POST"])
+@app.route("/packages/<namespace_name>/<package_name>", methods=["GET"])
 @swag_from("documentation/get_package.yaml", methods=["GET"])
 def get_package(namespace_name, package_name):
     # Get namespace from namespace name.
     namespace = db.namespaces.find_one({"namespace": namespace_name})
+    namespace_obj = Namespace.from_json(namespace)
 
     # Check if namespace exists.
     if not namespace:
@@ -454,28 +469,31 @@ def get_package(namespace_name, package_name):
 
     # Get package from a package_name and namespace's id.
     package = db.packages.find_one(
-        {"name": package_name, "namespace": namespace["_id"]}
+        {"name": package_name, "namespace": namespace_obj.id}
     )
 
     # Check if package is not found.
     if not package:
         return jsonify({"message": "Package not found", "code": 404}), 404
+    
+    package_obj = Package.from_json(package)
 
     # Get the package author from id.
-    package_author = db.users.find_one({"_id": package["author"]})
+    package_author = db.users.find_one({"_id": package_obj.author})
+    package_author_obj = User.from_json(package_author)
 
     # Only latest version of the package will be sent as a response.
     package_response_data = {
-        "name": package["name"],
-        "namespace": namespace["namespace"],
-        "latest_version_data": package["versions"][-1],
-        "author": package_author["username"],
-        "tags": package["tags"],
-        "license": package["license"],
-        "createdAt": package["createdAt"],
-        "version_history": package["versions"],
-        "updatedAt": package["updatedAt"],
-        "description": package["description"],
+        "name": package_obj.name,
+        "namespace": namespace_obj.namespace,
+        "latest_version_data": package_obj.versions[-1],
+        "author": package_author_obj.username,
+        "tags": package_obj.tags,
+        "license": package_obj.license,
+        "createdAt": package_obj.createdAt,
+        "version_history": package_obj.versions,
+        "updatedAt": package_obj.updatedAt,
+        "description": package_obj.description,
     }
 
     return jsonify({"data": package_response_data, "code": 200})
@@ -509,11 +527,15 @@ def verify_user_role(namespace_name, package_name):
             jsonify({"status": "error", "message": "Package not found", "code": 404}),
             404,
         )
+    
+    user_obj = User.from_json(user)
+    package_obj = Package.from_json(package)
+    namespace_obj = Namespace.from_json(namespace)
 
     if (
-        str(user["_id"]) in [str(obj_id) for obj_id in namespace["maintainers"]]
-        or str(user["_id"]) in [str(obj_id) for obj_id in namespace["admins"]]
-        or str(user["_id"]) in [str(obj_id) for obj_id in package["maintainers"]]
+        str(user_obj.id) in [str(obj_id) for obj_id in namespace_obj.maintainers]
+        or str(user_obj.id) in [str(obj_id) for obj_id in namespace_obj.admins]
+        or str(user_obj.id) in [str(obj_id) for obj_id in package_obj.maintainers]
     ):
         return jsonify({"status": "success", "code": 200, "isVerified": True}), 200
     else:
@@ -529,6 +551,8 @@ def get_package_from_version(namespace_name, package_name, version):
     # Check if namespace does not exists.
     if not namespace:
         return jsonify({"message": "Namespace not found", "code": 404}), 404
+    
+    namespace_obj = Namespace.from_json(namespace)
 
     # Get package from a package_name, namespace's id and version.
     package = db.packages.find_one(
@@ -544,26 +568,30 @@ def get_package_from_version(namespace_name, package_name, version):
         return jsonify({"message": "Package not found", "code": 404}), 404
 
     else:
+        package_obj = Package.from_json(package)
+
         # Get the package author from id.
-        package_author = db.users.find_one({"_id": package["author"]})
+        package_author = db.users.find_one({"_id": package_obj.author})
+
+        package_author_obj = User.from_json(package_author)
 
         # Extract version data from the list of versions.
-        version_history = package["versions"]
+        version_history = package_obj.versions
         version_data = next(
-            filter(lambda obj: obj["version"] == version, version_history), None
+            filter(lambda obj: obj.version == version, version_history), None
         )
 
         # Only queried version should be sent as response.
         package_response_data = {
-            "name": package["name"],
-            "namespace": namespace["namespace"],
-            "author": package_author["username"],
-            "tags": package["tags"],
-            "license": package["license"],
-            "createdAt": package["createdAt"],
-            "version_data": version_data,
-            "updatedAt": package["updatedAt"],
-            "description": package["description"],
+            "name": package_obj.name,
+            "namespace": namespace_obj.namespace,
+            "author": package_author_obj.username,
+            "tags": package_obj.tags,
+            "license": package_obj.license,
+            "created_at": package_obj.created_at,
+            "version_data": version_data.to_json(),
+            "updatedAt": package_obj.updated_at,
+            "description": package_obj.description,
         }
 
         return jsonify({"data": package_response_data, "code": 200}), 200
@@ -579,9 +607,11 @@ def delete_package(namespace_name, package_name):
 
     if not user:
         return jsonify({"message": "User not found", "code": 404}), 404
+    
+    user_obj = User.from_json(user)
 
     # Check if the user is authorized to delete the package.
-    if not "admin" in user["roles"]:
+    if not "admin" in user_obj.roles:
         return (
             jsonify(
                 {
@@ -630,9 +660,11 @@ def delete_package_version(namespace_name, package_name, version):
 
     if not user:
         return jsonify({"message": "User not found", "code": 404}), 404
+    
+    user_obj = User.from_json(user)
 
     # Check if the user is authorized to delete the package.
-    if not "admin" in user["roles"]:
+    if not "admin" in user_obj.roles:
         return (
             jsonify(
                 {
@@ -685,19 +717,24 @@ def create_token_upload_token_package(namespace_name, package_name):
 
     if not namespace_doc:
         return jsonify({"code": 404, "message": "Namespace not found"}), 404
+    
+    namespace_obj = Namespace.from_json(namespace_doc)
 
     # Get the package from package_name & namespace_id.
     package_doc = db.packages.find_one(
-        {"name": package_name, "namespace": namespace_doc["_id"]}
+        {"name": package_name, "namespace": namespace_obj.id}
     )
 
     if not package_doc:
         return jsonify({"code": 404, "message": "Package not found"}), 404
+    
+    package_obj = Package.from_json(package_doc)
+    user_obj = User.from_json(user_doc)
 
     # Check if the user is authorized to generate package token.
     # Only package maintainers will have the option to generate tokens for a package.
-    if not str(user_doc["_id"]) in [
-        str(obj_id) for obj_id in package_doc["maintainers"]
+    if not str(user_obj.id) in [
+        str(obj_id) for obj_id in package_obj.maintainers
     ]:
         return (
             jsonify(
@@ -711,12 +748,12 @@ def create_token_upload_token_package(namespace_name, package_name):
 
     upload_token_obj = {
         "token": upload_token,
-        "createdAt": datetime.utcnow(),
-        "createdBy": user_doc["_id"],
+        "created_at": datetime.utcnow(),
+        "created_by": user_doc["_id"],
     }
 
     db.packages.update_one(
-        {"_id": package_doc["_id"]}, {"$addToSet": {"upload_tokens": upload_token_obj}}
+        {"_id": package_obj.id}, {"$addToSet": {"upload_tokens": upload_token_obj}}
     )
 
     return (
@@ -724,7 +761,7 @@ def create_token_upload_token_package(namespace_name, package_name):
             {
                 "code": 200,
                 "message": "Upload token created successfully",
-                "uploadToken": upload_token,
+                "upload_token": upload_token,
             }
         ),
         200,
@@ -740,11 +777,15 @@ def package_maintainers(namespace, package):
 
     if not user:
         return jsonify({"code": 401, "message": "Unauthorized"}), 401
+    
+    user_obj = User.from_json(user)
 
     namespace_doc = db.namespaces.find_one({"namespace": namespace})
 
     if not namespace_doc:
         return jsonify({"message": "Namespace not found", "code": 404})
+    
+    namespace_obj = Namespace.from_json(namespace_doc)
 
     package_doc = db.packages.find_one(
         {"name": package, "namespace": namespace_doc["_id"]}
@@ -752,13 +793,16 @@ def package_maintainers(namespace, package):
 
     if not package_doc:
         return jsonify({"message": "Package not found", "code": 404})
+    
+    package_obj = Package.from_json(package_doc)
 
     maintainers = []
 
-    for i in package_doc["maintainers"]:
+    for i in package_obj.maintainers:
         maintainer = db.users.find_one({"_id": i}, {"_id": 1, "username": 1})
+        maintainer_obj = User.from_json(maintainer)
         maintainers.append(
-            {"id": str(maintainer["_id"]), "username": maintainer["username"]}
+            {"id": str(maintainer_obj.id), "username": maintainer_obj.username}
         )
 
     return jsonify({"code": 200, "users": maintainers}), 200
