@@ -486,13 +486,13 @@ def get_package(namespace_name, package_name):
     package_response_data = {
         "name": package_obj.name,
         "namespace": namespace_obj.namespace,
-        "latest_version_data": package_obj.versions[-1],
+        "latest_version_data": package_obj.versions[-1].to_json(),
         "author": package_author_obj.username,
         "tags": package_obj.tags,
         "license": package_obj.license,
-        "createdAt": package_obj.createdAt,
-        "version_history": package_obj.versions,
-        "updatedAt": package_obj.updatedAt,
+        "created_at": package_obj.created_at,
+        "version_history": package_obj.to_json()["versions"],
+        "updated_at": package_obj.updated_at,
         "description": package_obj.description,
     }
 
@@ -788,7 +788,7 @@ def package_maintainers(namespace, package):
     namespace_obj = Namespace.from_json(namespace_doc)
 
     package_doc = db.packages.find_one(
-        {"name": package, "namespace": namespace_doc["_id"]}
+        {"name": package, "namespace": namespace_obj.id}
     )
 
     if not package_doc:
@@ -799,7 +799,7 @@ def package_maintainers(namespace, package):
     maintainers = []
 
     for i in package_obj.maintainers:
-        maintainer = db.users.find_one({"_id": i}, {"_id": 1, "username": 1})
+        maintainer = db.users.find_one({"_id": ObjectId(i)}, {"_id": 1, "username": 1})
         maintainer_obj = User.from_json(maintainer)
         maintainers.append(
             {"id": str(maintainer_obj.id), "username": maintainer_obj.username}
