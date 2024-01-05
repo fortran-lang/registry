@@ -59,7 +59,7 @@ class Package:
         versions = [Version.from_json(v_data) for v_data in versions_data]
 
         return Package(
-            id=str(json_data.get("id")),
+            id=str(json_data.get("_id")),
             name=json_data.get("name"),
             namespace=json_data.get("namespace"),
             description=json_data.get("description"),

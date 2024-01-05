@@ -392,7 +392,7 @@ def upload():
             return jsonify({"message": "Dry run Successful.", "code": 200}), 200
 
         db.packages.update_one(
-            {"_id": package_obj.id},
+            {"_id": ObjectId(package_obj.id)},
             {"$set": package_obj.to_json()},
         )
 
