@@ -16,9 +16,9 @@ class TestPackages(BaseTestClass):
         self.access_token = None
         self.is_created = False
         self.is_namespace_created = False
-        self.email = f"testemail@gmail.com"
+        self.email = f"testemail{random.randint(1,100)}@gmail.com"
         self.password = "123456"
-        self.username = f"testuser"
+        self.username = f"testuser{random.randint(1,100)}"
         self.test_package_data = {
             "package_name": "test_package",
             "package_version": "0.0.1",
@@ -26,7 +26,7 @@ class TestPackages(BaseTestClass):
         }
 
         self.test_namespace_data = {
-            "namespace": f"test_namespace",
+            "namespace": f"test_namespace{random.randint(1,100)}",
             "namespace_description": "Test namespace description",
         }
 
