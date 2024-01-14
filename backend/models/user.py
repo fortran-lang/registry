@@ -3,7 +3,7 @@ from datetime import datetime
 class User:
     def __init__(self, username, email, password, uuid, 
                     lastLogout=None, is_verified=False, new_email='', 
-                        login_at=None, created_at=datetime.now(), roles=[], id=None):
+                        login_at=None, created_at=datetime.now(), roles=[], author_of=[], id=None):
         self.id = id
         self.username = username
         self.email = email
@@ -15,6 +15,7 @@ class User:
         self.isVerified = is_verified
         self.newEmail = new_email
         self.roles = roles
+        self.authorOf = author_of
 
     # Create a to json method.
     def to_json(self):
@@ -28,7 +29,8 @@ class User:
             'uuid': self.uuid,
             'isVerified': self.isVerified,
             'newEmail': self.newEmail,
-            'roles': self.roles
+            'roles': self.roles,
+            'authorOf': self.authorOf
         }
     
     # Create a from json method.
@@ -45,5 +47,6 @@ class User:
             uuid=json_data.get('uuid'),
             is_verified=json_data.get('isVerified'),
             new_email=json_data.get('newEmail'),
-            roles=json_data.get('roles')
+            roles=json_data.get('roles'),
+            author_of=json_data.get('authorOf')
         )

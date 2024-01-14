@@ -13,7 +13,7 @@ class TestPackages(BaseTestClass):
 
         # This method is called before each test method
         # Reset or initialize variables here if needed
-        self.uuid = None
+        self.access_token = None
         self.is_created = False
         self.is_namespace_created = False
         self.email = f"testemail{random.randint(1,100)}@gmail.com"
@@ -50,18 +50,17 @@ class TestPackages(BaseTestClass):
             "username": self.username,
         }
         if self.is_created:
-            return self.uuid
+            return self.access_token
+        
         response_for_signup = self.client.post("/auth/signup", data=signup_data)
-        self.assertEqual(200, response_for_signup.json["code"])
-
         login_data = {"user_identifier": self.email, "password": self.password}
 
         # Login with the same user.
         response_for_login = self.client.post("/auth/login", data=login_data)
+
         self.assertEqual(200, response_for_login.json["code"])
-        self.is_created = True
-        self.uuid = response_for_login.json["uuid"]
-        return response_for_login.json["uuid"]
+        self.access_token = response_for_login.json["access_token"]
+        return response_for_login.json["access_token"]
 
     def upload(self):
         """
@@ -76,20 +75,22 @@ class TestPackages(BaseTestClass):
         Raises:
         AssertionError: If the response code received from the server is not as expected.
         """
-        uuid = self.login()
-        self.test_namespace_data["uuid"] = uuid
+        access_token = self.login()
+
+        headers = {"Authorization": f"Bearer {access_token}"}
 
         # Try to create a namespace.
         if not self.is_namespace_created:
-            response = self.client.post("/namespaces", data=self.test_namespace_data)
+            response = self.client.post("/namespaces", data=self.test_namespace_data, headers=headers)
             self.assertEqual(200, response.json["code"])
             self.is_namespace_created = True
 
         # Create an upload token for the namespace.
         response = self.client.post(
             f"/namespaces/{self.test_namespace_data['namespace']}/uploadToken",
-            data={"uuid": uuid},
+            headers=headers,
         )
+
         self.assertEqual(200, response.json["code"])
 
         upload_token = response.json["uploadToken"]
@@ -104,6 +105,7 @@ class TestPackages(BaseTestClass):
                 "dry_run": "false",
                 "tarball": ("static/registry.tar.gz", "package.tar.gz"),
             },
+            headers=headers,
         )
 
         response.json["uploadToken"] = upload_token
@@ -372,7 +374,7 @@ class TestPackages(BaseTestClass):
         """
 
         # create a user
-        uuid = self.login()
+        access_token = self.login()
 
         # Upload the package.
         response = self.upload()
@@ -380,7 +382,7 @@ class TestPackages(BaseTestClass):
 
         response = self.client.get(
             f"/packages/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}/maintainers",
-            data={"uuid": uuid},
+            headers={"Authorization": f"Bearer {access_token}"},
         )
         self.assertEqual(200, response.json["code"])
         print("test_package_maintainers passed")
