@@ -17,8 +17,6 @@ import math
 import semantic_version
 from license_expression import get_spdx_licensing
 
-# from validate_package import validate
-
 
 parameters = {
     "name": "name",
@@ -973,7 +971,7 @@ def view_report():
                     del report["isViewed"]
                     non_viewed_reports.append(report)
 
-        return jsonify({"message": "Malicious Reports", "code": 200, "reports": non_viewed_reports}), 200
+        return jsonify({"message": "Malicious Reports fetched Successfully", "code": 200, "reports": non_viewed_reports}), 200
 
 
     return jsonify({"message": "Unauthorized", "code": 401}), 401
