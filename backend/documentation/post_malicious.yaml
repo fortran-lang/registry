@@ -1,0 +1,68 @@
+description: stores the malicious reports from the user for packages.
+parameters:
+  - name: uuid
+    in: formData
+    description: The uuid of the user
+    required: true
+    type: string
+  - name: reason
+    in: formData
+    description: reason for reporting the package.
+    required: true
+    type: string
+  - name: namespace
+    in: url
+    description: namespace of the package to be reported
+    required: true
+    type: string
+  - name: package
+    in: url
+    description: package to be reported
+    required: true
+    type: string
+
+responses:
+  200:
+    description: Malicious Report Submitted Successfully or Malicious Report Updated Successfully
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response status code
+        message:
+          type: string
+          description: Malicious Report Submitted Successfully or Malicious Report Updated Successfully
+  404:
+    description: User not found
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response status code
+        message:
+          type: string
+          description: User not found or Namespace not found or Package not found
+  400:
+    description: User not found
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response status code
+        message:
+          type: string
+          description: Reason should atleast be 10 characters or Reason is missing
+  401:
+    description: Unauthorized
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response status code
+        message:
+          type: string
+          description: Error message
