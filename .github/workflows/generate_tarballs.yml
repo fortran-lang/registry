@@ -38,5 +38,5 @@ jobs:
       - name: Archives
         uses: actions/upload-artifact@v2
         with:
-          name: registry_database
+          name: Registry Database Archive
           path: backend/static/

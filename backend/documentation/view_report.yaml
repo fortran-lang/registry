@@ -1,0 +1,35 @@
+description: Shows the malicious reports of the various packages to the Admin only
+parameters:
+  - name: uuid
+    in: formData
+    description: The uuid of the user
+    required: true
+    type: string
+
+
+responses:
+  200:
+    description: Malicious Reports fetched Successfully
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response status code
+        message:
+          type: string
+          description: Response message
+        reports:
+          type: list
+          description: objects of malicious reports with thier packages,namespaces,reporters.
+  401:
+    description: Unauthorized
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response status code
+        message:
+          type: string
+          description: Unauthorized
