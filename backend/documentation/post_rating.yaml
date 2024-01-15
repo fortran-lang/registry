@@ -1,0 +1,68 @@
+description: stores the ratings from the user for packages.
+parameters:
+  - name: uuid
+    in: formData
+    description: The uuid of the user
+    required: true
+    type: string
+  - name: rating
+    in: formData
+    description: ratings for the package.
+    required: true
+    type: integer
+  - name: namespace
+    in: url
+    description: namespace of the package
+    required: true
+    type: string
+  - name: package
+    in: url
+    description: package to be rated
+    required: true
+    type: string
+
+responses:
+  200:
+    description: Ratings Submitted Successfully or Ratings Updated Successfully
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response status code
+        message:
+          type: string
+          description: Ratings Submitted Successfully or Ratings Updated Successfully
+  404:
+    description: User not found
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response status code
+        message:
+          type: string
+          description: User not found or Namespace not found or Package not found
+  400:
+    description: Rating is missing
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response status code
+        message:
+          type: string
+          description: Rating is missing or Rating should be between 1 and 5
+  401:
+    description: Unauthorized
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response status code
+        message:
+          type: string
+          description: Error message
