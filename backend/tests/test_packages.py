@@ -4,6 +4,10 @@ from server import app
 from packages import check_token_expiry
 from datetime import datetime
 import random
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 class TestPackages(BaseTestClass):
@@ -384,3 +388,189 @@ class TestPackages(BaseTestClass):
         )
         self.assertEqual(200, response.json["code"])
         print("test_package_maintainers passed")
+    
+    def test_successful_rating_submit(self):
+        """
+        Test case to verify the behaviour of the system when a user tries to submit rating to a package successfully.
+
+        Parameters:
+        None
+
+        Returns:
+        None
+
+        Raises:
+        AssertionError: If the response code received from the server is not as expected.
+        """
+        uuid = self.login()
+        self.assertEqual(200, response["code"])
+        response = self.client.get(
+            f"/ratings/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}",
+            data={"uuid": uuid,"rating":5},
+        )
+        self.assertEqual(200, response.json["code"])
+        print("test_successful_rating_submit passed")
+
+    def test_unsuccessful_rating_invalid_submit(self):
+        """
+        Test case to verify the behaviour of the system when a user tries to submit invalid rating to a package successfully.
+
+        Parameters:
+        None
+
+        Returns:
+        None
+
+        Raises:
+        AssertionError: If the response code received from the server is not as expected.
+        """
+        uuid = self.login()
+        self.assertEqual(200, response["code"])
+        response = self.client.get(
+            f"/ratings/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}",
+            data={"uuid": uuid,"rating":-1},
+        )
+        self.assertEqual(400, response.json["code"])
+        print("test_unsuccessful_rating_invalid_submit passed")
+
+    def test_unsuccessful_rating_invalid_uuid_submit(self):
+        """
+        Test case to verify the behaviour of the system when a user tries to submit valid rating to a package successfully with invalid uuid
+
+        Parameters:
+        None
+
+        Returns:
+        None
+
+        Raises:
+        AssertionError: If the response code received from the server is not as expected.
+        """
+        uuid = self.login()
+        self.assertEqual(200, response["code"])
+        response = self.client.get(
+            f"/ratings/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}",
+            data={"uuid": "uuid","rating":5},
+        )
+        self.assertEqual(404, response.json["code"])
+        print("test_unsuccessful_rating_invalid_uuid_submit passed")
+
+    def test_successful_post_malicious(self):
+        """
+        Test case to verify the behaviour of the system when a user tries to submit malicious report to a package successfully
+
+        Parameters:
+        None
+
+        Returns:
+        None
+
+        Raises:
+        AssertionError: If the response code received from the server is not as expected.
+        """
+        uuid = self.login()
+        self.assertEqual(200, response["code"])
+        response = self.client.get(
+            f"/report/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}",
+            data={"uuid": uuid,"reason":"the package is found to be malicious"},
+        )
+        self.assertEqual(200, response.json["code"])
+        print("test_successful_post_malicious passed")
+
+    def test_unsuccessful_post_malicious_invalid_uuid(self):
+        """
+        Test case to verify the behaviour of the system when a user tries to submit malicious report to a package successfully with invalid uuid
+
+        Parameters:
+        None
+
+        Returns:
+        None
+
+        Raises:
+        AssertionError: If the response code received from the server is not as expected.
+        """
+        uuid = self.login()
+        self.assertEqual(200, response["code"])
+        response = self.client.get(
+            f"/report/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}",
+            data={"uuid": "uuid","reason":"the package is found to be malicious"},
+        )
+        self.assertEqual(404, response.json["code"])
+        print("test_unsuccessful_post_malicious_invalid_uuid passed")
+
+    def test_unsuccessful_post_malicious_short_reason(self):
+        """
+        Test case to verify the behaviour of the system when a user tries to submit malicious report to a package successfully with invalid reason
+
+        Parameters:
+        None
+
+        Returns:
+        None
+
+        Raises:
+        AssertionError: If the response code received from the server is not as expected.
+        """
+        uuid = self.login()
+        self.assertEqual(200, response["code"])
+        response = self.client.get(
+            f"/report/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}",
+            data={"uuid": "uuid","reason":"package"},
+        )
+        self.assertEqual(400, response.json["code"])
+        print("test_unsuccessful_post_malicious_short_reason passed")
+
+    def test_successful_fetch_malicious_reports(self):
+        """
+        Test case to verify the behaviour of the system when a sudo user tries fetch the malicious reports successfully
+
+        Parameters:
+        None
+
+        Returns:
+        None
+
+        Raises:
+        AssertionError: If the response code received from the server is not as expected.
+        """
+
+        signup_data = {
+            "email": self.email,
+            "password": self.password,
+            "username": self.username,
+        }
+        if self.is_created:
+            return self.uuid
+        response_for_signup = self.client.post("/auth/signup", data=signup_data)
+        self.assertEqual(200, response_for_signup.json["code"])
+
+        login_data = {"user_identifier": self.email, "password": self.password}
+
+        response_for_login = self.client.post("/auth/login", data=login_data)
+        self.assertEqual(200, response_for_login.json["code"])
+        uuid = response_for_login.json["uuid"]
+        self.assertEqual(200, response["code"])
+        response = self.client.get("/report/view",data={"uuid": uuid})
+        self.assertEqual(200, response.json["code"])
+        print("test_successful_fetch_malicious_reports passed")
+
+    def test_unsuccessful_fetch_malicious_reports(self):
+        """
+        Test case to verify the behaviour of the system when a sudo user tries fetch the malicious reports successfully with invalid uuid
+
+        Parameters:
+        None
+
+        Returns:
+        None
+
+        Raises:
+        AssertionError: If the response code received from the server is not as expected.
+        """
+
+        uuid = self.login()
+        self.assertEqual(200, response["code"])
+        response = self.client.get("/report/view",data={"uuid": uuid})
+        self.assertEqual(401, response.json["code"])
+        print("test_unsuccessful_fetch_malicious_reports passed")
