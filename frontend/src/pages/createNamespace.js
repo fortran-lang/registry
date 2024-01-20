@@ -12,7 +12,7 @@ import "react-toastify/dist/ReactToastify.css";
 const NamespaceForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const uuid = useSelector((state) => state.auth.uuid);
+  const accessToken = useSelector((state) => state.auth.accessToken);
   const isLoading = useSelector((state) => state.createNamespace.isLoading);
   const message = useSelector((state) => state.createNamespace.message);
   const statuscode = useSelector((state) => state.createNamespace.statuscode);
@@ -30,7 +30,7 @@ const NamespaceForm = () => {
   useEffect(() => {
     if (statuscode === 200) {
       toast.success(message, {
-        onClose: () => navigate("/manage/projects")
+        onClose: () => navigate("/manage/projects"),
       });
     } else if (statuscode !== 0 && statuscode !== 200) {
       toast.error(message, toast_css);
@@ -38,15 +38,15 @@ const NamespaceForm = () => {
   }, [statuscode]);
 
   useEffect(() => {
-    if (uuid === null) {
+    if (accessToken === null) {
       navigate("/");
     }
-  }, [uuid]);
+  }, [accessToken]);
 
   const [data, setData] = useState({
     namespace: "",
     namespace_description: "",
-    uuid: uuid,
+    accessToken: accessToken,
   });
 
   const handleChange = (event) => {

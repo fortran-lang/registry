@@ -10,7 +10,6 @@ export const createNamespace = (data) => async (dispatch) => {
   });
 
   let formData = new FormData();
-  formData.append("uuid", data.uuid);
   formData.append("namespace", data.namespace);
   formData.append("namespace_description", data.namespace_description);
 
@@ -19,6 +18,9 @@ export const createNamespace = (data) => async (dispatch) => {
       method: "post",
       url: `${process.env.REACT_APP_REGISTRY_API_URL}/namespaces`,
       data: formData,
+      headers: {
+        Authorization: `Bearer ${data.accessToken}`,
+      },
     });
 
     if (result.data.code === 200) {
