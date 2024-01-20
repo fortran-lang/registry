@@ -17,7 +17,8 @@ const authTransform = createTransform(
     return {
       isAuthenticated: inboundState.isAuthenticated,
       username: inboundState.username,
-      uuid: inboundState.uuid,
+      accessToken: inboundState.accessToken,
+      refreshToken: inboundState.refreshToken,
     };
   },
   // Transform state on its way back from storage to be rehydrated
