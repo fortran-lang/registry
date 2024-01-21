@@ -2,9 +2,9 @@ name: Run Tests for Backend
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
   workflow_dispatch:
 
 jobs:
@@ -15,10 +15,13 @@ jobs:
     - name: Checkout page source
       uses: actions/checkout@v4
 
-    - name: Build the Docker image and run tests
-      run: docker compose -f "backend/compose.test.yaml" up -d
+      - name: Build the Docker image and run tests
+        run: docker compose -f "backend/compose.test.yaml" up -d
 
-    - name: Print Logs for Container
-      run: |
-        export CONTAINER_ID=$(docker ps -aqf "name=ci") 
-        `docker logs -f $CONTAINER_ID` | grep -i "FAILED" && exit 1 || exit 0
+      - name: Print Logs for Container
+        run: |
+          export CONTAINER_ID=$(docker ps -aqf "name=backend-test_ci-1") 
+          docker logs -f $CONTAINER_ID 2>&1 | grep -i "FAILED" && exit 1 || exit 0
+
+      - name: Stop and remove the container
+        run: docker compose -f "backend/compose.test.yaml" down

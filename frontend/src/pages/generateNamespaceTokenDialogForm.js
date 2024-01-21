@@ -9,7 +9,7 @@ import {
 
 const GenerateNamespaceTokenDialogForm = (props) => {
   const [validationError, setValidationError] = useState("");
-  const uuid = useSelector((state) => state.auth.uuid);
+  const accessToken = useSelector((state) => state.auth.accessToken);
   const successMessage = useSelector(
     (state) => state.generateNamespaceToken.successMessage
   );
@@ -33,7 +33,7 @@ const GenerateNamespaceTokenDialogForm = (props) => {
 
     dispatch(
       generateToken({
-        uuid: uuid,
+        accessToken: accessToken,
         namespace: props.namespace,
       })
     );
@@ -45,8 +45,8 @@ const GenerateNamespaceTokenDialogForm = (props) => {
   };
 
   const validateForm = () => {
-    if (!uuid) {
-      setValidationError("uuid is required");
+    if (!accessToken) {
+      setValidationError("Access token is required");
       return false;
     }
 

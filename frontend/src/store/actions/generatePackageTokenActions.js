@@ -8,7 +8,6 @@ export const RESET_MESSAGE = "RESET_ERROR_MESSAGE";
 
 export const generatePackageToken = (data) => async (dispatch) => {
   let formData = new FormData();
-  formData.append("uuid", data.uuid);
 
   try {
     dispatch({
@@ -19,6 +18,9 @@ export const generatePackageToken = (data) => async (dispatch) => {
       method: "post",
       url: `${process.env.REACT_APP_REGISTRY_API_URL}/packages/${data.namespace}/${data.package}/uploadToken`,
       data: formData,
+      headers: {
+        Authorization: `Bearer ${data.accessToken}`,
+      },
     });
 
     if (result.data.code === 200) {

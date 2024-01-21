@@ -8,12 +8,13 @@ import {
   RESET_ERROR_MESSAGE,
   LOGIN_REQUEST,
   SIGNUP_REQUEST,
-  LOGOUT_REQUEST
+  LOGOUT_REQUEST,
 } from "../actions/authActions";
 
 const initialState = {
   isAuthenticated: false,
-  uuid: null,
+  accessToken: null,
+  refreshToken: null,
   error: null,
   username: null,
   isLoading: false,
@@ -26,24 +27,25 @@ const authReducer = (state = initialState, action) => {
       return {
         ...state,
         isLoading: true,
-        error: '',
+        error: "",
       };
-      case LOGOUT_REQUEST:
-        return {
-          ...state,
-          isLoading: true,
-        };
-      case SIGNUP_REQUEST:
+    case LOGOUT_REQUEST:
       return {
         ...state,
         isLoading: true,
-        error: '',
+      };
+    case SIGNUP_REQUEST:
+      return {
+        ...state,
+        isLoading: true,
+        error: "",
       };
     case LOGIN_SUCCESS:
       return {
         ...state,
         isAuthenticated: true,
-        uuid: action.payload.uuid,
+        accessToken: action.payload.accessToken,
+        refreshToken: action.payload.refreshToken,
         username: action.payload.username,
         isLoading: false,
       };

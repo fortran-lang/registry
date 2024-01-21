@@ -76,7 +76,7 @@ const PackagePage = () => {
 
       <p style={{ textAlign: "left", fontSize: 16 }}>
         v{data.latest_version_data.version} Published{" "}
-        {updatedDays(data.updatedAt)} days ago
+        {updatedDays(data.updated_at)} days ago
       </p>
       <MDBTabs className="mb-3">
         <MDBTabsItem>
@@ -162,7 +162,7 @@ const PackagePage = () => {
                           </a>
                         </td>
                         <td colSpan={3}>
-                          {updatedDays(ver.createdAt)} Days ago
+                          {updatedDays(ver.created_at)} Days ago
                         </td>
                         <td colSpan={3}>
                           {ver.isDeprecated === "true" ? "Yes" : "No"}
@@ -234,10 +234,10 @@ const sideBar = (data) => {
         fpm install {data.namespace}/{data.name}
       </code>
       <p style={{ fontSize: 16, textAlign: "left" }}>Repository</p>
-      <Container> { data.repository }</Container>
+      <Container> {data.repository}</Container>
       <hr></hr>
       <p style={{ fontSize: 16, textAlign: "left" }}>Homepage</p>
-      <Container>{ data.homepage }</Container>
+      <Container>{data.homepage}</Container>
       <hr></hr>
       <p style={{ fontSize: 16, textAlign: "left" }}>License</p>
       {data.license}
@@ -246,7 +246,7 @@ const sideBar = (data) => {
       {data.latest_version_data.version}
       <hr></hr>
       <p style={{ fontSize: 16, textAlign: "left" }}>Last publish</p>
-      {updatedDays(data.updatedAt)} days ago
+      {updatedDays(data.updated_at)} days ago
       <hr></hr>
     </MDBCol>
   );
