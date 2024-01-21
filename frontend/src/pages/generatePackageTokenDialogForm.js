@@ -9,7 +9,7 @@ import {
 
 const GeneratePackageTokenDialogForm = (props) => {
   const [validationError, setValidationError] = useState("");
-  const uuid = useSelector((state) => state.auth.uuid);
+  const accessToken = useSelector((state) => state.auth.accessToken);
   const successMessage = useSelector(
     (state) => state.generatePackageToken.successMessage
   );
@@ -33,7 +33,7 @@ const GeneratePackageTokenDialogForm = (props) => {
 
     dispatch(
       generatePackageToken({
-        uuid: uuid,
+        accessToken: accessToken,
         namespace: props.namespace,
         package: props.package,
       })
@@ -46,8 +46,8 @@ const GeneratePackageTokenDialogForm = (props) => {
   };
 
   const validateForm = () => {
-    if (!uuid) {
-      setValidationError("uuid is required");
+    if (!accessToken) {
+      setValidationError("Access token is required");
       return false;
     }
 
