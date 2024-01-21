@@ -16,6 +16,15 @@ class Package:
         self.tags = tags
         self.is_deprecated = is_deprecated
         self.versions = versions
+        self.malicious_report  = {}
+        self.is_verified = False
+        self.is_malicious = False
+        self.security_status = "No security issues found"
+        self.downloads_stats = {}
+        self.ratings = {
+            "users": {},
+            "avg_ratings": 0,
+        }
 
         # Ensure that versions list only contains instances of Version class
         for v in self.versions:
@@ -46,7 +55,12 @@ class Package:
             "maintainers": maintainers_json,
             "tags": self.tags,
             "is_deprecated": self.is_deprecated,
-            "versions": versions_json
+            "versions": versions_json,
+            "malicious_report": self.malicious_report,
+            "is_verified": self.is_verified,
+            "is_malicious": self.is_malicious,
+            "security_status": self.security_status,
+            "ratings": self.ratings,
         }
     
     # Create a from_json method.
@@ -73,7 +87,12 @@ class Package:
             maintainers=json_data.get("maintainers"),
             tags=json_data.get("tags"),
             is_deprecated=json_data.get("is_deprecated"),
-            versions=versions
+            versions=versions,
+            malicious_report=json_data.get("malicious_report"),
+            is_verified=json_data.get("is_verified"),
+            is_malicious=json_data.get("is_malicious"),
+            security_status=json_data.get("security_status"),
+            ratings=json_data.get("ratings"),
         )
     
 class Version:
@@ -84,6 +103,7 @@ class Version:
         self.created_at = created_at
         self.is_deprecated = is_deprecated
         self.download_url = download_url
+        self.is_verified = False
 
     # Create a to_json method.
     def to_json(self):
@@ -93,7 +113,8 @@ class Version:
             "dependencies": self.dependencies,
             "created_at": self.created_at,
             "is_deprecated": self.is_deprecated,
-            "download_url": self.download_url
+            "download_url": self.download_url,
+            "is_verified": self.is_verified,
         }
     
     # Create a from_json method.
@@ -105,5 +126,6 @@ class Version:
             dependencies=json_data.get("dependencies"),
             created_at=json_data.get("created_at"),
             is_deprecated=json_data.get("is_deprecated"),
-            download_url=json_data.get("download_url")
+            download_url=json_data.get("download_url"),
+            is_verified=json_data.get("is_verified"),
         )

@@ -378,8 +378,6 @@ def upload():
             created_at=datetime.utcnow(),
             is_deprecated=False,
             download_url=f"/tarballs/{file_object_id}",
-            # "download_url_zip": f"/tarballs/{zipfile_object_id}",
-            # "download_url_tar": f"/tarballs/{tarfile_object_id}",
         )
 
 
@@ -514,6 +512,8 @@ def get_package(namespace_name, package_name):
         "version_history": package_obj.to_json()["versions"],
         "updated_at": package_obj.updated_at,
         "description": package_obj.description,
+        "ratings": round(sum(package_obj.ratings['users'].values())/len(package_obj.ratings['users']),3),
+        "downloads": package_obj.downloads_stats,
     }
 
     return jsonify({"data": package_response_data, "code": 200})
@@ -793,6 +793,9 @@ def create_token_upload_token_package(namespace_name, package_name):
 @jwt_required()
 def package_maintainers(namespace, package):
     uuid = get_jwt_identity()
+    if not uuid:
+        return jsonify({"code": 401, "message": "Unauthorized"}), 401
+    
     user = db.users.find_one({"uuid": uuid})
 
     if not user:
