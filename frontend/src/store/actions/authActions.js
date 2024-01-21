@@ -30,7 +30,8 @@ export const login = (user_identifier, password) => async (dispatch) => {
       dispatch({
         type: LOGIN_SUCCESS,
         payload: {
-          uuid: result.data.uuid,
+          accessToken: result.data.access_token,
+          refreshToken: result.data.refresh_token,
           username: result.data.username,
         },
       });
@@ -57,21 +58,17 @@ export const LOGOUT_SUCCESS = "LOGOUT_SUCCESS";
 export const LOGOUT_FAILURE = "LOGOUT_FAILURE";
 export const LOGOUT_REQUEST = "LOGOUT_REQUEST";
 
-export const logout = (uuid) => async (dispatch) => {
+export const logout = (accessToken) => async (dispatch) => {
   dispatch({
     type: LOGOUT_REQUEST,
   });
-  let formData = new FormData();
-
-  formData.append("uuid", uuid);
 
   try {
     let result = await axios({
       method: "post",
       url: `${process.env.REACT_APP_REGISTRY_API_URL}/auth/logout`,
-      data: formData,
       headers: {
-        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${accessToken}`,
       },
     });
 

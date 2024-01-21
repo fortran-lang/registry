@@ -18,14 +18,14 @@ const NavbarComponent = () => {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const isAdmin = useSelector((state) => state.admin.isAdmin);
   const username = useSelector((state) => state.auth.username);
-  const uuid = useSelector((state) => state.auth.uuid);
+  const accessToken = useSelector((state) => state.auth.accessToken);
 
   useEffect(() => {
-    dispatch(adminAuth(uuid));
-  }, [isAuthenticated, uuid]);
+    dispatch(adminAuth(accessToken));
+  }, [isAuthenticated, accessToken]);
 
   const signOut = () => {
-    dispatch(logout(uuid));
+    dispatch(logout(accessToken));
   };
 
   return (
