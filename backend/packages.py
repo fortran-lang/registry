@@ -793,8 +793,6 @@ def create_token_upload_token_package(namespace_name, package_name):
 @jwt_required()
 def package_maintainers(namespace, package):
     uuid = get_jwt_identity()
-    if not uuid:
-        return jsonify({"code": 401, "message": "Unauthorized"}), 401
     
     user = db.users.find_one({"uuid": uuid})
 
@@ -866,9 +864,6 @@ def post_ratings(namespace, package):
     uuid = get_jwt_identity()
     rating = request.form.get("rating")
 
-    if not uuid:
-        return jsonify({"code": 401, "message": "Unauthorized"}), 401
-
     if not rating:
         return jsonify({"code": 400, "message": "Rating is missing"}), 400
 
@@ -931,9 +926,6 @@ def post_ratings(namespace, package):
 def post_malicious(namespace, package):
     uuid = get_jwt_identity()
     reason = request.form.get("reason")
-
-    if not uuid:
-        return jsonify({"code": 401, "message": "Unauthorized"}), 401
 
     if not reason:
         return jsonify({"code": 400, "message": "Reason is missing"}), 400
@@ -998,10 +990,7 @@ def post_malicious(namespace, package):
 def view_report():
     uuid = get_jwt_identity()
 
-    if not uuid:
-        return jsonify({"message": "Unauthorized", "code": 401}), 401
-    else:
-        user = db.users.find_one({"uuid": uuid})
+    user = db.users.find_one({"uuid": uuid})
 
     if "admin" in user["roles"]:
         non_viewed_reports = list()
