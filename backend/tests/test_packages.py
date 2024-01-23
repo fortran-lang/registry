@@ -320,6 +320,7 @@ class TestPackages(BaseTestClass):
         response = self.client.get(
             f"/packages/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}/0.0.1"
         )
+        print(response.json["message"])
         self.assertEqual(200, response.json["code"])
         print("test_get_existing_package_version passed")
 
