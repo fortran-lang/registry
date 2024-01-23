@@ -166,6 +166,7 @@ def upload():
     package_name = request.form.get("package_name")
     package_version = request.form.get("package_version")
     package_license = request.form.get("package_license")
+    homepage = request.form.get("homepage")
     dry_run = request.form.get("dry_run")
     tarball = request.files["tarball"]
 
@@ -302,7 +303,7 @@ def upload():
                 name=package_name,
                 namespace=namespace_obj.id,
                 description=package_data["description"],
-                homepage=package_data["homepage"],
+                homepage=homepage,
                 repository=package_data["repository"],
                 copyright=package_data["copyright"],
                 license=package_license,

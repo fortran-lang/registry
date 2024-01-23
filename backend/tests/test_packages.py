@@ -27,6 +27,7 @@ class TestPackages(BaseTestClass):
             "package_name": "test_package",
             "package_version": "0.0.1",
             "package_license": "MIT",
+            "homepage":"fortran-lang.org"
         }
 
         self.test_namespace_data = {
@@ -407,9 +408,9 @@ class TestPackages(BaseTestClass):
         AssertionError: If the response code received from the server is not as expected.
         """
         access_token = self.login()
-        self.assertEqual(200, response["code"])
-        response = self.client.get(
+        response = self.client.post(
             f"/ratings/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}",
+            content_type="multipart/form-data",
             data={"rating":5},  headers={"Authorization": f"Bearer {access_token}"},
         )
         self.assertEqual(200, response.json["code"])
@@ -429,9 +430,9 @@ class TestPackages(BaseTestClass):
         AssertionError: If the response code received from the server is not as expected.
         """
         access_token = self.login()
-        self.assertEqual(200, response["code"])
-        response = self.client.get(
+        response = self.client.post(
             f"/ratings/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}",
+            content_type="multipart/form-data",
             data={"rating":-1},  headers={"Authorization": f"Bearer {access_token}"},
         )
         self.assertEqual(400, response.json["code"])
@@ -451,12 +452,12 @@ class TestPackages(BaseTestClass):
         AssertionError: If the response code received from the server is not as expected.
         """
         access_token = self.login()
-        self.assertEqual(200, response["code"])
-        response = self.client.get(
+        response = self.client.post(
             f"/ratings/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}",
+            content_type="multipart/form-data",
             data={"rating":5},  headers={"Authorization": f"Bearer access_token"},
         )
-        self.assertEqual(404, response.json["code"])
+        self.assertEqual("Not enough segments", response.json["msg"])
         print("test_unsuccessful_rating_invalid_access_token_submit passed")
 
     def test_successful_post_malicious(self):
@@ -473,11 +474,12 @@ class TestPackages(BaseTestClass):
         AssertionError: If the response code received from the server is not as expected.
         """
         access_token = self.login()
-        self.assertEqual(200, response["code"])
         response = self.client.post(
             f"/report/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}",
+            content_type="multipart/form-data",
             data={"reason":"the package is found to be malicious"},  headers={"Authorization": f"Bearer {access_token}"},
         )
+        print("test_successful_post_malicious response", response.json)
         self.assertEqual(200, response.json["code"])
         print("test_successful_post_malicious passed")
 
@@ -495,12 +497,12 @@ class TestPackages(BaseTestClass):
         AssertionError: If the response code received from the server is not as expected.
         """
         access_token = self.login()
-        self.assertEqual(200, response["code"])
-        response = self.client.get(
+        response = self.client.post(
             f"/report/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}",
+            content_type="multipart/form-data",
             data={"reason":"the package is found to be malicious"},  headers={"Authorization": f"Bearer access_token"},
         )
-        self.assertEqual(404, response.json["code"])
+        self.assertEqual("Not enough segments", response.json["msg"])
         print("test_unsuccessful_post_malicious_invalid_access_token passed")
 
     def test_unsuccessful_post_malicious_short_reason(self):
@@ -517,9 +519,9 @@ class TestPackages(BaseTestClass):
         AssertionError: If the response code received from the server is not as expected.
         """
         access_token = self.login()
-        self.assertEqual(200, response["code"])
-        response = self.client.get(
+        response = self.client.post(
             f"/report/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}",
+            content_type="multipart/form-data",
             data={"reason":"package"},  headers={"Authorization": f"Bearer {access_token}"},
         )
         self.assertEqual(400, response.json["code"])
@@ -539,22 +541,7 @@ class TestPackages(BaseTestClass):
         AssertionError: If the response code received from the server is not as expected.
         """
 
-        signup_data = {
-            "email": self.email,
-            "password": self.password,
-            "username": self.username,
-        }
-        if self.is_created:
-            return self.access_token
-        response_for_signup = self.client.post("/auth/signup", data=signup_data)
-        self.assertEqual(200, response_for_signup.json["code"])
-
-        login_data = {"user_identifier": self.email, "password": self.password}
-
-        response_for_login = self.client.post("/auth/login", data=login_data)
-        self.assertEqual(200, response_for_login.json["code"])
-        access_token = response_for_login.json["access_token"]
-        self.assertEqual(200, response["code"])
+        access_token = self.login() # create a sudo user
         response = self.client.get("/report/view",headers={"Authorization": f"Bearer {access_token}"})
         self.assertEqual(200, response.json["code"])
         print("test_successful_fetch_malicious_reports passed")
@@ -574,7 +561,6 @@ class TestPackages(BaseTestClass):
         """
 
         access_token = self.login()
-        self.assertEqual(200, response["code"])
         response = self.client.get("/report/view",headers={"Authorization": f"Bearer {access_token}"})
         self.assertEqual(401, response.json["code"])
         print("test_unsuccessful_fetch_malicious_reports passed")
