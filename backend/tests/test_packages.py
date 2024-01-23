@@ -57,6 +57,8 @@ class TestPackages(BaseTestClass):
             return self.access_token
         
         response_for_signup = self.client.post("/auth/signup", data=signup_data)
+        self.assertEqual(200, response_for_signup.json["code"])
+        self.is_created = True
         login_data = {"user_identifier": self.email, "password": self.password}
 
         # Login with the same user.
@@ -404,11 +406,11 @@ class TestPackages(BaseTestClass):
         Raises:
         AssertionError: If the response code received from the server is not as expected.
         """
-        uuid = self.login()
+        access_token = self.login()
         self.assertEqual(200, response["code"])
         response = self.client.get(
             f"/ratings/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}",
-            data={"uuid": uuid,"rating":5},
+            data={"rating":5},  headers={"Authorization": f"Bearer {access_token}"},
         )
         self.assertEqual(200, response.json["code"])
         print("test_successful_rating_submit passed")
@@ -426,11 +428,11 @@ class TestPackages(BaseTestClass):
         Raises:
         AssertionError: If the response code received from the server is not as expected.
         """
-        uuid = self.login()
+        access_token = self.login()
         self.assertEqual(200, response["code"])
         response = self.client.get(
             f"/ratings/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}",
-            data={"uuid": uuid,"rating":-1},
+            data={"rating":-1},  headers={"Authorization": f"Bearer {access_token}"},
         )
         self.assertEqual(400, response.json["code"])
         print("test_unsuccessful_rating_invalid_submit passed")
@@ -448,11 +450,11 @@ class TestPackages(BaseTestClass):
         Raises:
         AssertionError: If the response code received from the server is not as expected.
         """
-        uuid = self.login()
+        access_token = self.login()
         self.assertEqual(200, response["code"])
         response = self.client.get(
             f"/ratings/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}",
-            data={"uuid": "uuid","rating":5},
+            data={"rating":5},  headers={"Authorization": f"Bearer access_token"},
         )
         self.assertEqual(404, response.json["code"])
         print("test_unsuccessful_rating_invalid_uuid_submit passed")
@@ -470,11 +472,11 @@ class TestPackages(BaseTestClass):
         Raises:
         AssertionError: If the response code received from the server is not as expected.
         """
-        uuid = self.login()
+        access_token = self.login()
         self.assertEqual(200, response["code"])
-        response = self.client.get(
+        response = self.client.post(
             f"/report/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}",
-            data={"uuid": uuid,"reason":"the package is found to be malicious"},
+            data={"reason":"the package is found to be malicious"},  headers={"Authorization": f"Bearer {access_token}"},
         )
         self.assertEqual(200, response.json["code"])
         print("test_successful_post_malicious passed")
@@ -492,11 +494,11 @@ class TestPackages(BaseTestClass):
         Raises:
         AssertionError: If the response code received from the server is not as expected.
         """
-        uuid = self.login()
+        access_token = self.login()
         self.assertEqual(200, response["code"])
         response = self.client.get(
             f"/report/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}",
-            data={"uuid": "uuid","reason":"the package is found to be malicious"},
+            data={"reason":"the package is found to be malicious"},  headers={"Authorization": f"Bearer access_token"},
         )
         self.assertEqual(404, response.json["code"])
         print("test_unsuccessful_post_malicious_invalid_uuid passed")
@@ -514,11 +516,11 @@ class TestPackages(BaseTestClass):
         Raises:
         AssertionError: If the response code received from the server is not as expected.
         """
-        uuid = self.login()
+        access_token = self.login()
         self.assertEqual(200, response["code"])
         response = self.client.get(
             f"/report/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}",
-            data={"uuid": "uuid","reason":"package"},
+            data={"reason":"package"},  headers={"Authorization": f"Bearer {access_token}"},
         )
         self.assertEqual(400, response.json["code"])
         print("test_unsuccessful_post_malicious_short_reason passed")
@@ -543,7 +545,7 @@ class TestPackages(BaseTestClass):
             "username": self.username,
         }
         if self.is_created:
-            return self.uuid
+            return self.access_token
         response_for_signup = self.client.post("/auth/signup", data=signup_data)
         self.assertEqual(200, response_for_signup.json["code"])
 
@@ -551,9 +553,9 @@ class TestPackages(BaseTestClass):
 
         response_for_login = self.client.post("/auth/login", data=login_data)
         self.assertEqual(200, response_for_login.json["code"])
-        uuid = response_for_login.json["uuid"]
+        access_token = response_for_login.json["access_token"]
         self.assertEqual(200, response["code"])
-        response = self.client.get("/report/view",data={"uuid": uuid})
+        response = self.client.get("/report/view",headers={"Authorization": f"Bearer {access_token}"})
         self.assertEqual(200, response.json["code"])
         print("test_successful_fetch_malicious_reports passed")
 
@@ -571,8 +573,8 @@ class TestPackages(BaseTestClass):
         AssertionError: If the response code received from the server is not as expected.
         """
 
-        uuid = self.login()
+        access_token = self.login()
         self.assertEqual(200, response["code"])
-        response = self.client.get("/report/view",data={"uuid": uuid})
+        response = self.client.get("/report/view",headers={"Authorization": f"Bearer {access_token}"})
         self.assertEqual(401, response.json["code"])
         print("test_unsuccessful_fetch_malicious_reports passed")
