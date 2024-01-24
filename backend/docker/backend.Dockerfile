@@ -1,5 +1,5 @@
 # Prod environment
-FROM --platform=$BUILDPLATFORM python:3.10-alpine AS builder
+FROM --platform=$BUILDPLATFORM python:3.10.13-bookworm AS builder
 
 WORKDIR /src
 COPY requirements.txt /src
