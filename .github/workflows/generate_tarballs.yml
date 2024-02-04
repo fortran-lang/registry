@@ -1,0 +1,42 @@
+# Github action to generate  of the registry database archives
+#
+
+name:  Registry Database Archive
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 1,15 * *"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+
+      - name: Setup mongo tools - only shell
+        uses: boly38/action-mongo-tools@stable
+        with:
+          mongo-shell: "false"
+          mongo-tools: "true"
+
+      - name: Install python libraries
+        run: pip3 install --user -r backend/requirements.txt
+
+      - name: load env file
+        run: |
+          echo "${{ secrets.ENV_FILE }}" > backend/.env
+
+      - name: generate tarball
+        run: cd backend && python generate_tarball.py
+
+      - name: Archives
+        uses: actions/upload-artifact@v2
+        with:
+          name: Registry Database Archive
+          path: backend/static/

@@ -5,12 +5,13 @@ from bson.objectid import ObjectId
 from flask import request, jsonify, abort, send_file
 from gridfs.errors import NoFile
 from datetime import datetime, timedelta
-from auth import generate_uuid,IS_VERCEL
+from auth import generate_uuid, IS_VERCEL
 from app import swagger
 import tarfile
 import os
 import toml
 import shutil
+import json
 from flasgger.utils import swag_from
 from urllib.parse import unquote
 import math
@@ -21,7 +22,6 @@ from models.namespace import Namespace
 from models.user import User
 from models.package import Package
 from models.package import Version
-# from validate_package import validate
 
 
 parameters = {
@@ -167,6 +167,7 @@ def upload():
     package_name = request.form.get("package_name")
     package_version = request.form.get("package_version")
     package_license = request.form.get("package_license")
+    homepage = request.form.get("homepage")
     dry_run = request.form.get("dry_run")
     tarball = request.files["tarball"]
 
@@ -276,23 +277,25 @@ def upload():
         {"name": package_name, "namespace": namespace_obj.id}
     )
 
-    if tarball.content_type not in ["application/gzip", "application/zip","application/octet-stream","application/x-tar"]:
+    if tarball.content_type not in [
+        "application/gzip",
+        "application/zip",
+        "application/octet-stream",
+        "application/x-tar",
+    ]:
         return jsonify({"code": 400, "message": "Invalid file type"}), 400
 
     tarball_name = "{}-{}.tar.gz".format(package_name, package_version)
 
-    if not IS_VERCEL:  # TODO: Disable this after Validation is Enabled
-        package_data = extract_toml(tarball)
-    else:
-        package_data = {"homepage": "homepage", "repository": "repository", "description": "description","copyright":"copyright"}
-    # validate the package with fpm
-    # valid_package, package_data = validate(tarball,"{}-{}".format(package_name, package_version))  # TODO: Enable this after Validation is Enabled
-    
+    package_data = {
+        "repository": "Package Under Verification",
+        "description": "Package Under Verification",
+        "copyright": "Package Under Verification",
+    }
 
-    # if not valid_package: # TODO: Enable this after Validation is Enabled
-    #     return jsonify({"code": 400, "message": "Invalid package"}), 400    
-
-    file_object_id = file_storage.put(tarball, content_type=tarball.content_type, filename=tarball_name)
+    file_object_id = file_storage.put(
+        tarball, content_type=tarball.content_type, filename=tarball_name
+    )
 
     # No previous recorded versions of the package found.
     if not package_doc:
@@ -301,7 +304,7 @@ def upload():
                 name=package_name,
                 namespace=namespace_obj.id,
                 description=package_data["description"],
-                homepage=package_data["homepage"],
+                homepage=homepage,
                 repository=package_data["repository"],
                 copyright=package_data["copyright"],
                 license=package_license,
@@ -377,9 +380,8 @@ def upload():
             created_at=datetime.utcnow(),
             is_deprecated=False,
             download_url=f"/tarballs/{file_object_id}",
-            # "download_url_zip": f"/tarballs/{zipfile_object_id}",
-            # "download_url_tar": f"/tarballs/{tarfile_object_id}",
         )
+
 
         package_obj.versions.append(new_version)
         
@@ -431,21 +433,39 @@ def check_token_expiry(upload_token_created_at):
 
     return False
 
-@app.route('/tarballs/<oid>', methods=["GET"])
+
+@app.route("/tarballs/<oid>", methods=["GET"])
 @swag_from("documentation/get_tarball.yaml", methods=["GET"])
 def serve_gridfs_file(oid):
     try:
         file = file_storage.get(ObjectId(oid))
 
-        # Return the file data as a Flask response object
-        return send_file(
-            file,
-            download_name=file.filename,
-            as_attachment=True,
-            mimetype=file.content_type,
+        package_version_doc = db.packages.update_one(
+            {
+                "versions.oid": oid,
+            },
+            {
+                "$inc": {
+                    f"downloads_stats.versions.{oid}": 1,
+                    "downloads_stats.total_downloads": 1,
+                    f"downloads_stats.dates.{str(datetime.now())[:10]}.{oid}": 1,
+                    f"downloads_stats.dates.{str(datetime.now())[:10]}.total_downloads": 1,
+                }
+            },
         )
+        if package_version_doc.modified_count > 0:
+            # Return the file data as a Flask response object
+            return send_file(
+                file,
+                download_name=file.filename,
+                as_attachment=True,
+                mimetype=file.content_type,
+            )
+        return jsonify({"message": "Package version not found", "code": 404}), 404
+
     except NoFile:
         abort(404)
+
 
 def check_version(current_version, new_version):
     current_list = list(map(int, current_version.split(".")))
@@ -494,11 +514,13 @@ def get_package(namespace_name, package_name):
         "version_history": package_obj.to_json()["versions"],
         "updated_at": package_obj.updated_at,
         "description": package_obj.description,
+        "ratings": round(sum(package_obj.ratings['users'].values())/len(package_obj.ratings['users']),3),
+        "downloads": package_obj.downloads_stats,
     }
 
     return jsonify({"data": package_response_data, "code": 200})
 
- 
+
 @app.route("/packages/<namespace_name>/<package_name>/verify", methods=["POST"])
 @swag_from("documentation/verify_user_role.yaml", methods=["POST"])
 @jwt_required()
@@ -568,7 +590,9 @@ def get_package_from_version(namespace_name, package_name, version):
         return jsonify({"message": "Package not found", "code": 404}), 404
 
     else:
-        package_obj = Package.from_json(package)
+        return jsonify({"message": f"Package not found {type(json.dumps(package))}", "code": 404,}), 404
+        package_obj = Package.from_json(json.dumps(package))
+        return jsonify({"message": f"Package not found {package}", "code": 404,}), 404
 
         # Get the package author from id.
         package_author = db.users.find_one({"_id": package_obj.author})
@@ -767,6 +791,7 @@ def create_token_upload_token_package(namespace_name, package_name):
         200,
     )
 
+
 @app.route("/packages/<namespace>/<package>/maintainers", methods=["GET"])
 @swag_from("documentation/package_maintainers.yaml", methods=["GET"])
 @jwt_required()
@@ -836,19 +861,153 @@ def checkUserUnauthorizedForNamespaceTokenCreation(user_id, namespace_obj):
     return str_user_id not in admins_id_list and str_user_id not in maintainers_id_list
 
 
-def extract_toml(file):
-    with open('static/temp/temp.tar.gz', 'wb') as f:
-        f.write(file.read())
-    with tarfile.open('static/temp/temp.tar.gz', "r") as tar:
-        tar.extractall("static/temp")
+@app.route("/ratings/<namespace>/<package>", methods=["POST"])
+@swag_from("documentation/post_rating.yaml", methods=["POST"])
+@jwt_required()
+def post_ratings(namespace, package):
+    uuid = get_jwt_identity()
+    rating = request.form.get("rating")
 
-    for root, dirs, files in os.walk('static/temp'):
-        file_name = 'fpm.toml'
-        if file_name in files:
-            file_path = os.path.join(root, file_name)
-            with open(file_path, 'r') as file:
-                file_content = file.read()
-            shutil.rmtree('static/temp')
-            os.makedirs('static/temp', exist_ok=True)
-            parsed_toml = toml.loads(file_content)
-            return parsed_toml
+    if not rating:
+        return jsonify({"code": 400, "message": "Rating is missing"}), 400
+
+    if int(rating) < 1 or int(rating) > 5:
+        return (
+            jsonify({"code": 400, "message": "Rating should be between 1 and 5"}),
+            400,
+        )
+
+    user = db.users.find_one({"uuid": uuid})
+    namespace_doc = db.namespaces.find_one({"namespace": namespace})
+    package_doc = db.packages.find_one(
+        {"name": package, "namespace": namespace_doc["_id"]}
+    )
+
+    if not user or not namespace_doc or not package_doc:
+        error_message = {
+            "user": "User not found" if not user else None,
+            "namespace": "Namespace not found" if not namespace_doc else None,
+            "package": "Package not found" if not package_doc else None,
+            "code": 404
+        }
+        return jsonify({"message": error_message}), 404
+
+    if user["_id"] in package_doc["ratings"]["users"] and package_doc["ratings"][
+        "users"
+    ][user["_id"]] == int(rating):
+        return jsonify({"message": "Ratings Submitted Successfully", "code": 200}), 200
+
+    if user["_id"] in package_doc["ratings"]["users"] and package_doc["ratings"][
+        "users"
+    ][user["_id"]] != int(rating):
+        package_version_doc = db.packages.update_one(
+            {"name": package, "namespace": namespace_doc["_id"]},
+            {
+                "$set": {
+                    f"ratings.users.{user['_id']}": int(rating),
+                },
+            },
+        )
+        return jsonify({"message": "Ratings Updated Successfully", "code": 200}), 200
+
+    package_version_doc = db.packages.update_one(
+        {"name": package, "namespace": namespace_doc["_id"]},
+        {
+            "$set": {
+                f"ratings.users.{user['_id']}": int(rating),
+            },
+            "$inc": {
+                "ratings.total_count": 1,
+            },
+        },
+    )
+    return jsonify({"message": "Ratings Submitted Successfully", "code": 200}), 200
+
+
+@app.route("/report/<namespace>/<package>", methods=["POST"])
+@swag_from("documentation/post_malicious.yaml", methods=["POST"])
+@jwt_required()
+def post_malicious(namespace, package):
+    uuid = get_jwt_identity()
+    reason = request.form.get("reason")
+
+    if not reason:
+        return jsonify({"code": 400, "message": "Reason is missing"}), 400
+    
+    reason = reason.strip()
+
+    if len(reason) < 10:
+        return (
+            jsonify({"code": 400, "message": "Reason should atleast be 10 characters"}),
+            400,
+        )
+
+    user = db.users.find_one({"uuid": uuid})
+    namespace_doc = db.namespaces.find_one({"namespace": namespace})
+    package_doc = db.packages.find_one(
+        {"name": package, "namespace": namespace_doc["_id"]}
+    )
+
+    if not user or not namespace_doc or not package_doc:
+        error_message = {
+            "user": "User not found" if not user else None,
+            "namespace": "Namespace not found" if not namespace_doc else None,
+            "package": "Package not found" if not package_doc else None,
+            "code": 404
+        }
+        return jsonify({"message": error_message}), 404
+
+    if user["_id"] in package_doc["malicious_report"]["users"] and package_doc["malicious_report"][
+        "users"
+    ][user["_id"]]['reason'] == str(reason):
+        return jsonify({"message": "Malicious Report Submitted Successfully", "code": 200}), 200
+
+    if user["_id"] in package_doc["malicious_report"]["users"] and package_doc["malicious_report"][
+        "users"
+    ][user["_id"]]['reason'] != str(reason):
+        package_version_doc = db.packages.update_one(
+            {"name": package, "namespace": namespace_doc["_id"]},
+            {
+                "$set": {
+                    f"malicious_report.users.{user['_id']}": { 'reason': str(reason), 'isViewed': False },
+                    "malicious_report.isViewed": False,
+
+                },
+            },
+        )
+        return jsonify({"message": "Malicious Report Updated Successfully", "code": 200}), 200
+
+    package_version_doc = db.packages.update_one(
+        {"name": package, "namespace": namespace_doc["_id"]},
+        {
+            "$set": {
+                f"malicious_report.users.{user['_id']}": { 'reason': str(reason), 'isViewed': False },
+                "malicious_report.isViewed": False,
+            }
+        },
+    )
+    return jsonify({"message": "Malicious Report Submitted Successfully", "code": 200}), 200
+
+@app.route("/report/view", methods=["GET"])
+@swag_from("documentation/view_report.yaml", methods=["GET"])
+@jwt_required()
+def view_report():
+    uuid = get_jwt_identity()
+
+    user = db.users.find_one({"uuid": uuid})
+
+    if "admin" in user["roles"]:
+        non_viewed_reports = list()
+        malicious_reports = db.packages.find({"malicious_reports.isViewed": False})
+        for package in list(malicious_reports):
+            for user_id, report in package.get("malicious_report", {}).get("users", {}).items():
+                if not report.get("isViewed", False):
+                    report['name'] = db.users.find_one({"_id": ObjectId(user_id)}, {"username": 1})["username"]
+                    del report["isViewed"]
+                    non_viewed_reports.append(report)
+
+        return jsonify({"message": "Malicious Reports fetched Successfully", "code": 200, "reports": non_viewed_reports}), 200
+
+
+    return jsonify({"message": "Unauthorized", "code": 401}), 401
+

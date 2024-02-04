@@ -4,6 +4,10 @@ from server import app
 from packages import check_token_expiry
 from datetime import datetime
 import random
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 class TestPackages(BaseTestClass):
@@ -23,6 +27,7 @@ class TestPackages(BaseTestClass):
             "package_name": "test_package",
             "package_version": "0.0.1",
             "package_license": "MIT",
+            "homepage":"fortran-lang.org"
         }
 
         self.test_namespace_data = {
@@ -38,7 +43,7 @@ class TestPackages(BaseTestClass):
         None
 
         Returns:
-        uuid (str): The UUID of the user who successfully logged in.
+        access_token (str): The access_token of the user who successfully logged in.
 
         Raises:
         AssertionError: If the response code received from the server is not as expected.
@@ -53,6 +58,8 @@ class TestPackages(BaseTestClass):
             return self.access_token
         
         response_for_signup = self.client.post("/auth/signup", data=signup_data)
+        self.assertEqual(200, response_for_signup.json["code"])
+        self.is_created = True
         login_data = {"user_identifier": self.email, "password": self.password}
 
         # Login with the same user.
@@ -313,6 +320,7 @@ class TestPackages(BaseTestClass):
         response = self.client.get(
             f"/packages/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}/0.0.1"
         )
+        print(response.json["message"])
         self.assertEqual(200, response.json["code"])
         print("test_get_existing_package_version passed")
 
@@ -386,3 +394,174 @@ class TestPackages(BaseTestClass):
         )
         self.assertEqual(200, response.json["code"])
         print("test_package_maintainers passed")
+    
+    def test_successful_rating_submit(self):
+        """
+        Test case to verify the behaviour of the system when a user tries to submit rating to a package successfully.
+
+        Parameters:
+        None
+
+        Returns:
+        None
+
+        Raises:
+        AssertionError: If the response code received from the server is not as expected.
+        """
+        access_token = self.login()
+        response = self.client.post(
+            f"/ratings/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}",
+            content_type="multipart/form-data",
+            data={"rating":5},  headers={"Authorization": f"Bearer {access_token}"},
+        )
+        self.assertEqual(200, response.json["code"])
+        print("test_successful_rating_submit passed")
+
+    def test_unsuccessful_rating_invalid_submit(self):
+        """
+        Test case to verify the behaviour of the system when a user tries to submit invalid rating to a package successfully.
+
+        Parameters:
+        None
+
+        Returns:
+        None
+
+        Raises:
+        AssertionError: If the response code received from the server is not as expected.
+        """
+        access_token = self.login()
+        response = self.client.post(
+            f"/ratings/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}",
+            content_type="multipart/form-data",
+            data={"rating":-1},  headers={"Authorization": f"Bearer {access_token}"},
+        )
+        self.assertEqual(400, response.json["code"])
+        print("test_unsuccessful_rating_invalid_submit passed")
+
+    def test_unsuccessful_rating_invalid_access_token_submit(self):
+        """
+        Test case to verify the behaviour of the system when a user tries to submit valid rating to a package successfully with invalid access_token
+
+        Parameters:
+        None
+
+        Returns:
+        None
+
+        Raises:
+        AssertionError: If the response code received from the server is not as expected.
+        """
+        access_token = self.login()
+        response = self.client.post(
+            f"/ratings/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}",
+            content_type="multipart/form-data",
+            data={"rating":5},  headers={"Authorization": f"Bearer access_token"},
+        )
+        self.assertEqual("Not enough segments", response.json["msg"])
+        print("test_unsuccessful_rating_invalid_access_token_submit passed")
+
+    def test_successful_post_malicious(self):
+        """
+        Test case to verify the behaviour of the system when a user tries to submit malicious report to a package successfully
+
+        Parameters:
+        None
+
+        Returns:
+        None
+
+        Raises:
+        AssertionError: If the response code received from the server is not as expected.
+        """
+        access_token = self.login()
+        response = self.client.post(
+            f"/report/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}",
+            content_type="multipart/form-data",
+            data={"reason":"the package is found to be malicious"},  headers={"Authorization": f"Bearer {access_token}"},
+        )
+        print("test_successful_post_malicious response", response.json)
+        self.assertEqual(200, response.json["code"])
+        print("test_successful_post_malicious passed")
+
+    def test_unsuccessful_post_malicious_invalid_access_token(self):
+        """
+        Test case to verify the behaviour of the system when a user tries to submit malicious report to a package successfully with invalid access_token
+
+        Parameters:
+        None
+
+        Returns:
+        None
+
+        Raises:
+        AssertionError: If the response code received from the server is not as expected.
+        """
+        access_token = self.login()
+        response = self.client.post(
+            f"/report/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}",
+            content_type="multipart/form-data",
+            data={"reason":"the package is found to be malicious"},  headers={"Authorization": f"Bearer access_token"},
+        )
+        self.assertEqual("Not enough segments", response.json["msg"])
+        print("test_unsuccessful_post_malicious_invalid_access_token passed")
+
+    def test_unsuccessful_post_malicious_short_reason(self):
+        """
+        Test case to verify the behaviour of the system when a user tries to submit malicious report to a package successfully with invalid reason
+
+        Parameters:
+        None
+
+        Returns:
+        None
+
+        Raises:
+        AssertionError: If the response code received from the server is not as expected.
+        """
+        access_token = self.login()
+        response = self.client.post(
+            f"/report/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}",
+            content_type="multipart/form-data",
+            data={"reason":"package"},  headers={"Authorization": f"Bearer {access_token}"},
+        )
+        self.assertEqual(400, response.json["code"])
+        print("test_unsuccessful_post_malicious_short_reason passed")
+
+    def test_successful_fetch_malicious_reports(self):
+        """
+        Test case to verify the behaviour of the system when a sudo user tries fetch the malicious reports successfully
+
+        Parameters:
+        None
+
+        Returns:
+        None
+
+        Raises:
+        AssertionError: If the response code received from the server is not as expected.
+        """
+
+        access_token = self.login() # create a sudo user
+        response = self.client.get("/report/view",headers={"Authorization": f"Bearer {access_token}"})
+        self.assertEqual(200, response.json["code"])
+        print("test_successful_fetch_malicious_reports passed")
+
+    def test_unsuccessful_fetch_malicious_reports(self):
+        """
+        Test case to verify the behaviour of the system when a sudo user tries fetch the malicious reports successfully with invalid access_token
+
+        Parameters:
+        None
+
+        Returns:
+        None
+
+        Raises:
+        AssertionError: If the response code received from the server is not as expected.
+        """
+
+        access_token = self.login()
+        response = self.client.get("/report/view",headers={"Authorization": f"Bearer {access_token}"})
+        self.assertEqual(401, response.json["code"])
+        print("test_unsuccessful_fetch_malicious_reports passed")

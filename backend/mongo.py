@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from gridfs import GridFS
 from app import app
 from flask import jsonify
-import subprocess
+import logging
 
 load_dotenv()
 database_name = os.environ["MONGO_DB_NAME"]
@@ -20,25 +20,31 @@ except KeyError as err:
 db = client[database_name]
 file_storage = GridFS(db, collection="tarballs")
 
+# Create a collection to store the logs
+class MongoDBHandler(logging.Handler):
+    def __init__(self, collection):
+        super().__init__()
+        self.collection = collection
+
+    def emit(self, record):
+        log_document = {
+            "timestamp": datetime.utcnow(),
+            "level": record.levelname,
+            "message": self.format(record)
+        }
+        self.collection.insert_one(log_document)
+
+# Create the MongoDB logging handler
+mongo_handler = MongoDBHandler(collection=db.logs)
+mongo_handler.setLevel(logging.ERROR)  # Set the handler's log level to the lowest (DEBUG)
+
+# Configure the root logger with the MongoDB handler
+logging.root.addHandler(mongo_handler)
 
 @app.route("/registry/archives", methods=["GET"])
 def clone():
     folder_path = "static"
     file_list = os.listdir(folder_path)
-
-    # Check if the folder exists and was modified more than 1 week ago
-    if os.path.exists(folder_path):
-        mod_time = datetime.fromtimestamp(os.path.getmtime(folder_path))
-        if datetime.now() - mod_time > timedelta(days=7):
-            generate_latest_tarball()
-
     return jsonify(
         {"message": "Successfully Fetched Archives", "archives": file_list, "code": 200}
     )
-
-
-def generate_latest_tarball():
-    # Execute the mongodump command
-    archive_date = datetime.datetime.now().strftime("%Y-%m-%d")
-    command = f"mongodump --uri={mongo_uri}--archive=static/registry-{archive_date}.tar.gz --db={database_name} --gzip --excludeCollection=users"
-    subprocess.call(command, shell=True)

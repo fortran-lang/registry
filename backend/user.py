@@ -165,11 +165,9 @@ def delete_user():
         if delete_user:
             db.users.delete_one({"username": username})
             return jsonify({"message": "User deleted", "code": 200}), 200
-        else:
-            return jsonify({"message": "User not found", "code": 404}), 404
+        return jsonify({"message": "User not found", "code": 404}), 404
 
-    else:
-        return jsonify({"message": "Unauthorized", "code": 401}), 401
+    return jsonify({"message": "Unauthorized", "code": 401}), 401
 
 
 @app.route("/users/account", methods=["POST"])

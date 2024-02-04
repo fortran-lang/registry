@@ -4,9 +4,9 @@ from flasgger import Swagger
 from flask_jwt_extended import JWTManager
 
 app = Flask(__name__)
-app.config["JWT_SECRET_KEY"] = "fpm-registry-secret-key"  #TODO: Please change this.
-app.config["JWT_ACCESS_TOKEN_EXPIRES"] = 90 * 24 * 60 * 60  # 90 days
-CORS(app)
+app.config["JWT_SECRET_KEY"] = "fpm-registry-secret-key"     #TODO: Please change this.
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = 90 * 24 * 60 * 60   # 90 days
+CORS(app)                                                    #TODO: Please restrict to only the frontend domain.
 JWTManager(app)
 
 swagger = Swagger(
