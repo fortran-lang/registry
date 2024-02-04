@@ -10,9 +10,6 @@ services:
       - 80:80
     depends_on:
       - backend
-    networks:
-      - my_network
-    
 
   backend:
     build:
@@ -22,21 +19,17 @@ services:
     # flask requires SIGINT to stop gracefully
     # (default stop signal from Compose is SIGTERM)
     stop_signal: SIGINT
-    environment:  # these are the test environment variables.
+    environment: # these are the test environment variables.
       - FLASK_SERVER_PORT=9091
-      - MONGO_DB_NAME=registry
-      - MONGO_URI=mongodb://mongo:27017/fpmregistry
+      - MONGO_URI=mongodb://mongo:27017/
       - SALT=MYSALT
       - MONGO_DB_NAME=fpmregistry
       - SUDO_PASSWORD=fortran
       - MONGO_USER_NAME=fortran
       - MONGO_PASSWORD=fortran
       - HOST=localhost:3000
-      # - RESET_EMAIL=reset@localhost.com   # set to registry email
-      # - RESET_PASSWORD=reset
-    networks:
-      - my_network
-
+      - RESET_EMAIL=reset@localhost.com # set to registry email
+      - RESET_PASSWORD=reset
     volumes:
       - .:/src
     depends_on:
@@ -50,14 +43,13 @@ services:
     volumes:
       - .:/src
     ports:
-      - "5000:5000"
-    networks:
-      - my_network
+      - "5001:5001"
+    environment: # these are the test environment variables.
+      - MONGO_URI=mongodb://mongo:27017/
+      - SALT=MYSALT
+      - MONGO_DB_NAME=fpmregistry
+      - MONGO_USER_NAME=fortran
+      - MONGO_PASSWORD=fortran
 
   mongo:
     image: mongo
-
-  
-networks:
-  my_network:
-    driver: bridge
