@@ -29,9 +29,12 @@ def process_package(packagename):
 
     # Read fpm.toml
     toml_path = f'static/temp/{packagename}/fpm.toml'
-    with open(toml_path, 'r') as file:
-        file_content = file.read()
-    parsed_toml = toml.loads(file_content)
+    try:
+        with open(toml_path, 'r') as file:
+            file_content = file.read()
+        parsed_toml = toml.loads(file_content) # handle toml parsing errors
+    except:
+        return False, None
 
     # Clean up
     cleanup_command = f'rm -rf static/temp/{packagename} static/temp/{packagename}.tar.gz'

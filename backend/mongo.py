@@ -36,7 +36,7 @@ class MongoDBHandler(logging.Handler):
 
 # Create the MongoDB logging handler
 mongo_handler = MongoDBHandler(collection=db.logs)
-mongo_handler.setLevel(logging.DEBUG)  # Set the handler's log level to the lowest (DEBUG)
+mongo_handler.setLevel(logging.ERROR)  # Set the handler's log level to the lowest (DEBUG)
 
 # Configure the root logger with the MongoDB handler
 logging.root.addHandler(mongo_handler)
