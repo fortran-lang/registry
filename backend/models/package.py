@@ -1,6 +1,7 @@
 class Package:
     def __init__(self, name, namespace, description, homepage, repository, 
-                    copyright, license, created_at, updated_at, author, maintainers, tags, is_deprecated, versions=[], id=None):
+                    copyright, license, created_at, updated_at, author, maintainers, tags, is_deprecated, versions=[], id=None,
+                        malicious_report={}, is_verified=False, is_malicious=False, security_status="No security issues found", ratings={"users": {}, "avg_ratings": 0}):
         self.id = id
         self.name = name
         self.namespace = namespace
@@ -16,15 +17,12 @@ class Package:
         self.tags = tags
         self.is_deprecated = is_deprecated
         self.versions = versions
-        self.malicious_report  = {}
-        self.is_verified = False
-        self.is_malicious = False
-        self.security_status = "No security issues found"
+        self.malicious_report  = malicious_report
+        self.is_verified = is_verified
+        self.is_malicious = is_malicious
+        self.security_status = security_status
         self.downloads_stats = {}
-        self.ratings = {
-            "users": {},
-            "avg_ratings": 0,
-        }
+        self.ratings = ratings
 
         # Ensure that versions list only contains instances of Version class
         for v in self.versions:
@@ -96,14 +94,14 @@ class Package:
         )
     
 class Version:
-    def __init__(self, version, tarball, dependencies, created_at, is_deprecated, download_url):
+    def __init__(self, version, tarball, dependencies, created_at, is_deprecated, download_url, is_verified=False):
         self.version = version
         self.tarball = tarball
         self.dependencies = dependencies
         self.created_at = created_at
         self.is_deprecated = is_deprecated
         self.download_url = download_url
-        self.is_verified = False
+        self.is_verified = is_verified
 
     # Create a to_json method.
     def to_json(self):
