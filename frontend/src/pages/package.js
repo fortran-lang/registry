@@ -181,6 +181,8 @@ const PackagePage = () => {
         </MDBTabsPane>
       </MDBTabsContent>
       <ReportPackageForm
+        namespace={namespace_name}
+        package={package_name}
         show={showReportForm}
         onHide={() => setShowReportForm(false)}
       />
