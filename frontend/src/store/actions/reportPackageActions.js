@@ -27,27 +27,26 @@ export const reportPackage = (data, access_token) => async (dispatch) => {
       },
     });
 
-    if (result.data.code === 200) {
-      dispatch({
-        type: REPORT_PACKAGE_SUCCESS,
-        payload: {
-          message: result.data.message,
-        },
-      });
-    } else {
-      dispatch({
-        type: REPORT_PACKAGE_FAILURE,
-        payload: {
-          message: result.data.message,
-        },
-      });
-    }
+    dispatch({
+      type: REPORT_PACKAGE_SUCCESS,
+      payload: {
+        message: result.data.message,
+        statuscode: result.data.code,
+      },
+    });
   } catch (error) {
     dispatch({
       type: REPORT_PACKAGE_FAILURE,
       payload: {
         message: error.response.data.message,
+        statuscode: error.response.data.code,
       },
     });
   }
+};
+
+export const resetErrorMessage = () => (dispatch) => {
+  dispatch({
+    type: RESET_ERROR_MESSAGE,
+  });
 };

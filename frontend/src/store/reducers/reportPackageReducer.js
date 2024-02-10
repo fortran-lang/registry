@@ -9,6 +9,7 @@ const initialState = {
   isLoading: false,
   error: null,
   message: null,
+  statuscode: 0,
 };
 
 const reportPackageReducer = (state = initialState, action) => {
@@ -23,20 +24,25 @@ const reportPackageReducer = (state = initialState, action) => {
         ...state,
         isLoading: false,
         message: action.payload.message,
+        statuscode: action.payload.statuscode,
       };
     case REPORT_PACKAGE_FAILURE:
       return {
         ...state,
         isLoading: false,
-        error: action.payload.message,
+        message: action.payload.message,
+        statuscode: action.payload.statuscode,
       };
     case RESET_ERROR_MESSAGE:
       return {
         ...state,
         error: null,
         message: null,
+        statuscode: 0,
       };
     default:
       return state;
   }
 };
+
+export default reportPackageReducer;

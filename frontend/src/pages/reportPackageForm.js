@@ -1,12 +1,20 @@
-import React, { useState } from "react";
-import { Form, Button, Modal } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Form, Button, Modal, Spinner } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import { reportPackage } from "../store/actions/reportPackageActions";
+import {
+  reportPackage,
+  resetErrorMessage,
+} from "../store/actions/reportPackageActions";
+import { toast, ToastContainer } from "react-toastify";
+import { reset } from "../store/actions/accountActions";
 
 const ReportPackageForm = (props) => {
   const dispatch = useDispatch();
   const [reason, setReason] = useState("");
   const accessToken = useSelector((state) => state.auth.accessToken);
+  const isLoading = useSelector((state) => state.reportPackage.isLoading);
+  const statusCode = useSelector((state) => state.reportPackage.statuscode);
+  const message = useSelector((state) => state.reportPackage.message);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,12 +26,34 @@ const ReportPackageForm = (props) => {
     );
   };
 
+  useEffect(() => {
+    console.log("Inside use effect");
+    if (statusCode === 200) {
+      toast.success(message);
+    } else {
+      toast.error(message);
+    }
+
+    dispatch(resetErrorMessage());
+  }, [statusCode]);
+
   return (
     <Form onSubmit={handleSubmit}>
       <Modal {...props} size="lg">
         <Modal.Header closeButton>
           <Modal.Title>Report Package</Modal.Title>
         </Modal.Header>
+        <ToastContainer
+          position="top-center"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          pauseOnHover
+          theme="light"
+        />
         <Modal.Body>
           <Form.Group
             className="mb-3"
@@ -45,9 +75,21 @@ const ReportPackageForm = (props) => {
           </Form.Group>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="primary" type="submit" onClick={handleSubmit}>
-            Submit
-          </Button>
+          {!isLoading ? (
+            <Button variant="primary" type="submit" onClick={handleSubmit}>
+              Submit
+            </Button>
+          ) : (
+            <div style={{ margin: 0 }}>
+              <Spinner
+                className="spinner-border m-3"
+                animation="border"
+                role="status"
+              >
+                <span className="visually-hidden">Loading...</span>
+              </Spinner>
+            </div>
+          )}
         </Modal.Footer>
       </Modal>
     </Form>
