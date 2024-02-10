@@ -957,26 +957,6 @@ def post_malicious(namespace, package):
         }
         return jsonify({"message": error_message}), 404
 
-    if user["_id"] in package_doc["malicious_report"]["users"] and package_doc["malicious_report"][
-        "users"
-    ][user["_id"]]['reason'] == str(reason):
-        return jsonify({"message": "Malicious Report Submitted Successfully", "code": 200}), 200
-
-    if user["_id"] in package_doc["malicious_report"]["users"] and package_doc["malicious_report"][
-        "users"
-    ][user["_id"]]['reason'] != str(reason):
-        package_version_doc = db.packages.update_one(
-            {"name": package, "namespace": namespace_doc["_id"]},
-            {
-                "$set": {
-                    f"malicious_report.users.{user['_id']}": { 'reason': str(reason), 'isViewed': False },
-                    "malicious_report.isViewed": False,
-
-                },
-            },
-        )
-        return jsonify({"message": "Malicious Report Updated Successfully", "code": 200}), 200
-
     package_version_doc = db.packages.update_one(
         {"name": package, "namespace": namespace_doc["_id"]},
         {
