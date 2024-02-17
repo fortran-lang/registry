@@ -516,6 +516,7 @@ def get_package(namespace_name, package_name):
         "description": package_obj.description,
         "ratings": round(sum(package_obj.ratings['users'].values())/len(package_obj.ratings['users']),3) if len(package_obj.ratings['users']) > 0 else 0,
         "downloads": package_obj.downloads_stats,
+        "ratings_count": package_obj.ratings["counts"] if "counts" in package_obj.ratings else {},
     }
 
     return jsonify({"data": package_response_data, "code": 200})
