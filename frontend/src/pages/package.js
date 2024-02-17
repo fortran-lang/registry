@@ -190,7 +190,7 @@ const PackagePage = () => {
         </MDBTabsPane>
         <MDBTabsPane show={iconsActive === "stats"}>
           <MDBContainer>
-            <PackageRatingGraph />
+            <PackageRatingGraph data={data.ratings_count} />
           </MDBContainer>
         </MDBTabsPane>
       </MDBTabsContent>
