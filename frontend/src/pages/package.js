@@ -24,6 +24,7 @@ import {
 import ShowUserListDialog from "./showUserListDialog";
 import ReportPackageForm from "./reportPackageForm";
 import { Button } from "react-bootstrap";
+import PackageRatingGraph from "./packageRatingGraph";
 
 const PackagePage = () => {
   const [iconsActive, setIconsActive] = useState("readme");
@@ -106,6 +107,14 @@ const PackagePage = () => {
             <MDBIcon fas icon="tag" className="me-2" /> Versions
           </MDBTabsLink>
         </MDBTabsItem>
+        <MDBTabsItem>
+          <MDBTabsLink
+            onClick={() => handleIconsClick("stats")}
+            active={iconsActive === "stats"}
+          >
+            <MDBIcon fas icon="chart-bar" className="me-2" /> Stats
+          </MDBTabsLink>
+        </MDBTabsItem>
       </MDBTabs>
 
       <MDBTabsContent sm={4}>
@@ -177,6 +186,11 @@ const PackagePage = () => {
               </MDBCol>
               {sideBar(data)}
             </MDBRow>
+          </MDBContainer>
+        </MDBTabsPane>
+        <MDBTabsPane show={iconsActive === "stats"}>
+          <MDBContainer>
+            <PackageRatingGraph data={data.ratings_count} />
           </MDBContainer>
         </MDBTabsPane>
       </MDBTabsContent>

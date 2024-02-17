@@ -27,7 +27,6 @@ const ReportPackageForm = (props) => {
   };
 
   useEffect(() => {
-    console.log("Inside use effect");
     if (statusCode === 200) {
       toast.success(message);
     } else {

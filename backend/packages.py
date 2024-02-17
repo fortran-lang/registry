@@ -516,6 +516,7 @@ def get_package(namespace_name, package_name):
         "description": package_obj.description,
         "ratings": round(sum(package_obj.ratings['users'].values())/len(package_obj.ratings['users']),3) if len(package_obj.ratings['users']) > 0 else 0,
         "downloads": package_obj.downloads_stats,
+        "ratings_count": package_obj.ratings["counts"] if "counts" in package_obj.ratings else {},
     }
 
     return jsonify({"data": package_response_data, "code": 200})
@@ -892,35 +893,49 @@ def post_ratings(namespace, package):
         }
         return jsonify({"message": error_message}), 404
 
-    if user["_id"] in package_doc["ratings"]["users"] and package_doc["ratings"][
-        "users"
-    ][user["_id"]] == int(rating):
-        return jsonify({"message": "Ratings Submitted Successfully", "code": 200}), 200
-
-    if user["_id"] in package_doc["ratings"]["users"] and package_doc["ratings"][
-        "users"
-    ][user["_id"]] != int(rating):
-        package_version_doc = db.packages.update_one(
-            {"name": package, "namespace": namespace_doc["_id"]},
-            {
-                "$set": {
-                    f"ratings.users.{user['_id']}": int(rating),
-                },
-            },
-        )
-        return jsonify({"message": "Ratings Updated Successfully", "code": 200}), 200
-
-    package_version_doc = db.packages.update_one(
+    db.packages.update_one(
         {"name": package, "namespace": namespace_doc["_id"]},
         {
             "$set": {
                 f"ratings.users.{user['_id']}": int(rating),
             },
-            "$inc": {
-                "ratings.total_count": 1,
+        },
+    )
+
+    # Iterate through ratings and calculate how many users rated 5, 4, 3, 2, 1.
+    ratings = db.packages.find_one(
+        {"name": package, "namespace": namespace_doc["_id"]}
+    )["ratings"]["users"]
+
+    ratings_count = {
+        "5": 0,
+        "4": 0,
+        "3": 0,
+        "2": 0,
+        "1": 0,
+    }
+
+    for user_id, user_rating in ratings.items():
+        if user_rating == 5:
+            ratings_count["5"] += 1
+        elif user_rating == 4:
+            ratings_count["4"] += 1
+        elif user_rating == 3:
+            ratings_count["3"] += 1
+        elif user_rating == 2:
+            ratings_count["2"] += 1
+        elif user_rating == 1:
+            ratings_count["1"] += 1
+
+    db.packages.update_one(
+        {"name": package, "namespace": namespace_doc["_id"]},
+        {
+            "$set": {
+                "ratings.counts": ratings_count,
             },
         },
     )
+    
     return jsonify({"message": "Ratings Submitted Successfully", "code": 200}), 200
 
 
