@@ -118,7 +118,7 @@ def profile(username):
                         "name": package["name"],
                         "namespace": namespace["namespace"],
                         "description": package["description"],
-                        "updatedAt": package["updatedAt"],
+                        "updatedAt": package["updated_at"],
                         "isNamespaceMaintainer": isNamespaceMaintainer,
                         "isPackageMaintainer": isPackageMaintainer,
                     }
