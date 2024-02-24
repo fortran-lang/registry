@@ -94,7 +94,7 @@ class Package:
         )
     
 class Version:
-    def __init__(self, version, tarball, dependencies, created_at, is_deprecated, download_url,is_verified=False):
+    def __init__(self, version, tarball, dependencies, created_at, is_deprecated, download_url, is_verified=False):
         self.version = version
         self.tarball = tarball
         self.dependencies = dependencies
