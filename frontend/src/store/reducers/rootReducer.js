@@ -17,6 +17,7 @@ import addRemoveNamespaceMaintainerReducer from "./namespaceMaintainersReducer";
 import addRemoveNamespaceAdminReducer from "./namespaceAdminReducer";
 import verifyEmailReducer from "./verifyEmailReducer";
 import userListReducer from "./userListReducer";
+import reportPackageReducer from "./reportPackageReducer";
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -37,6 +38,7 @@ const rootReducer = combineReducers({
   verifyEmail: verifyEmailReducer,
   userList: userListReducer,
   archives: archivesReducer,
+  reportPackage: reportPackageReducer,
 });
 
 export default rootReducer;

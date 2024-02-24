@@ -22,6 +22,9 @@ import {
   verifyUserRole,
 } from "../store/actions/packageActions";
 import ShowUserListDialog from "./showUserListDialog";
+import ReportPackageForm from "./reportPackageForm";
+import { Button } from "react-bootstrap";
+import PackageRatingGraph from "./packageRatingGraph";
 
 const PackagePage = () => {
   const [iconsActive, setIconsActive] = useState("readme");
@@ -33,6 +36,7 @@ const PackagePage = () => {
   const navigate = useNavigate();
   const [togglePackageMaintainersDialog, settogglePackageMaintainersDialog] =
     useState(false);
+  const [showReportForm, setShowReportForm] = useState(false);
 
   const handleIconsClick = (value) => {
     if (value === iconsActive) {
@@ -103,6 +107,14 @@ const PackagePage = () => {
             <MDBIcon fas icon="tag" className="me-2" /> Versions
           </MDBTabsLink>
         </MDBTabsItem>
+        <MDBTabsItem>
+          <MDBTabsLink
+            onClick={() => handleIconsClick("stats")}
+            active={iconsActive === "stats"}
+          >
+            <MDBIcon fas icon="chart-bar" className="me-2" /> Stats
+          </MDBTabsLink>
+        </MDBTabsItem>
       </MDBTabs>
 
       <MDBTabsContent sm={4}>
@@ -111,7 +123,7 @@ const PackagePage = () => {
             <MDBRow>
               <MDBCol size="9">{data.description}</MDBCol>
 
-              {sideBar(data)}
+              {sideBar(data, setShowReportForm)}
             </MDBRow>
           </MDBContainer>
         </MDBTabsPane>
@@ -176,7 +188,18 @@ const PackagePage = () => {
             </MDBRow>
           </MDBContainer>
         </MDBTabsPane>
+        <MDBTabsPane show={iconsActive === "stats"}>
+          <MDBContainer>
+            <PackageRatingGraph data={data.ratings_count} />
+          </MDBContainer>
+        </MDBTabsPane>
       </MDBTabsContent>
+      <ReportPackageForm
+        namespace={namespace_name}
+        package={package_name}
+        show={showReportForm}
+        onHide={() => setShowReportForm(false)}
+      />
     </Container>
   ) : (
     <Container style={{ margin: "200px" }}>
@@ -226,7 +249,7 @@ const ViewPackageMaintainersButton = ({
   );
 };
 
-const sideBar = (data) => {
+const sideBar = (data, setShowReportForm) => {
   return (
     <MDBCol size="3">
       <p style={{ fontSize: 16, textAlign: "left" }}>Install</p>
@@ -248,6 +271,13 @@ const sideBar = (data) => {
       <p style={{ fontSize: 16, textAlign: "left" }}>Last publish</p>
       {updatedDays(data.updated_at)} days ago
       <hr></hr>
+      <Button
+        variant="danger"
+        style={{ margin: 0 }}
+        onClick={() => setShowReportForm(true)}
+      >
+        Report
+      </Button>
     </MDBCol>
   );
 };
