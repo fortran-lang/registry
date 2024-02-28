@@ -20,18 +20,26 @@ import {
   deleteRelease,
   deprecatePackage,
 } from "../store/actions/adminActions";
+import ViewMalicousReports from "./viewMalicousReports";
 import NoPage from "./404";
 
 const AdminSection = () => {
   const uuid = useSelector((state) => state.auth.uuid);
+  const accessToken = useSelector((state) => state.auth.accessToken);
   const dispatch = useDispatch();
   const message = useSelector((state) => state.admin.message);
   const statuscode = useSelector((state) => state.admin.statuscode);
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const isAdmin = useSelector((state) => state.admin.isAdmin);
 
+  const [showReports, setShowReports] = useState(false);
+
+  const handleShowReports = (value) => {
+    setShowReports(value);
+  };
+
   useEffect(() => {
-    dispatch(adminAuth(uuid));
+    dispatch(adminAuth(accessToken));
   }, [isAuthenticated, uuid]);
 
   useEffect(() => {
@@ -207,10 +215,18 @@ const AdminSection = () => {
   //     });
   //   };
 
-  return isAdmin? ( 
+  return isAdmin ? (
     <Container>
-      <br></br>
       <h2 style={{ textAlign: "left" }}>Admin Settings</h2>
+      <div style={{ marginBottom: "8px" }}>
+        <h4>View Malicious Reports</h4>
+        <Button
+          style={{ fontSize: 16 }}
+          onClick={() => handleShowReports(true)}
+        >
+          View Reports
+        </Button>
+      </div>
       <div>
         <h4>Delete package</h4>
         <p style={{ textAlign: "left" }}>
@@ -361,6 +377,10 @@ const AdminSection = () => {
           Change Password
         </Button>
       </div> */}
+      <ViewMalicousReports
+        show={showReports}
+        onHide={() => handleShowReports(false)}
+      />
       <MDBModal show={modalData.showModal} tabIndex="-1">
         <MDBModalDialog>
           <MDBModalContent>
@@ -386,7 +406,9 @@ const AdminSection = () => {
         </MDBModalDialog>
       </MDBModal>
     </Container>
-  ):(<NoPage/>);
+  ) : (
+    <NoPage />
+  );
 };
 
 export default AdminSection;
