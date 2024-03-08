@@ -993,12 +993,14 @@ def view_report():
 
     if "admin" in user["roles"]:
         non_viewed_reports = list()
-        malicious_reports = db.packages.find({"malicious_reports.isViewed": False})
+        malicious_reports = db.packages.find({"malicious_report.isViewed": False})
         for package in list(malicious_reports):
             for user_id, report in package.get("malicious_report", {}).get("users", {}).items():
                 if not report.get("isViewed", False):
                     report['name'] = db.users.find_one({"_id": ObjectId(user_id)}, {"username": 1})["username"]
                     del report["isViewed"]
+                    report["package"] = package["name"]
+                    report["namespace"] = db.namespaces.find_one({"_id": package["namespace"]}, {"namespace": 1})["namespace"]
                     non_viewed_reports.append(report)
 
         return jsonify({"message": "Malicious Reports fetched Successfully", "code": 200, "reports": non_viewed_reports}), 200

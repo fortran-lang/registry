@@ -18,10 +18,9 @@ export const ADMIN_AUTH_SUCCESS = "ADMIN_AUTH_SUCCESS";
 export const DELETE_PACKAGE_SUCCESS = "DELETE_PACKAGE_SUCCESS";
 export const DELETE_PACKAGE_ERROR = "DELETE_PACKAGE_ERROR";
 
-export const adminAuth = (uuid) => async (dispatch) => {
+export const adminAuth = (accessToken) => async (dispatch) => {
   // Make an api call to authenticate admin
   let formData = new FormData();
-  formData.append("uuid", uuid);
 
   try {
     let result = await axios({
@@ -30,6 +29,7 @@ export const adminAuth = (uuid) => async (dispatch) => {
       data: formData,
       headers: {
         "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${accessToken}`,
       },
     });
 
@@ -157,7 +157,7 @@ export const deleteNamespace = (namespace, uuid) => async (dispatch) => {
 
 export const deletePackage =
   (namespacename, packagename, uuid) => async (dispatch) => {
-    // Make an api call to delete package 
+    // Make an api call to delete package
     let formData = new FormData();
 
     formData.append("uuid", uuid);
@@ -204,7 +204,7 @@ export const deletePackage =
 
 export const deleteRelease =
   (namespace_name, package_name, version, uuid) => async (dispatch) => {
-    // Make an api call to delete package release 
+    // Make an api call to delete package release
     let formData = new FormData();
 
     formData.append("uuid", uuid);

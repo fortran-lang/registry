@@ -7,6 +7,7 @@ from flask import request, jsonify
 from app import swagger
 from flasgger.utils import swag_from
 from auth import forgot_password
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 load_dotenv()
 
@@ -194,8 +195,10 @@ def account():
 
 @app.route("/users/admin", methods=["POST"])
 @swag_from("documentation/check_admin_user.yaml", methods=["POST"])
+@jwt_required()
 def admin():
-    uuid = request.form.get("uuid")
+    uuid = get_jwt_identity()
+    
     if not uuid:
         return jsonify({"message": "Unauthorized", "code": 401}), 401
     else:
