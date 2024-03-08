@@ -1,6 +1,6 @@
 class Package:
     def __init__(self, name, namespace, description, homepage, repository, 
-                    copyright, license, created_at, updated_at, author, maintainers, tags, is_deprecated, versions=[], id=None,
+                    copyright, license, created_at, updated_at, author, maintainers, keywords, is_deprecated, versions=[], id=None,
                         malicious_report={}, is_verified=False, is_malicious=False, security_status="No security issues found", ratings={"users": {}, "avg_ratings": 0}):
         self.id = id
         self.name = name
@@ -14,7 +14,7 @@ class Package:
         self.updated_at = updated_at
         self.author = author
         self.maintainers = maintainers
-        self.tags = tags
+        self.keywords = keywords
         self.is_deprecated = is_deprecated
         self.versions = versions
         self.malicious_report  = malicious_report
@@ -51,7 +51,7 @@ class Package:
             "updated_at": self.updated_at,
             "author": self.author,
             "maintainers": maintainers_json,
-            "tags": self.tags,
+            "keywords": self.keywords,
             "is_deprecated": self.is_deprecated,
             "versions": versions_json,
             "malicious_report": self.malicious_report,
@@ -83,7 +83,7 @@ class Package:
             updated_at=json_data.get("updated_at"),
             author=json_data.get("author"),
             maintainers=json_data.get("maintainers"),
-            tags=json_data.get("tags"),
+            keywords=json_data.get("keywords"),
             is_deprecated=json_data.get("is_deprecated"),
             versions=versions,
             malicious_report=json_data.get("malicious_report"),

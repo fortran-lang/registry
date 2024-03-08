@@ -23,10 +23,6 @@ def process_package(packagename):
     extract_command = f'tar -xzf static/temp/{packagename}.tar.gz -C static/temp/{packagename}/'
     run_command(extract_command)
 
-    # Build the package
-    build_command = f'cd static/temp/{packagename} && fpm build'
-    result = run_command(build_command)
-
     # Read fpm.toml
     toml_path = f'static/temp/{packagename}/fpm.toml'
     try:
@@ -40,12 +36,12 @@ def process_package(packagename):
     cleanup_command = f'rm -rf static/temp/{packagename} static/temp/{packagename}.tar.gz'
     run_command(cleanup_command)
 
-    if '<ERROR>' in result:
-        # Package build failed 
-        return False, None
-    if '[100%] Project compiled successfully.' in result:
-        # Package build success 
-        return True, parsed_toml
+    # if '<ERROR>' in result:
+    #     # Package build failed 
+    #     return False, None
+    # if '[100%] Project compiled successfully.' in result:
+    #     # Package build success 
+    #     return True, parsed_toml
 
 
 def validate():
@@ -59,21 +55,56 @@ def validate():
                 with open(f"static/temp/{packagename}.tar.gz", "wb") as f:
                     f.write(tarball.read())
                 result = process_package(packagename)
+                
                 if result[0] == False:
                     db.packages.update_one({"name": packages['name'],"namespace":package['namespace']}, {"$set": {"versions.$[elem].unabletoVerify": True}}, array_filters=[{"elem.version": i['version']}])
-                    print("Package build failed for " + packagename)
+                    print("Package tests failed for " + packagename)
+                    continue
                 else:
-                    print("Package build success for " + packagename)
+                    print("Package tests success for " + packagename)
                     db.packages.update_one({"name": package['name'],"namespace":package['namespace']}, {"$set": {"versions.$[elem].isVerified": True}}, array_filters=[{"elem.version": i['version']}])
 
                 update_data = {}
 
-                for key in ['repository', 'copyright', 'description']:
+                for key in ['repository', 'copyright', 'description',"homepage"]:
                     if key in result[1] and package[key] == "Package Under Verification":
                         update_data[key] = result[1][key]
 
-                if update_data:
-                    db.packages.update_one({"name": package['name'],"namespace":package['namespace']}, {"$set": update_data})
+                for key in ['categories', 'keywords']:
+                    if key in result[1]:
+                        update_data[key] = package[key] + result[1][key]
+
+                for k,v in package.items():
+                    if v == "Package Under Verification" and k not in update_data.keys():
+                        update_data[k] = f"{k} key not provided."
+
+                db.packages.update_one({"name": package['name'],"namespace":package['namespace']}, {"$set": update_data})
     return 0
 
 validate()
+
+
+# target checking of sections:
+
+# upload time
+# name: The name of the project 
+# version: The version of the project
+# license: The project license
+
+maintainer: Maintainer of the project                        auto supported by registry
+author: Author of the project                                auto supported by registry
+
+repository: The project’s repository                         supported 
+homepage: The project’s homepage                             supported 
+description: Description of the project                      supported 
+copyright: Copyright of the project                          supported 
+keywords: Keywords describing the project                    supported 
+categories: Categories associated with the project           not supported
+
+
+# support categories and keywords
+# support the keywords and update from verification
+# fix 595 line  and packages model tages to keywords.
+# add categories to packages model 
+
+# package is verified iff all versions are verified
