@@ -163,36 +163,3 @@ def validate() -> None:
 
 
 validate()
-
-
-# # target checking of sections:
-# # upload time
-# # name: The name of the project 
-# # version: The version of the project
-# # license: The project license
-
-# maintainer: Maintainer of the project                        auto supported by registry
-# author: Author of the project                                auto supported by registry
-
-# repository: The project’s repository                         supported 
-# homepage: The project’s homepage                             supported 
-# description: Description of the project                      supported 
-# copyright: Copyright of the project                          supported 
-# keywords: Keywords describing the project                    supported 
-# categories: Categories associated with the project           not supported
-
-
-# # support categories and keywords
-# # support the keywords and update from verification
-# # fix 595 line  and packages model tages to keywords.
-# # add categories to packages model 
-# # package is verified if and only if all versions are verified
-
-
-# firstly check verified of a package
-# if not verified then check for each version
-# if not verified then process the package
-# if verified then update the package
-# if not verified then update the package
-
-# bug fix package rating handling.

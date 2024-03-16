@@ -1,6 +1,6 @@
 class Package:
     def __init__(self, name, namespace, description, homepage, repository, 
-                    copyright, license, created_at, updated_at, author, maintainers, keywords, is_deprecated, versions=[], id=None,
+                    copyright, license, created_at, updated_at, author, maintainers, keywords, categories, is_deprecated, versions=[], id=None,
                         malicious_report={}, is_verified=False, is_malicious=False, security_status="No security issues found", ratings={"users": {}, "avg_ratings": 0}):
         self.id = id
         self.name = name
@@ -23,6 +23,7 @@ class Package:
         self.security_status = security_status
         self.downloads_stats = {}
         self.ratings = ratings
+        self.categories = categories
 
         # Ensure that versions list only contains instances of Version class
         for v in self.versions:
@@ -52,6 +53,7 @@ class Package:
             "author": self.author,
             "maintainers": maintainers_json,
             "keywords": self.keywords,
+            "categories": self.categories,
             "is_deprecated": self.is_deprecated,
             "versions": versions_json,
             "malicious_report": self.malicious_report,
@@ -84,6 +86,7 @@ class Package:
             author=json_data.get("author"),
             maintainers=json_data.get("maintainers"),
             keywords=json_data.get("keywords"),
+            categories=json_data.get("categories"),
             is_deprecated=json_data.get("is_deprecated"),
             versions=versions,
             malicious_report=json_data.get("malicious_report"),

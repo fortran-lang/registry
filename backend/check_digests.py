@@ -67,7 +67,6 @@ def check_digests(file_path: str) -> Tuple[int, bool]:
         # Compute the digest of the file content
         computed_digest: int = hash(dilate(file_content))
    
-
         # Print computed digest, expected digest, and file name
         print(computed_digest == expected_digest, file_name)
 
@@ -81,4 +80,3 @@ def check_digests(file_path: str) -> Tuple[int, bool]:
 
     return (error_count, True if error_count == 0 else False)
 
-# print(check_digests(""))

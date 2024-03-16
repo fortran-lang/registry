@@ -94,6 +94,7 @@ def search_packages():
                 "$or": [
                     {"name": {"$regex": query}},
                     {"keywords": {"$in": [query]}},
+                    {"categories": {"$in": [query]}},
                     {"description": {"$regex": query}},
                 ]
             },
@@ -111,6 +112,7 @@ def search_packages():
                 "author": 1,
                 "description": 1,
                 "keywords": 1,
+                "categories": 1,
                 "updated_at": 1,
             },
         )
@@ -143,6 +145,7 @@ def search_packages():
                 "author": package_obj.author,
                 "description": package_obj.description,
                 "keywords": package_obj.keywords,
+                "categories": package_obj.categories,
                 "updated_at": package_obj.updated_at,
             })
 
@@ -312,6 +315,7 @@ def upload():
                 author=user_obj.id,
                 maintainers=[user_obj.id],
                 keywords=["fortran", "fpm"],
+                categories=["fortran", "fpm"],
                 is_deprecated=False,
                 versions=[],
             )
@@ -517,6 +521,7 @@ def get_package(namespace_name, package_name):
         "latest_version_data": package_obj.versions[-1].to_json(),
         "author": package_author_obj.username,
         "keywords": package_obj.keywords if package_obj.keywords else [],
+        "categories": package_obj.categories if package_obj.categories else [],
         "license": package_obj.license,
         "created_at": package_obj.created_at,
         "version_history": version_history,
@@ -618,6 +623,7 @@ def get_package_from_version(namespace_name, package_name, version):
             "namespace": namespace_obj.namespace,
             "author": package_author_obj.username,
             "keywords": package_obj.keywords,
+            "categories": package_obj.categories,
             "license": package_obj.license,
             "created_at": package_obj.created_at,
             "version_data": version_data.to_json(),
