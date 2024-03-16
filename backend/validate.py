@@ -125,15 +125,7 @@ def validate() -> None:
                 if result[2] == "Error parsing toml file":
                     db.packages.update_one({"name": package['name'],"namespace":package['namespace']}, {"$set": update_data})
                     pass
-
-                # if result[0] == False:
-                #     db.packages.update_one({"name": packages['name'],"namespace":package['namespace']}, {"$set": {"versions.$[elem].unabletoVerify": True}}, array_filters=[{"elem.version": i['version']}])
-                #     print("Package tests failed for " + packagename)
-                # else:
-                #     print("Package tests success for " + packagename)
-                #     db.packages.update_one({"name": package['name'],"namespace":package['namespace']}, {"$set": {"versions.$[elem].isVerified": True}}, array_filters=[{"elem.version": i['version']}])
-                     
-
+                
                 for key in ['repository', 'copyright', 'description',"homepage", 'categories', 'keywords']:
                     if key in result[1] and package[key] != result[1][key]:
                         if key in ['categories', 'keywords']:
