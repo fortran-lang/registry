@@ -7,23 +7,58 @@ from bson.objectid import ObjectId
 from gridfs.errors import NoFile
 import toml
 from check_digests import check_digests
+from typing import Union,List, Tuple, Dict, Any
 
 
-def run_command(command):
+def run_command(command: str) -> Union[str, None]:
+    """
+    Execute a shell command and return its output.
+
+    Args:
+        command (str): The command to execute.
+
+    Returns:
+        Union[str, None]: The standard output of the command if successful,
+                          otherwise standard error.
+    """
     result = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     if result.returncode != 0:
         print(f"Error executing command: {command}")
         print(result.stderr)
     return result.stdout if result.stdout else result.stderr
 
-def collect_dependencies(section, parsed_toml):
+def collect_dependencies(section: str, parsed_toml: Dict[str, List[Dict[str, Any]]]) -> List[Tuple[str, str]]:
+    """
+    Collect dependencies from a section in a parsed TOML file.
+
+    Args:
+        section (str): The section in the TOML file to collect dependencies from.
+        parsed_toml (Dict[str, List[Dict[str, Any]]]): The parsed TOML file represented as a dictionary.
+
+    Returns:
+        List[Tuple[str, str]]: A list of dependency tuples containing (namespace, dependency_name).
+
+    """
     dependencies = list()
     for dependency_dict in parsed_toml.get(section, []):
         for dependency_name, dependency_info in dependency_dict.get('dependencies', {}).items():
             dependencies.append((dependency_info['namespace'],dependency_name))
     return dependencies
 
-def process_package(packagename):
+def process_package(packagename: str) -> Tuple[bool, Union[dict, None], str]:
+    """
+    This function creates a directory, extracts package contents, reads and parses 'fpm.toml',
+    checks digests, and cleans up temporary files.
+
+    Args:
+        packagename (str): The name of the package.
+
+    Returns:
+        Tuple[bool, Union[dict, None], str]: A tuple containing:
+            - bool: Whether the package processing was successful.
+            - Union[dict, None]: Parsed 'fpm.toml' content if successful, None otherwise.
+            - str: Message describing the result of the package processing.
+    """
     create_dir_command = f'mkdir -p static/temp/{packagename}'
     run_command(create_dir_command)
     extract_command = f'tar -xzf static/temp/{packagename}.tar.gz -C static/temp/{packagename}/'
@@ -52,8 +87,19 @@ def process_package(packagename):
         return True, parsed_toml, "Package verified successfully."
 
 
-def validate():
-    packages = db.packages.find({"versions": {"$elemMatch": {"isVerified": False}}})
+def validate() -> None:
+    """
+    This function checks the verification status of packages, verifies their contents,
+    updates package information, and ensures dependencies are present in the database.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+    # packages = db.packages.find({"versions": {"$elemMatch": {"isVerified": False}}}) # find packages with unverified versions
+    packages = db.packages.find({"isVerified": False})
     packages = list(packages)
     for  package in packages:
         for i in package['versions']:
