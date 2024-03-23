@@ -1,0 +1,28 @@
+name: Run Tests for Backend
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout page source
+        uses: actions/checkout@v4
+
+      - name: MongoDB in GitHub Actions
+        uses: supercharge/mongodb-github-action@1.10.0
+        with:
+          mongodb-port: 27017    
+      
+      - name: load env file
+        run: |
+          echo "${{ secrets.TEST_ENV_FILE }}" > backend/.env
+
+      - name: Build the Docker image and run tests
+        run: cd backend && python -m unittest discover -s tests
