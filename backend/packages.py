@@ -22,6 +22,7 @@ from models.namespace import Namespace
 from models.user import User
 from models.package import Package
 from models.package import Version
+from bson import json_util
 
 
 parameters = {
@@ -604,7 +605,7 @@ def get_package_from_version(namespace_name, package_name, version):
         return jsonify({"message": "Package not found", "code": 404}), 404
 
     else:
-        package_obj = Package.from_json(json.dumps(package))
+        package_obj = Package.from_json(json_util.dumps(package))
 
         # Get the package author from id.
         package_author = db.users.find_one({"_id": package_obj.author})
