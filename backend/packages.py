@@ -93,7 +93,8 @@ def search_packages():
             {
                 "$or": [
                     {"name": {"$regex": query}},
-                    {"tags": {"$in": [query]}},
+                    {"keywords": {"$in": [query]}},
+                    {"categories": {"$in": [query]}},
                     {"description": {"$regex": query}},
                 ]
             },
@@ -110,7 +111,8 @@ def search_packages():
                 "namespace": 1,
                 "author": 1,
                 "description": 1,
-                "tags": 1,
+                "keywords": 1,
+                "categories": 1,
                 "updated_at": 1,
             },
         )
@@ -142,7 +144,8 @@ def search_packages():
                 "namespace": package_obj.namespace,
                 "author": package_obj.author,
                 "description": package_obj.description,
-                "tags": package_obj.tags,
+                "keywords": package_obj.keywords,
+                "categories": package_obj.categories,
                 "updated_at": package_obj.updated_at,
             })
 
@@ -161,13 +164,11 @@ def search_packages():
 
 @app.route("/packages", methods=["POST"])
 @swag_from("documentation/package_upload.yaml", methods=["POST"])
-@jwt_required()
 def upload():
     upload_token = request.form.get("upload_token")
     package_name = request.form.get("package_name")
     package_version = request.form.get("package_version")
     package_license = request.form.get("package_license")
-    homepage = request.form.get("homepage")
     dry_run = request.form.get("dry_run")
     tarball = request.files["tarball"]
 
@@ -291,6 +292,7 @@ def upload():
         "repository": "Package Under Verification",
         "description": "Package Under Verification",
         "copyright": "Package Under Verification",
+        "homepage": "Package Under Verification",
     }
 
     file_object_id = file_storage.put(
@@ -304,7 +306,7 @@ def upload():
                 name=package_name,
                 namespace=namespace_obj.id,
                 description=package_data["description"],
-                homepage=homepage,
+                homepage=package_data["homepage"],
                 repository=package_data["repository"],
                 copyright=package_data["copyright"],
                 license=package_license,
@@ -312,7 +314,8 @@ def upload():
                 updated_at=datetime.utcnow(),
                 author=user_obj.id,
                 maintainers=[user_obj.id],
-                tags=["fortran", "fpm"],
+                keywords=["fortran", "fpm"],
+                categories=["fortran", "fpm"],
                 is_deprecated=False,
                 versions=[],
             )
@@ -478,7 +481,6 @@ def check_version(current_version, new_version):
 def get_package(namespace_name, package_name):
     # Get namespace from namespace name.
     namespace = db.namespaces.find_one({"namespace": namespace_name})
-    namespace_obj = Namespace.from_json(namespace)
 
     # Check if namespace exists.
     if not namespace:
@@ -487,6 +489,7 @@ def get_package(namespace_name, package_name):
             404,
         )
 
+    namespace_obj = Namespace.from_json(namespace)
     # Get package from a package_name and namespace's id.
     package = db.packages.find_one(
         {"name": package_name, "namespace": namespace_obj.id}
@@ -502,21 +505,31 @@ def get_package(namespace_name, package_name):
     package_author = db.users.find_one({"_id": package_obj.author})
     package_author_obj = User.from_json(package_author)
 
+    try:  # handle the case where the package has no ratings
+        ratings = round(sum(package_obj.ratings['users'].values())/len(package_obj.ratings['users']),3) if len(package_obj.ratings['users']) > 0 else 0,
+        rating_count = package_obj.ratings["counts"] if "counts" in package_obj.ratings else {}
+    except:
+        ratings = 0
+        rating_count = {}
+
+    version_history = [{k: v for k, v in i.items() if k != 'tarball'} for i in package_obj.to_json()["versions"]]
+
     # Only latest version of the package will be sent as a response.
     package_response_data = {
         "name": package_obj.name,
         "namespace": namespace_obj.namespace,
         "latest_version_data": package_obj.versions[-1].to_json(),
         "author": package_author_obj.username,
-        "tags": package_obj.tags,
+        "keywords": package_obj.keywords if package_obj.keywords else [],
+        "categories": package_obj.categories if package_obj.categories else [],
         "license": package_obj.license,
         "created_at": package_obj.created_at,
-        "version_history": package_obj.to_json()["versions"],
+        "version_history": version_history,
         "updated_at": package_obj.updated_at,
         "description": package_obj.description,
-        "ratings": round(sum(package_obj.ratings['users'].values())/len(package_obj.ratings['users']),3) if len(package_obj.ratings['users']) > 0 else 0,
+        "ratings": ratings,
         "downloads": package_obj.downloads_stats,
-        "ratings_count": package_obj.ratings["counts"] if "counts" in package_obj.ratings else {},
+        "ratings_count": rating_count
     }
 
     return jsonify({"data": package_response_data, "code": 200})
@@ -591,9 +604,7 @@ def get_package_from_version(namespace_name, package_name, version):
         return jsonify({"message": "Package not found", "code": 404}), 404
 
     else:
-        return jsonify({"message": f"Package not found {type(json.dumps(package))}", "code": 404,}), 404
         package_obj = Package.from_json(json.dumps(package))
-        return jsonify({"message": f"Package not found {package}", "code": 404,}), 404
 
         # Get the package author from id.
         package_author = db.users.find_one({"_id": package_obj.author})
@@ -611,7 +622,8 @@ def get_package_from_version(namespace_name, package_name, version):
             "name": package_obj.name,
             "namespace": namespace_obj.namespace,
             "author": package_author_obj.username,
-            "tags": package_obj.tags,
+            "keywords": package_obj.keywords,
+            "categories": package_obj.categories,
             "license": package_obj.license,
             "created_at": package_obj.created_at,
             "version_data": version_data.to_json(),
