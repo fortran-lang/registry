@@ -59,24 +59,20 @@ def check_digests(file_path: str) -> Tuple[int, bool]:
         # Extract digest and file name for the current source
         expected_digest: str = source_info['digest']
         file_name: str = source_info['file-name']
-
-        # Read the content of the file
-        with open(file_name, 'r',newline='') as file:
-            file_content: str = file.read()
+        
+        try:
+            # Read the content of the file
+            with open(file_name, 'r',newline='') as file:
+                file_content: str = file.read()
+        except:
+            return (-1, "Error reading file content.")
 
         # Compute the digest of the file content
         computed_digest: int = hash(dilate(file_content))
-   
-        # Print computed digest, expected digest, and file name
-        print(computed_digest == expected_digest, file_name)
 
         # Check if computed digest matches the expected digest
         if computed_digest != expected_digest:
-            # Print error message if digests don't match
-            print(f"Computed digest {computed_digest} does not match expected digest {expected_digest} for file {file_name}")
-            print("ERROR")
             error_count += 1
             
-
     return (error_count, True if error_count == 0 else False)
 

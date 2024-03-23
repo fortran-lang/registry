@@ -79,11 +79,11 @@ def process_package(packagename: str) -> Tuple[bool, Union[dict, None], str]:
     cleanup_command = f'rm -rf static/temp/{packagename} static/temp/{packagename}.tar.gz'
     run_command(cleanup_command)
 
-    if result[0]!= 0:
+    if result[0]==-1:
         # Package verification failed 
-        return False, parsed_toml, "Digests do not match"
-    if '[100%] Project compiled successfully.' in result:
-        # Package verification success 
+        return False, parsed_toml, "Digests do not match or file not found."
+    else:
+        # Package verification success
         return True, parsed_toml, "Package verified successfully."
 
 
@@ -138,11 +138,10 @@ def validate() -> None:
                 for section in ['test', 'example', 'executable']:
                     dependencies += collect_dependencies(section, result[1])
                 
-                # TODO: verify if the dependencies are present in the database
                 update_data['dependencies'] = list(set(dependencies))
 
                 for i in dependencies:
-                    dependency_package = db.packages.find_one({"name": i[1], "namespace": i[0]}) # also verify the version
+                    dependency_package = db.packages.find_one({"name": i[1], "namespace": i[0]}) # TODO: enable version checking
                     if dependency_package is None:
                         print(f"Dependency {i[0]}/{i[1]} not found in the database")
                         update_data['isVerified'] = False                     # if any dependency is not found, the package is not verified      
