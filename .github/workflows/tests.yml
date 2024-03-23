@@ -18,7 +18,13 @@ jobs:
       - name: MongoDB in GitHub Actions
         uses: supercharge/mongodb-github-action@1.10.0
         with:
-          mongodb-port: 27017    
+          mongodb-port: 27017  
+          
+      - name: Setup Python
+        uses: actions/setup-python@v5
+  
+      - name: Install python libraries
+        run: pip3 install --user -r backend/requirements.txt
       
       - name: load env file
         run: |
