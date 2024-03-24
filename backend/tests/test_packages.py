@@ -320,8 +320,8 @@ class TestPackages(BaseTestClass):
         response = self.client.get(
             f"/packages/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}/0.0.1"
         )
-        print(response.json["message"])
-        self.assertEqual(200, response.json["code"])
+
+        self.assertEqual(200, response.json["code"]) # TODO: Check after fixing : get_package_from_version 608
         print("test_get_existing_package_version passed")
 
     def test_package_invalid_license(self):
@@ -545,6 +545,7 @@ class TestPackages(BaseTestClass):
 
         access_token = self.login(is_sudo=True)   # create a sudo user
         response = self.client.get("/report/view",headers={"Authorization": f"Bearer {access_token}"})
+        print(response.json)
         self.assertEqual(200, response.json["code"])
         print("test_successful_fetch_malicious_reports passed")
 
