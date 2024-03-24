@@ -607,6 +607,7 @@ def get_package_from_version(namespace_name, package_name, version):
     else:
         package_obj = Package.from_json(json.loads(json_util.dumps(package)))
 
+        print(package_obj.to_json())
         # Get the package author from id.
         package_author = db.users.find_one({"_id": package_obj.author})
 
