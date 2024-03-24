@@ -97,7 +97,7 @@ class Package:
         )
     
 class Version:
-    def __init__(self, version, tarball, dependencies, created_at, is_deprecated, download_url, is_verified=False):
+    def __init__(self, version, tarball, dependencies, created_at, oid , is_deprecated, download_url, is_verified=False):
         self.version = version
         self.tarball = tarball
         self.dependencies = dependencies
@@ -105,6 +105,7 @@ class Version:
         self.is_deprecated = is_deprecated
         self.download_url = download_url
         self.is_verified = is_verified
+        self.oid = oid
 
     # Create a to_json method.
     def to_json(self):
@@ -116,6 +117,7 @@ class Version:
             "is_deprecated": self.is_deprecated,
             "download_url": self.download_url,
             "is_verified": self.is_verified,
+            "oid": self.oid,
         }
     
     # Create a from_json method.
@@ -129,4 +131,5 @@ class Version:
             is_deprecated=json_data.get("is_deprecated"),
             download_url=json_data.get("download_url"),
             is_verified=json_data.get("is_verified"),
+            oid=json_data.get("oid"),
         )

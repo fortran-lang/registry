@@ -337,6 +337,7 @@ def upload():
             dependencies="Test dependencies",
             created_at=datetime.utcnow(),
             is_deprecated=False,
+            oid= file_object_id,
             download_url=f"/tarballs/{file_object_id}",
         )
 
@@ -383,6 +384,7 @@ def upload():
             dependencies="Test dependencies",
             created_at=datetime.utcnow(),
             is_deprecated=False,
+            oid = file_object_id,
             download_url=f"/tarballs/{file_object_id}",
         )
 
@@ -444,16 +446,12 @@ def serve_gridfs_file(oid):
     try:
         file = file_storage.get(ObjectId(oid))
 
-        package_version_doc = db.packages.update_one(
-            {
-                "versions.oid": oid,
-            },
+        package_version_doc = db.tarballs.files.update_one(
+            {"_id": ObjectId(oid)},
             {
                 "$inc": {
-                    f"downloads_stats.versions.{oid}": 1,
                     "downloads_stats.total_downloads": 1,
-                    f"downloads_stats.dates.{str(datetime.now())[:10]}.{oid}": 1,
-                    f"downloads_stats.dates.{str(datetime.now())[:10]}.total_downloads": 1,
+                    f"downloads_stats.dates.{str(datetime.now())[:10]}": 1,
                 }
             },
         )
@@ -512,6 +510,8 @@ def get_package(namespace_name, package_name):
     except:
         ratings = 0
         rating_count = {}
+
+    # TODO get stats from each oid and then return.
 
     version_history = [{k: v for k, v in i.items() if k != 'tarball'} for i in package_obj.to_json()["versions"]]
 
