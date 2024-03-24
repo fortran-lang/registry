@@ -48,8 +48,11 @@ def check_digests(file_path: str) -> Tuple[int, bool]:
 
     # Initialize error count
     error_count: int = 0
-    with open(f'{file_path}model.json', 'r') as file:
-        model = json.load(file)
+    try:
+        with open(f'{file_path}fpm_model.json', 'r') as file:
+            model = json.load(file)
+    except:
+        return (-1, "Error reading model file.")
 
     src_data: dict = model['packages'][model['package-name']] 
     s = set()
@@ -62,7 +65,7 @@ def check_digests(file_path: str) -> Tuple[int, bool]:
         
         try:
             # Read the content of the file
-            with open(file_name, 'r',newline='') as file:
+            with open(f"{file_path}{file_name}", 'r',newline='') as file:
                 file_content: str = file.read()
         except:
             return (-1, "Error reading file content.")
