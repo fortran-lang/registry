@@ -151,6 +151,7 @@ def validate() -> None:
                         update_data[k] = f"{k} not provided."
 
                 db.packages.update_one({"name": package['name'],"namespace":package['namespace']}, {"$set": update_data})
+                print(f"Package {packagename} verified successfully.")
 
 
 validate()
