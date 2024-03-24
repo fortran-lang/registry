@@ -511,7 +511,30 @@ def get_package(namespace_name, package_name):
         ratings = 0
         rating_count = {}
 
-    # TODO get stats from each oid and then return.
+    # package_obj.downloads_stats Data Model
+    # downloads_stats:
+    #     total_downloads:1
+    #     versions:
+    #         oid1:1 
+    #         oid2:1
+    #     dates:
+    #         date1:
+    #             oid1:1
+    #             oid2:1
+    #             total_downloads:1
+    
+    downloads_stats = dict()
+    downloads_stats['versions'] = dict()
+    downloads_stats['dates'] = dict()
+    downloads_stats['total_downloads'] = 0
+    for i in package_obj.versions:
+        version_oid =  db.tarballs.files.find_one({"_id": ObjectId(i.oid)})
+        downloads_stats['versions'][i.oid] = version_oid['downloads_stats']['total_downloads']
+        downloads_stats['total_downloads'] += version_oid['downloads_stats']['total_downloads']
+        for DATE_VALUE in version_oid['downloads_stats']['dates']:
+            downloads_stats['dates'][DATE_VALUE][i.oid] = version_oid['downloads_stats']['dates'][DATE_VALUE]
+        for i in downloads_stats['dates']:
+            downloads_stats['dates'][i]['total_downloads'] = sum(downloads_stats['dates'][i].values())
 
     version_history = [{k: v for k, v in i.items() if k != 'tarball'} for i in package_obj.to_json()["versions"]]
 
@@ -529,7 +552,7 @@ def get_package(namespace_name, package_name):
         "updated_at": package_obj.updated_at,
         "description": package_obj.description,
         "ratings": ratings,
-        "downloads": package_obj.downloads_stats,
+        "downloads": downloads_stats,
         "ratings_count": rating_count
     }
 
