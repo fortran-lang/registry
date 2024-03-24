@@ -10,3 +10,4 @@ semantic-version
 docker
 toml
 flask-jwt-extended
+numpy

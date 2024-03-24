@@ -337,6 +337,7 @@ def upload():
             dependencies="Test dependencies",
             created_at=datetime.utcnow(),
             is_deprecated=False,
+            oid= file_object_id,
             download_url=f"/tarballs/{file_object_id}",
         )
 
@@ -383,6 +384,7 @@ def upload():
             dependencies="Test dependencies",
             created_at=datetime.utcnow(),
             is_deprecated=False,
+            oid = file_object_id,
             download_url=f"/tarballs/{file_object_id}",
         )
 
@@ -444,16 +446,12 @@ def serve_gridfs_file(oid):
     try:
         file = file_storage.get(ObjectId(oid))
 
-        package_version_doc = db.packages.update_one(
-            {
-                "versions.oid": oid,
-            },
+        package_version_doc = db.tarballs.files.update_one(
+            {"_id": ObjectId(oid)},
             {
                 "$inc": {
-                    f"downloads_stats.versions.{oid}": 1,
                     "downloads_stats.total_downloads": 1,
-                    f"downloads_stats.dates.{str(datetime.now())[:10]}.{oid}": 1,
-                    f"downloads_stats.dates.{str(datetime.now())[:10]}.total_downloads": 1,
+                    f"downloads_stats.dates.{str(datetime.now())[:10]}": 1,
                 }
             },
         )
@@ -513,13 +511,46 @@ def get_package(namespace_name, package_name):
         ratings = 0
         rating_count = {}
 
+    # package_obj.downloads_stats Data Model
+    # downloads_stats:
+    #     total_downloads:1
+    #     versions:
+    #         oid1:1 
+    #         oid2:1
+    #     dates:
+    #         date1:
+    #             oid1:1
+    #             oid2:1
+    #             total_downloads:1
+    
+    downloads_stats = dict()
+    downloads_stats['versions'] = dict()
+    downloads_stats['dates'] = dict()
+    downloads_stats['total_downloads'] = 0
+    try:
+        for i in package_obj.versions:
+            version_oid =  db.tarballs.files.find_one({"_id": ObjectId(i.oid)})
+            downloads_stats['versions'][str(i.oid)] = version_oid['downloads_stats']['total_downloads']
+            downloads_stats['total_downloads'] += version_oid['downloads_stats']['total_downloads']
+            for DATE_VALUE in version_oid['downloads_stats']['dates']:
+                downloads_stats['dates'][DATE_VALUE] = dict()
+                downloads_stats['dates'][DATE_VALUE][str(i.oid)] = version_oid['downloads_stats']['dates'][DATE_VALUE]
+            for i in downloads_stats['dates']:
+                downloads_stats['dates'][i]['total_downloads'] = sum(downloads_stats['dates'][i].values())
+    except:
+        downloads_stats = dict()
+
     version_history = [{k: v for k, v in i.items() if k != 'tarball'} for i in package_obj.to_json()["versions"]]
+    latest_version_data = package_obj.versions[-1].to_json()
+    latest_version_data['oid'] = str(latest_version_data['oid'])
+    for i in version_history:
+        i['oid'] = str(i['oid'])
 
     # Only latest version of the package will be sent as a response.
     package_response_data = {
         "name": package_obj.name,
         "namespace": namespace_obj.namespace,
-        "latest_version_data": package_obj.versions[-1].to_json(),
+        "latest_version_data": latest_version_data,
         "author": package_author_obj.username,
         "keywords": package_obj.keywords if package_obj.keywords else [],
         "categories": package_obj.categories if package_obj.categories else [],
@@ -529,10 +560,9 @@ def get_package(namespace_name, package_name):
         "updated_at": package_obj.updated_at,
         "description": package_obj.description,
         "ratings": ratings,
-        "downloads": package_obj.downloads_stats,
+        "downloads": downloads_stats,
         "ratings_count": rating_count
     }
-
     return jsonify({"data": package_response_data, "code": 200})
 
 
@@ -617,7 +647,8 @@ def get_package_from_version(namespace_name, package_name, version):
         version_data = next(
             filter(lambda obj: obj.version == version, version_history), None
         )
-
+        version_history = version_data.to_json()
+        version_history['oid'] = str(version_history['oid'])
         # Only queried version should be sent as response.
         package_response_data = {
             "name": package_obj.name,
@@ -627,7 +658,7 @@ def get_package_from_version(namespace_name, package_name, version):
             "categories": package_obj.categories,
             "license": package_obj.license,
             "created_at": package_obj.created_at,
-            "version_data": version_data.to_json(),
+            "version_data": version_history,
             "updatedAt": package_obj.updated_at,
             "description": package_obj.description,
         }

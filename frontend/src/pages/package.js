@@ -82,6 +82,8 @@ const PackagePage = () => {
         v{data.latest_version_data.version} Published{" "}
         {updatedDays(data.updated_at)} days ago
       </p>
+      <p>
+      </p>
       <MDBTabs className="mb-3">
         <MDBTabsItem>
           <MDBTabsLink
@@ -252,10 +254,9 @@ const ViewPackageMaintainersButton = ({
 const sideBar = (data, setShowReportForm) => {
   return (
     <MDBCol size="3">
-      <p style={{ fontSize: 16, textAlign: "left" }}>Install</p>
-      <code>
-        fpm install {data.namespace}/{data.name}
-      </code>
+      <p style={{ fontSize: 16, textAlign: "left" }}>Install (add to fpm.toml)</p>
+      <p style={{ fontSize: 14, textAlign: "left" }}><code>{data.name} = {"{"}{"'namespace'"}: {"'"}{data.namespace}{"'}"}</code> </p>
+      <hr></hr>
       <p style={{ fontSize: 16, textAlign: "left" }}>Repository</p>
       <Container> {data.repository}</Container>
       <hr></hr>

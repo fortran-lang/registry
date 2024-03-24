@@ -321,7 +321,7 @@ class TestPackages(BaseTestClass):
             f"/packages/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}/0.0.1"
         )
 
-        self.assertEqual(200, response.json["code"]) # TODO: Check after fixing : get_package_from_version 608
+        self.assertEqual(200, response.json["code"])
         print("test_get_existing_package_version passed")
 
     def test_package_invalid_license(self):
