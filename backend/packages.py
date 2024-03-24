@@ -563,7 +563,7 @@ def get_package(namespace_name, package_name):
         "downloads": downloads_stats,
         "ratings_count": rating_count
     }
-
+    print(package_response_data)
     return jsonify({"data": package_response_data, "code": 200})
 
 
