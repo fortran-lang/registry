@@ -6,7 +6,6 @@ from datetime import datetime
 import random
 import os
 from dotenv import load_dotenv
-from test_signup import test_successful_sudo_signup
 
 load_dotenv()
 
@@ -36,7 +35,7 @@ class TestPackages(BaseTestClass):
             "namespace_description": "Test namespace description",
         }
 
-    def login(self):
+    def login(self,is_sudo=False):
         """
         Helper function to signup and login a user.
 
@@ -52,7 +51,7 @@ class TestPackages(BaseTestClass):
 
         signup_data = {
             "email": self.email,
-            "password": self.password,
+            "password": self.password if not is_sudo else os.getenv("SUDO_PASSWORD"),
             "username": self.username,
         }
         if self.is_created:
@@ -544,8 +543,7 @@ class TestPackages(BaseTestClass):
         AssertionError: If the response code received from the server is not as expected.
         """
 
-        test_successful_sudo_signup = test_successful_sudo_signup() # create a sudo user
-        access_token = test_successful_sudo_signup["access_token"]
+        access_token = self.login(is_sudo=True)   # create a sudo user
         response = self.client.get("/report/view",headers={"Authorization": f"Bearer {access_token}"})
         self.assertEqual(200, response.json["code"])
         print("test_successful_fetch_malicious_reports passed")
