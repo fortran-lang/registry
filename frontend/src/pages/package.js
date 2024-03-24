@@ -255,7 +255,7 @@ const sideBar = (data, setShowReportForm) => {
   return (
     <MDBCol size="3">
       <p style={{ fontSize: 16, textAlign: "left" }}>Install (add to fpm.toml)</p>
-      <p> {data.name} = {"{"}{"'namespace'"}: {"'"}{data.namespace}{"'}"}</p>
+      <p style={{ fontSize: 16, textAlign: "left" }}> {data.name} = {"{"}{"'namespace'"}: {"'"}{data.namespace}{"'}"}</p>
       <hr></hr>
       <p style={{ fontSize: 16, textAlign: "left" }}>Repository</p>
       <Container> {data.repository}</Container>
