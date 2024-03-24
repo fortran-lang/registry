@@ -83,9 +83,9 @@ const PackagePage = () => {
         {updatedDays(data.updated_at)} days ago
       </p>
       <p>
-      <p style={{ fontSize: 16, textAlign: "left" }}>Install</p>
-      <p>
-        {data.name} = {"{"}{"namespace"}: {data.namespace}{"}"}
+      <p style={{ fontSize: 16, textAlign: "left" }}>Installation</p>
+      <p style={{ fontSize: 16, textAlign: "left" }}>
+          {data.name} = {"{"}{"namespace"}: {data.namespace}{"}"}
       </p>
 
       </p>
