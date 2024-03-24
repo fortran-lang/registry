@@ -22,6 +22,7 @@ from models.namespace import Namespace
 from models.user import User
 from models.package import Package
 from models.package import Version
+from bson import json_util
 
 
 parameters = {
@@ -604,7 +605,7 @@ def get_package_from_version(namespace_name, package_name, version):
         return jsonify({"message": "Package not found", "code": 404}), 404
 
     else:
-        package_obj = Package.from_json(json.dumps(package))
+        package_obj = Package.from_json(package)
 
         # Get the package author from id.
         package_author = db.users.find_one({"_id": package_obj.author})
@@ -891,19 +892,17 @@ def post_ratings(namespace, package):
         )
 
     user = db.users.find_one({"uuid": uuid})
+    if not user:
+        return jsonify({"code": 404, "message": "User not found"}), 404
+    
     namespace_doc = db.namespaces.find_one({"namespace": namespace})
+    if not namespace_doc:
+        return jsonify({"code": 404, "message": "Namespace not found"}), 404
     package_doc = db.packages.find_one(
         {"name": package, "namespace": namespace_doc["_id"]}
     )
-
-    if not user or not namespace_doc or not package_doc:
-        error_message = {
-            "user": "User not found" if not user else None,
-            "namespace": "Namespace not found" if not namespace_doc else None,
-            "package": "Package not found" if not package_doc else None,
-            "code": 404
-        }
-        return jsonify({"message": error_message}), 404
+    if not package_doc:
+        return jsonify({"code": 404, "message": "Package not found"}), 404
 
     db.packages.update_one(
         {"name": package, "namespace": namespace_doc["_id"]},
@@ -970,19 +969,18 @@ def post_malicious(namespace, package):
         )
 
     user = db.users.find_one({"uuid": uuid})
+
+    if not user:
+        return jsonify({"code": 404, "message": "User not found"}), 404
+    
     namespace_doc = db.namespaces.find_one({"namespace": namespace})
+    if not namespace_doc:
+        return jsonify({"code": 404, "message": "Namespace not found"}), 404
     package_doc = db.packages.find_one(
         {"name": package, "namespace": namespace_doc["_id"]}
     )
-
-    if not user or not namespace_doc or not package_doc:
-        error_message = {
-            "user": "User not found" if not user else None,
-            "namespace": "Namespace not found" if not namespace_doc else None,
-            "package": "Package not found" if not package_doc else None,
-            "code": 404
-        }
-        return jsonify({"message": error_message}), 404
+    if not package_doc:
+        return jsonify({"code": 404, "message": "Package not found"}), 404
 
     package_version_doc = db.packages.update_one(
         {"name": package, "namespace": namespace_doc["_id"]},

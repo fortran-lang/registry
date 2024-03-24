@@ -35,7 +35,7 @@ class TestPackages(BaseTestClass):
             "namespace_description": "Test namespace description",
         }
 
-    def login(self):
+    def login(self,is_sudo=False):
         """
         Helper function to signup and login a user.
 
@@ -51,7 +51,7 @@ class TestPackages(BaseTestClass):
 
         signup_data = {
             "email": self.email,
-            "password": self.password,
+            "password": self.password if not is_sudo else os.getenv("SUDO_PASSWORD"),
             "username": self.username,
         }
         if self.is_created:
@@ -60,7 +60,7 @@ class TestPackages(BaseTestClass):
         response_for_signup = self.client.post("/auth/signup", data=signup_data)
         self.assertEqual(200, response_for_signup.json["code"])
         self.is_created = True
-        login_data = {"user_identifier": self.email, "password": self.password}
+        login_data = {"user_identifier": self.email, "password": self.password if not is_sudo else os.getenv("SUDO_PASSWORD")}
 
         # Login with the same user.
         response_for_login = self.client.post("/auth/login", data=login_data)
@@ -320,8 +320,8 @@ class TestPackages(BaseTestClass):
         response = self.client.get(
             f"/packages/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}/0.0.1"
         )
-        print(response.json["message"])
-        self.assertEqual(200, response.json["code"])
+
+        self.assertEqual(200, response.json["code"]) # TODO: Check after fixing : get_package_from_version 608
         print("test_get_existing_package_version passed")
 
     def test_package_invalid_license(self):
@@ -409,6 +409,7 @@ class TestPackages(BaseTestClass):
         AssertionError: If the response code received from the server is not as expected.
         """
         access_token = self.login()
+        upload_response = self.upload()
         response = self.client.post(
             f"/ratings/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}",
             content_type="multipart/form-data",
@@ -475,12 +476,12 @@ class TestPackages(BaseTestClass):
         AssertionError: If the response code received from the server is not as expected.
         """
         access_token = self.login()
+        upload_response = self.upload()
         response = self.client.post(
             f"/report/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}",
             content_type="multipart/form-data",
             data={"reason":"the package is found to be malicious"},  headers={"Authorization": f"Bearer {access_token}"},
         )
-        print("test_successful_post_malicious response", response.json)
         self.assertEqual(200, response.json["code"])
         print("test_successful_post_malicious passed")
 
@@ -542,7 +543,7 @@ class TestPackages(BaseTestClass):
         AssertionError: If the response code received from the server is not as expected.
         """
 
-        access_token = self.login() # create a sudo user
+        access_token = self.login(is_sudo=True)   # create a sudo user
         response = self.client.get("/report/view",headers={"Authorization": f"Bearer {access_token}"})
         self.assertEqual(200, response.json["code"])
         print("test_successful_fetch_malicious_reports passed")
