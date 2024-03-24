@@ -64,6 +64,9 @@ def process_package(packagename: str) -> Tuple[bool, Union[dict, None], str]:
     extract_command = f'tar -xzf static/temp/{packagename}.tar.gz -C static/temp/{packagename}/'
     run_command(extract_command)
 
+    generate_model = "fpm build --dump=fpm_model.json" # TODO: interim bug fix, disable after fpm v0.10.2
+    run_command(generate_model)
+    
     # Read fpm.toml
     toml_path = f'static/temp/{packagename}/fpm.toml'
     try:
