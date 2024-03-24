@@ -527,15 +527,18 @@ def get_package(namespace_name, package_name):
     downloads_stats['versions'] = dict()
     downloads_stats['dates'] = dict()
     downloads_stats['total_downloads'] = 0
-    for i in package_obj.versions:
-        version_oid =  db.tarballs.files.find_one({"_id": ObjectId(i.oid)})
-        downloads_stats['versions'][str(i.oid)] = version_oid['downloads_stats']['total_downloads']
-        downloads_stats['total_downloads'] += version_oid['downloads_stats']['total_downloads']
-        for DATE_VALUE in version_oid['downloads_stats']['dates']:
-            downloads_stats['dates'][DATE_VALUE] = dict()
-            downloads_stats['dates'][DATE_VALUE][str(i.oid)] = version_oid['downloads_stats']['dates'][DATE_VALUE]
-        for i in downloads_stats['dates']:
-            downloads_stats['dates'][i]['total_downloads'] = sum(downloads_stats['dates'][i].values())
+    try:
+        for i in package_obj.versions:
+            version_oid =  db.tarballs.files.find_one({"_id": ObjectId(i.oid)})
+            downloads_stats['versions'][str(i.oid)] = version_oid['downloads_stats']['total_downloads']
+            downloads_stats['total_downloads'] += version_oid['downloads_stats']['total_downloads']
+            for DATE_VALUE in version_oid['downloads_stats']['dates']:
+                downloads_stats['dates'][DATE_VALUE] = dict()
+                downloads_stats['dates'][DATE_VALUE][str(i.oid)] = version_oid['downloads_stats']['dates'][DATE_VALUE]
+            for i in downloads_stats['dates']:
+                downloads_stats['dates'][i]['total_downloads'] = sum(downloads_stats['dates'][i].values())
+    except:
+        downloads_stats = dict()
 
     version_history = [{k: v for k, v in i.items() if k != 'tarball'} for i in package_obj.to_json()["versions"]]
     latest_version_data = package_obj.versions[-1].to_json()
