@@ -252,10 +252,6 @@ const ViewPackageMaintainersButton = ({
 const sideBar = (data, setShowReportForm) => {
   return (
     <MDBCol size="3">
-      <p style={{ fontSize: 16, textAlign: "left" }}>Install</p>
-      <code>
-        fpm install {data.namespace}/{data.name}
-      </code>
       <p style={{ fontSize: 16, textAlign: "left" }}>Repository</p>
       <Container> {data.repository}</Container>
       <hr></hr>
