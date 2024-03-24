@@ -77,7 +77,8 @@ def process_package(packagename: str) -> Tuple[bool, Union[dict, None], str]:
 
     # Clean up
     cleanup_command = f'rm -rf static/temp/{packagename} static/temp/{packagename}.tar.gz'
-    run_command(cleanup_command)
+    # run_command(cleanup_command)
+    print(result)
 
     if result[0]==-1:
         # Package verification failed 
@@ -99,11 +100,11 @@ def validate() -> None:
         None
     """
     # packages = db.packages.find({"versions": {"$elemMatch": {"isVerified": False}}}) # find packages with unverified versions
-    packages = db.packages.find({"isVerified": False})
+    packages = db.packages.find({"is_verified": False})
     packages = list(packages)
     for  package in packages:
         for i in package['versions']:
-            if 'isVerified' in i.keys() and i['isVerified'] == False:
+            if 'is_verified' in i.keys() and i['is_verified'] == False:
                 try:
                     tarball = file_storage.get(ObjectId(i['oid']))
                 except NoFile:
@@ -118,6 +119,7 @@ def validate() -> None:
                     update_data['isVerified'] = False
                     update_data['unabletoVerify'] = True
                     print("Package tests failed for " + packagename)
+                    print(result)
                 else:
                     print("Package tests success for " + packagename)
                     update_data['isVerified'] = True
