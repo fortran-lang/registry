@@ -648,9 +648,7 @@ def get_package_from_version(namespace_name, package_name, version):
             filter(lambda obj: obj.version == version, version_history), None
         )
         version_history = version_data.to_json()
-        print(version_history)
-        # for i in version_history:
-        #     i['oid'] = str(i['oid'])
+        version_history['oid'] = str(version_history['oid'])
         # Only queried version should be sent as response.
         package_response_data = {
             "name": package_obj.name,
