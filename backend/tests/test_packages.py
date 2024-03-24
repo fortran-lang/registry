@@ -409,6 +409,7 @@ class TestPackages(BaseTestClass):
         AssertionError: If the response code received from the server is not as expected.
         """
         access_token = self.login()
+        upload_response = self.upload()
         response = self.client.post(
             f"/ratings/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}",
             content_type="multipart/form-data",
@@ -475,6 +476,7 @@ class TestPackages(BaseTestClass):
         AssertionError: If the response code received from the server is not as expected.
         """
         access_token = self.login()
+        upload_response = self.upload()
         response = self.client.post(
             f"/report/{self.test_namespace_data['namespace']}/{self.test_package_data['package_name']}",
             content_type="multipart/form-data",
