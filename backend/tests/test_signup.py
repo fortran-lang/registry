@@ -133,3 +133,4 @@ class TestSignUp(BaseTestClass):
 
         response = self.client.post('/auth/signup', data=data)
         self.assertEqual(200, response.status_code)
+        return response.json

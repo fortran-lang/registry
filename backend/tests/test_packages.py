@@ -6,6 +6,7 @@ from datetime import datetime
 import random
 import os
 from dotenv import load_dotenv
+from test_signup import test_successful_sudo_signup
 
 load_dotenv()
 
@@ -482,7 +483,6 @@ class TestPackages(BaseTestClass):
             content_type="multipart/form-data",
             data={"reason":"the package is found to be malicious"},  headers={"Authorization": f"Bearer {access_token}"},
         )
-        print("test_successful_post_malicious response", response.json)
         self.assertEqual(200, response.json["code"])
         print("test_successful_post_malicious passed")
 
@@ -544,7 +544,8 @@ class TestPackages(BaseTestClass):
         AssertionError: If the response code received from the server is not as expected.
         """
 
-        access_token = self.login() # create a sudo user
+        test_successful_sudo_signup = test_successful_sudo_signup() # create a sudo user
+        access_token = test_successful_sudo_signup["access_token"]
         response = self.client.get("/report/view",headers={"Authorization": f"Bearer {access_token}"})
         self.assertEqual(200, response.json["code"])
         print("test_successful_fetch_malicious_reports passed")
