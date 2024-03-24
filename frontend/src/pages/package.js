@@ -82,6 +82,12 @@ const PackagePage = () => {
         v{data.latest_version_data.version} Published{" "}
         {updatedDays(data.updated_at)} days ago
       </p>
+      <p>
+      <p style={{ fontSize: 16, textAlign: "left" }}>Install</p>
+      <code>
+      {data.name} = {"namespace"={data.namespace}}
+      </code>
+      </p>
       <MDBTabs className="mb-3">
         <MDBTabsItem>
           <MDBTabsLink
