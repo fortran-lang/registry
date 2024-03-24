@@ -529,20 +529,25 @@ def get_package(namespace_name, package_name):
     downloads_stats['total_downloads'] = 0
     for i in package_obj.versions:
         version_oid =  db.tarballs.files.find_one({"_id": ObjectId(i.oid)})
-        downloads_stats['versions'][i.oid] = version_oid['downloads_stats']['total_downloads']
+        downloads_stats['versions'][str(i.oid)] = version_oid['downloads_stats']['total_downloads']
         downloads_stats['total_downloads'] += version_oid['downloads_stats']['total_downloads']
         for DATE_VALUE in version_oid['downloads_stats']['dates']:
-            downloads_stats['dates'][DATE_VALUE][i.oid] = version_oid['downloads_stats']['dates'][DATE_VALUE]
+            downloads_stats['dates'][DATE_VALUE] = dict()
+            downloads_stats['dates'][DATE_VALUE][str(i.oid)] = version_oid['downloads_stats']['dates'][DATE_VALUE]
         for i in downloads_stats['dates']:
             downloads_stats['dates'][i]['total_downloads'] = sum(downloads_stats['dates'][i].values())
 
     version_history = [{k: v for k, v in i.items() if k != 'tarball'} for i in package_obj.to_json()["versions"]]
+    latest_version_data = package_obj.versions[-1].to_json()
+    latest_version_data['oid'] = str(latest_version_data['oid'])
+    for i in version_history:
+        i['oid'] = str(i['oid'])
 
     # Only latest version of the package will be sent as a response.
     package_response_data = {
         "name": package_obj.name,
         "namespace": namespace_obj.namespace,
-        "latest_version_data": package_obj.versions[-1].to_json(),
+        "latest_version_data": latest_version_data,
         "author": package_author_obj.username,
         "keywords": package_obj.keywords if package_obj.keywords else [],
         "categories": package_obj.categories if package_obj.categories else [],
