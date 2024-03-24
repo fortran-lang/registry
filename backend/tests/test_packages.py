@@ -60,7 +60,7 @@ class TestPackages(BaseTestClass):
         response_for_signup = self.client.post("/auth/signup", data=signup_data)
         self.assertEqual(200, response_for_signup.json["code"])
         self.is_created = True
-        login_data = {"user_identifier": self.email, "password": self.password}
+        login_data = {"user_identifier": self.email, "password": self.password if not is_sudo else os.getenv("SUDO_PASSWORD")}
 
         # Login with the same user.
         response_for_login = self.client.post("/auth/login", data=login_data)
@@ -545,7 +545,6 @@ class TestPackages(BaseTestClass):
 
         access_token = self.login(is_sudo=True)   # create a sudo user
         response = self.client.get("/report/view",headers={"Authorization": f"Bearer {access_token}"})
-        print(response.json)
         self.assertEqual(200, response.json["code"])
         print("test_successful_fetch_malicious_reports passed")
 
