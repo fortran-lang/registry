@@ -84,9 +84,10 @@ const PackagePage = () => {
       </p>
       <p>
       <p style={{ fontSize: 16, textAlign: "left" }}>Install</p>
-      <code>
-      {data.name} = {"namespace"={data.namespace}}
-      </code>
+      <p>
+        {data.name} = {"{"}{"namespace"}: {data.namespace}{"}"}
+      </p>
+
       </p>
       <MDBTabs className="mb-3">
         <MDBTabsItem>
