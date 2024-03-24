@@ -563,7 +563,6 @@ def get_package(namespace_name, package_name):
         "downloads": downloads_stats,
         "ratings_count": rating_count
     }
-    print(package_response_data)
     return jsonify({"data": package_response_data, "code": 200})
 
 
@@ -648,7 +647,9 @@ def get_package_from_version(namespace_name, package_name, version):
         version_data = next(
             filter(lambda obj: obj.version == version, version_history), None
         )
-
+        version_history = version_data.to_json()
+        for i in version_history:
+            i['oid'] = str(i['oid'])
         # Only queried version should be sent as response.
         package_response_data = {
             "name": package_obj.name,
@@ -658,7 +659,7 @@ def get_package_from_version(namespace_name, package_name, version):
             "categories": package_obj.categories,
             "license": package_obj.license,
             "created_at": package_obj.created_at,
-            "version_data": version_data.to_json(),
+            "version_data": version_history,
             "updatedAt": package_obj.updated_at,
             "description": package_obj.description,
         }
