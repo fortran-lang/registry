@@ -85,7 +85,7 @@ const PackagePage = () => {
       <p>
       <p style={{ fontSize: 16, textAlign: "left" }}>Installation</p>
       <p style={{ fontSize: 16, textAlign: "left" }}>
-          {data.name} = {"{"}{"namespace"}: {data.namespace}{"}"}
+          {data.name} = {"{"}{"'namespace'"}: {"'"}{data.namespace}{"'}"}
       </p>
 
       </p>
