@@ -64,7 +64,7 @@ def process_package(packagename: str) -> Tuple[bool, Union[dict, None], str]:
     extract_command = f'tar -xzf static/temp/{packagename}.tar.gz -C static/temp/{packagename}/'
     run_command(extract_command)
 
-    generate_model = "fpm build --dump=fpm_model.json" # TODO: interim bug fix, disable after fpm v0.10.2
+    generate_model = f"cd static/temp/{packagename} && fpm build --dump=fpm_model.json" # TODO: interim bug fix, disable after fpm v0.10.2
     run_command(generate_model)
     
     # Read fpm.toml
@@ -139,7 +139,10 @@ def validate() -> None:
                             update_data[key] = result[1][key]
 
                 dependencies = list()
-                dependencies += [(dependency_info['namespace'],dependency_name) for dependency_name, dependency_info in result[1].get('dependencies', {}).items()]
+                try:
+                    dependencies += [(dependency_info['namespace'],dependency_name) for dependency_name, dependency_info in result[1].get('dependencies', {}).items()]
+                except:
+                    pass
                 for section in ['test', 'example', 'executable']:
                     dependencies += collect_dependencies(section, result[1])
                 
