@@ -232,7 +232,7 @@ const ViewPackageMaintainersButton = ({
 
   return (
     <React.Fragment>
-      {isVerified && (
+      {
         <p
           className="border border-success"
           style={{
@@ -246,7 +246,7 @@ const ViewPackageMaintainersButton = ({
         >
           View Package Maintainers
         </p>
-      )}
+      }
     </React.Fragment>
   );
 };
