@@ -7,6 +7,18 @@ on:
     branches: ["main"]
   workflow_dispatch:
 
+env:
+    MONGO_DB_NAME: testregistry
+    MONGO_URI: mongodb://localhost:27017/
+    MONGO_USER_NAME: Admin
+    MONGO_PASSWORD: Admin
+    SALT: MYSALT
+    HOST: localhost
+    RESET_EMAIL: reset@localhost.com
+    RESET_PASSWORD: reset
+    SUDO_PASSWORD: fortran
+    IS_CI: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -25,10 +37,6 @@ jobs:
   
       - name: Install python libraries
         run: pip3 install --user -r backend/requirements.txt
-      
-      - name: load env file
-        run: |
-          echo "${{ secrets.TEST_ENV_FILE }}" > backend/.env
 
-      - name: Build the Docker image and run tests
+      - name: run tests
         run: cd backend && python -m unittest discover -s tests

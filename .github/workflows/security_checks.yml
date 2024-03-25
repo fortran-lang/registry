@@ -18,13 +18,17 @@ jobs:
       
       - uses: fortran-lang/setup-fpm@v5
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          fpm-version: 'v0.10.1'
+          github-token: ${{ secrets.GITHUB_TOKEN }}     
 
       - name: Setup Python
         uses: actions/setup-python@v5
 
       - name: Install python libraries
         run: pip3 install --user -r backend/requirements.txt
+
+      - name: temporary folder for fortran packages
+        run: cd backend/static && mkdir temp
 
       - name: load env file
         run: |

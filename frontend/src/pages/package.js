@@ -232,7 +232,7 @@ const ViewPackageMaintainersButton = ({
 
   return (
     <React.Fragment>
-      {isVerified && (
+      {
         <p
           className="border border-success"
           style={{
@@ -246,7 +246,7 @@ const ViewPackageMaintainersButton = ({
         >
           View Package Maintainers
         </p>
-      )}
+      }
     </React.Fragment>
   );
 };
@@ -255,7 +255,7 @@ const sideBar = (data, setShowReportForm) => {
   return (
     <MDBCol size="3">
       <p style={{ fontSize: 16, textAlign: "left" }}>Install (add to fpm.toml)</p>
-      <p style={{ fontSize: 14, textAlign: "left" }}><code>{data.name} = {"{"}{"'namespace'"}: {"'"}{data.namespace}{"'}"}</code> </p>
+      <p style={{ fontSize: 14, textAlign: "left" }}><code>{data.name} = {"{"}{"'namespace'"}={"'"}{data.namespace}{"'}"}</code> </p>
       <hr></hr>
       <p style={{ fontSize: 16, textAlign: "left" }}>Repository</p>
       <Container> {data.repository}</Container>
