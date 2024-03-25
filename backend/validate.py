@@ -144,7 +144,10 @@ def validate() -> None:
                 except:
                     pass
                 for section in ['test', 'example', 'executable']:
-                    dependencies += collect_dependencies(section, result[1])
+                    try:
+                        dependencies += collect_dependencies(section, result[1])
+                    except:
+                        pass
                 
                 update_data['dependencies'] = list(set(dependencies))
 
