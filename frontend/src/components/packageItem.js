@@ -63,7 +63,7 @@ const PackageItem = ({ packageEntity }) => {
         </Col>
         <Col md={1} style={{ flex: 1, textAlign: "right" }}>
           <label style={{ fontSize: "16px" }}>
-            Last released {formatDate(packageEntity.updatedAt)}
+            Last released {formatDate(packageEntity.updated_at)}
           </label>
         </Col>
       </Row>
