@@ -38,5 +38,5 @@ jobs:
       - name: Install python libraries
         run: pip3 install --user -r backend/requirements.txt
 
-      - name: Build the Docker image and run tests
+      - name: run tests
         run: cd backend && python -m unittest discover -s tests
